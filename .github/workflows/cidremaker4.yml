@@ -1,0 +1,27 @@
+name: CidreMaker 4 Rust check
+
+on:
+  push:
+    paths:
+      - "CidreMaker4/**"
+      - ".github/workflows/cidremaker4.yml"
+  pull_request:
+    paths:
+      - "CidreMaker4/**"
+      - ".github/workflows/cidremaker4.yml"
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check
+        working-directory: CidreMaker4
+        run: cargo check
+      - name: Build release
+        working-directory: CidreMaker4
+        run: cargo build --release
