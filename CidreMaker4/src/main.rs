@@ -375,7 +375,7 @@ impl CidreMakerApp {
 
     fn save_data(&mut self) {
         let rows = self.batches.iter().map(|batch| {
-            let clean = |value: &str| value.replace('|', "/").replace(['\\r', '\\n'], " ");
+            let clean = |value: &str| value.replace('|', "/").replace('\r', " ").replace('\n', " ");
             format!(
                 "{}|{}|{}|{}|{}|{}|{}",
                 clean(&batch.code),
@@ -386,7 +386,7 @@ impl CidreMakerApp {
                 clean(&batch.status),
                 batch.progress
             )
-        }).collect::<Vec<_>>().join("\\n");
+        }).collect::<Vec<_>>().join("\n");
         let path = self.data_dir.join("batches.csv");
         match std::fs::write(&path, rows) {
             Ok(()) => self.save_status = format!("Сохранено: {}", path.display()),
