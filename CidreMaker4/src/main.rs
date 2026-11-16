@@ -32,40 +32,37 @@ fn main() -> eframe::Result<()> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Page {
-    Dashboard,
-    Batches,
-    Fermentation,
-    Operations,
-    Calculators,
-    Library,
     Analytics,
-    Settings,
+    Batches,
+    Calendar,
+    CalculatorAbv,
+    CalculatorTirage,
+    CalculatorExpedition,
+    CalculatorPetNat,
 }
 
 impl Page {
     fn title(self) -> &'static str {
         match self {
-            Self::Dashboard => "Обзор производства",
-            Self::Batches => "Производственные партии",
-            Self::Fermentation => "Брожение",
-            Self::Operations => "Технологические операции",
-            Self::Calculators => "Калькуляторы",
-            Self::Library => "Справочники",
-            Self::Analytics => "Аналитика",
-            Self::Settings => "Настройки и данные",
+            Self::Analytics => "Производство",
+            Self::Batches => "Партии",
+            Self::Calendar => "Календарь производства",
+            Self::CalculatorAbv => "Крепость и коррекция рефрактометра",
+            Self::CalculatorTirage => "Тиражный ликёр",
+            Self::CalculatorExpedition => "Экспедиционный ликёр",
+            Self::CalculatorPetNat => "Pet-Nat",
         }
     }
 
     fn subtitle(self) -> &'static str {
         match self {
-            Self::Dashboard => "Состояние производства и ближайшие задачи",
-            Self::Batches => "История и управление всеми партиями",
-            Self::Fermentation => "Измерения, динамика плотности и температура",
-            Self::Operations => "Полная история технологических действий",
-            Self::Calculators => "Расчёты с исходными данными и пояснениями",
-            Self::Library => "Материалы, оборудование и технологические справочники",
-            Self::Analytics => "Сравнение партий и производственные показатели",
-            Self::Settings => "Portable-хранилище, резервные копии и перенос данных",
+            Self::Analytics => "Сводка по активным партиям",
+            Self::Batches => "Журнал и управление производственными партиями",
+            Self::Calendar => "Календарь производственных этапов и задач",
+            Self::CalculatorAbv => "Расчёт крепости и коррекция показаний рефрактометра",
+            Self::CalculatorTirage => "Расчёт тиражного ликёра и дозировки на розлив",
+            Self::CalculatorExpedition => "Расчёт экспедиционного ликёра",
+            Self::CalculatorPetNat => "Расчёт остаточного сахара и давления для Pet-Nat",
         }
     }
 }
@@ -90,6 +87,7 @@ struct CidreMakerApp {
     new_batch_volume: String,
     search: String,
     data_dir: PathBuf,
+    save_status: String,
 }
 
 impl CidreMakerApp {
@@ -98,7 +96,7 @@ impl CidreMakerApp {
         let data_dir = portable_data_dir();
 
         Self {
-            page: Page::Dashboard,
+            page: Page::Analytics,
             batches: vec![
                 Batch {
                     code: "CM-26-001".into(),
@@ -143,70 +141,91 @@ impl CidreMakerApp {
             new_batch_volume: "20".into(),
             search: String::new(),
             data_dir,
+            save_status: "Демонстрационные данные".into(),
         }
     }
 
     fn sidebar(&mut self, ctx: &egui::Context) {
         egui::SidePanel::left("navigation")
             .exact_width(238.0)
-            .frame(egui::Frame::new().fill(PANEL).inner_margin(egui::Margin::same(14)))
+            .frame(egui::Frame::new().fill(PANEL).inner_margin(egui::Margin::same(18)))
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new("CM").size(22.0).strong().color(ACCENT));
-                    ui.vertical(|ui| {
-                        ui.label(egui::RichText::new("CidreMaker").size(17.0).strong().color(TEXT));
-                        ui.label(egui::RichText::new("STUDIO  ·  4.0").size(9.0).color(MUTED));
-                    });
-                });
-                ui.add_space(28.0);
-                ui.label(egui::RichText::new("РАБОЧЕЕ ПРОСТРАНСТВО").size(9.0).strong().color(MUTED));
+                ui.add_space(4.0);
+                ui.label(egui::RichText::new("Cidre").size(31.0).strong().color(TEXT));
+                ui.label(egui::RichText::new("♥ Maker").size(27.0).strong().color(TEXT));
+                ui.add_space(22.0);
+                ui.separator();
+                ui.add_space(8.0);
+                ui.label(egui::RichText::new("КАЛЬКУЛЯТОРЫ").size(10.0).strong().color(MUTED));
                 ui.add_space(8.0);
 
-                self.nav_button(ui, Page::Dashboard, "⌂", "Обзор");
-                self.nav_button(ui, Page::Batches, "▦", "Партии");
-                self.nav_button(ui, Page::Fermentation, "◉", "Брожение");
-                self.nav_button(ui, Page::Operations, "⇄", "Операции");
-
-                ui.add_space(20.0);
-                ui.label(egui::RichText::new("ИНСТРУМЕНТЫ").size(9.0).strong().color(MUTED));
-                ui.add_space(8.0);
-                self.nav_button(ui, Page::Calculators, "∑", "Калькуляторы");
-                self.nav_button(ui, Page::Library, "▤", "Справочники");
-                self.nav_button(ui, Page::Analytics, "⌁", "Аналитика");
-
-                ui.add_space(20.0);
-                ui.label(egui::RichText::new("СИСТЕМА").size(9.0).strong().color(MUTED));
-                ui.add_space(8.0);
-                self.nav_button(ui, Page::Settings, "⚙", "Настройки и данные");
+                self.calculator_button(ui, Page::CalculatorAbv, "Крепость и коррекция\nрефрактометра");
+                self.calculator_button(ui, Page::CalculatorTirage, "Тиражный ликёр");
+                self.calculator_button(ui, Page::CalculatorExpedition, "Экспедиционный ликёр");
+                self.calculator_button(ui, Page::CalculatorPetNat, "Pet-Nat");
 
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Min), |ui| {
-                    ui.add_space(10.0);
+                    ui.add_space(8.0);
                     ui.label(egui::RichText::new("PORTABLE MODE").size(9.0).strong().color(GREEN));
                     ui.label(egui::RichText::new("Данные рядом с приложением").size(10.0).color(MUTED));
                     ui.separator();
-                    ui.label(egui::RichText::new("CidreMaker 4 · Prototype").size(10.0).color(MUTED));
+                    ui.label(egui::RichText::new("CidreMaker 4").size(10.0).color(MUTED));
                 });
             });
     }
 
-    fn nav_button(&mut self, ui: &mut egui::Ui, page: Page, icon: &str, label: &str) {
+    fn calculator_button(&mut self, ui: &mut egui::Ui, page: Page, label: &str) {
         let active = self.page == page;
-        let fill = if active { CARD_ALT } else { PANEL };
-        let color = if active { ACCENT } else { MUTED };
+        let response = ui.add_sized(
+            [ui.available_width(), 46.0],
+            egui::Button::new(
+                egui::RichText::new(label)
+                    .size(13.0)
+                    .color(if active { TEXT } else { MUTED })
+                    .strong(),
+            )
+            .fill(if active { CARD_ALT } else { PANEL })
+            .corner_radius(egui::CornerRadius::same(7)),
+        );
+        if response.clicked() {
+            self.page = page;
+        }
+    }
+
+    fn top_bar(&mut self, ctx: &egui::Context) {
+        egui::TopBottomPanel::top("topbar")
+            .frame(egui::Frame::new().fill(BG).inner_margin(egui::Margin::symmetric(22, 10)))
+            .show(ctx, |ui| {
+                ui.horizontal(|ui| {
+                    self.top_tab(ui, Page::Batches, "☷", "Партии");
+                    self.top_tab(ui, Page::Calendar, "▦", "Календарь");
+                    self.top_tab(ui, Page::Analytics, "⌁", "Аналитика");
+                    ui.add_space(10.0);
+                    ui.separator();
+                    ui.add_space(6.0);
+                    if ui.button("＋ Новая партия").clicked() {
+                        self.show_new_batch = true;
+                    }
+                    if ui.button("Сохранить").clicked() {
+                        self.save_data();
+                    }
+                });
+            });
+    }
+
+    fn top_tab(&mut self, ui: &mut egui::Ui, page: Page, icon: &str, label: &str) {
+        let active = self.page == page;
+        let fill = if active { CARD_ALT } else { CARD };
         let response = egui::Frame::new()
             .fill(fill)
-            .corner_radius(egui::CornerRadius::same(8))
-            .inner_margin(egui::Margin::symmetric(10, 9))
+            .corner_radius(egui::CornerRadius {
+                nw: 9, ne: 9, sw: 0, se: 0,
+            })
+            .inner_margin(egui::Margin::symmetric(20, 12))
             .show(ui, |ui| {
-                ui.set_width(ui.available_width());
-                ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new(icon).size(17.0).color(color));
-                    ui.label(
-                        egui::RichText::new(label)
-                            .size(13.0)
-                            .color(if active { TEXT } else { MUTED })
-                            .strong(active),
-                    );
+                ui.vertical_centered(|ui| {
+                    ui.label(egui::RichText::new(icon).size(23.0).color(if active { TEXT } else { MUTED }));
+                    ui.label(egui::RichText::new(label).size(14.0).strong().color(if active { TEXT } else { MUTED }));
                 });
             })
             .response
@@ -214,32 +233,9 @@ impl CidreMakerApp {
         if response.clicked() {
             self.page = page;
         }
-        ui.add_space(3.0);
     }
 
-    fn top_bar(&mut self, ctx: &egui::Context) {
-        egui::TopBottomPanel::top("topbar")
-            .frame(egui::Frame::new().fill(BG).inner_margin(egui::Margin::symmetric(22, 14)))
-            .show(ctx, |ui| {
-                ui.horizontal(|ui| {
-                    ui.vertical(|ui| {
-                        ui.label(egui::RichText::new(self.page.title()).size(20.0).strong().color(TEXT));
-                        ui.label(egui::RichText::new(self.page.subtitle()).size(11.0).color(MUTED));
-                    });
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        let _ = ui.button("●  Профиль");
-                        if ui.button("＋  Новая партия").clicked() {
-                            self.show_new_batch = true;
-                            self.page = Page::Batches;
-                        }
-                        ui.add_space(12.0);
-                        ui.label(egui::RichText::new("16 ноября 2026").size(11.0).color(MUTED));
-                    });
-                });
-            });
-    }
-
-    fn dashboard(&mut self, ui: &mut egui::Ui) {
+    fn analytics_page(&mut self, ui: &mut egui::Ui) {
         ui.horizontal(|ui| {
             ui.label(egui::RichText::new("Производство").size(16.0).strong().color(TEXT));
             ui.add_space(6.0);
@@ -351,13 +347,12 @@ impl CidreMakerApp {
 
     fn placeholder_page(&self, ui: &mut egui::Ui) {
         let (headline, description, items) = match self.page {
-            Page::Fermentation => ("Журнал брожения", "Все измерения будут привязаны к конкретной партии и времени.", vec!["Brix / SG / Plato", "Температура и динамика", "Подкормки и добавки", "График изменения плотности"]),
-            Page::Operations => ("История технологических операций", "Операции формируют прослеживаемую историю каждой партии.", vec!["Прессование и подготовка сусла", "Переливы и снятие с осадка", "Купажирование и выдержка", "Розлив, тираж и дегоржаж"]),
-            Page::Calculators => ("Расчётный центр", "Каждый расчёт будет показывать формулу, исходные данные, единицы и предупреждения.", vec!["Крепость и коррекция рефрактометра", "Карбонизация и остаточный сахар", "Тиражный и экспедиционный ликёры", "Pet-Nat, купажирование и Solera"]),
-            Page::Library => ("Технологические справочники", "Пользовательские записи и локальные справочники будут храниться в portable-проекте.", vec!["Дрожжи и бактерии", "Питательные вещества и ферменты", "Осветлители и стабилизаторы", "Бутылки, давление и укупорка"]),
-            Page::Analytics => ("Аналитика производства", "Сравнение партий, истории измерений и сенсорных оценок.", vec!["Динамика брожения", "Сравнение партий и урожаев", "Выход сока и потери", "История дегустаций"]),
-            Page::Settings => ("Portable-хранилище", "Данные не должны зависеть от профиля Windows или установки программы.", vec!["База данных SQLite рядом с EXE", "Фото и вложения в отдельной папке", "Резервные копии и восстановление", "Импорт и экспорт проектов"]),
-            _ => ("Раздел", "Выберите раздел в боковом меню.", vec![]),
+            Page::Calendar => ("Производственный календарь", "Здесь будут отображаться этапы партий, запланированные операции и контрольные даты.", vec!["Календарь брожения и выдержки", "Планируемые переливы и измерения", "Розлив и подготовка бутылок", "Напоминания по задачам"]),
+            Page::CalculatorAbv => ("Крепость и рефрактометр", "Калькулятор для оценки фактической крепости и коррекции показаний после начала брожения.", vec!["Начальная и текущая плотность", "Показания рефрактометра Brix", "Расчёт фактической крепости", "Коррекция показаний с пояснением формулы"]),
+            Page::CalculatorTirage => ("Тиражный ликёр", "Расчёт сахара и объёма тиражного ликёра для заданной партии и целевого давления.", vec!["Объём вина для тиража", "Целевое давление и остаточный сахар", "Сахар и объём ликёра", "Дозировка на бутылку"]),
+            Page::CalculatorExpedition => ("Экспедиционный ликёр", "Расчёт состава и дозировки экспедиционного ликёра после дегоржажа.", vec!["Объём партии и дозировка", "Целевой уровень сладости", "Состав ликёра", "Количество на бутылку и на весь тираж"]),
+            Page::CalculatorPetNat => ("Pet-Nat", "Расчёт остаточного сахара и потенциального давления перед розливом.", vec!["Текущая плотность и остаточный сахар", "Целевое давление", "Расчёт сахара к розливу", "Предупреждения по давлению"]),
+            Page::Calendar | Page::Analytics | Page::Batches => ("Раздел", "Выберите рабочее пространство.", vec![]),
         };
 
         egui::Frame::new().fill(CARD).corner_radius(12).inner_margin(22.0).show(ui, |ui| {
@@ -376,6 +371,27 @@ impl CidreMakerApp {
             ui.add_space(10.0);
             ui.label(egui::RichText::new("Этот экран — каркас интерфейса. Функциональность будет подключаться поэтапно.").size(11.0).color(MUTED));
         });
+    }
+
+    fn save_data(&mut self) {
+        let rows = self.batches.iter().map(|batch| {
+            let clean = |value: &str| value.replace('|', "/").replace(['\\r', '\\n'], " ");
+            format!(
+                "{}|{}|{}|{}|{}|{}|{}",
+                clean(&batch.code),
+                clean(&batch.name),
+                clean(&batch.kind),
+                clean(&batch.stage),
+                clean(&batch.volume),
+                clean(&batch.status),
+                batch.progress
+            )
+        }).collect::<Vec<_>>().join("\\n");
+        let path = self.data_dir.join("batches.csv");
+        match std::fs::write(&path, rows) {
+            Ok(()) => self.save_status = format!("Сохранено: {}", path.display()),
+            Err(error) => self.save_status = format!("Ошибка сохранения: {error}"),
+        }
     }
 
     fn new_batch_dialog(&mut self, ctx: &egui::Context) {
@@ -432,7 +448,7 @@ impl eframe::App for CidreMakerApp {
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     match self.page {
-                        Page::Dashboard => self.dashboard(ui),
+                        Page::Analytics => self.analytics_page(ui),
                         Page::Batches => self.batches_page(ui),
                         _ => self.placeholder_page(ui),
                     }
@@ -448,7 +464,7 @@ impl eframe::App for CidreMakerApp {
                     ui.separator();
                     ui.label(egui::RichText::new(format!("Хранилище: {}", self.data_dir.display())).size(10.0).color(MUTED));
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        ui.label(egui::RichText::new("Демонстрационные данные · не сохраняются").size(10.0).color(ORANGE));
+                        ui.label(egui::RichText::new(&self.save_status).size(10.0).color(if self.save_status.starts_with("Ошибка") { ORANGE } else { GREEN }));
                     });
                 });
             });
