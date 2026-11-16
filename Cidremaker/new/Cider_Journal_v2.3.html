@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Cider Journal v2.3</title>
+<style>
+/* ============ ТЕМЫ ============ */
+:root{
+  --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,Arial,sans-serif;
+  --font-mono:ui-monospace,'SF Mono','Cascadia Mono',Menlo,Consolas,monospace;
+  --radius:14px;
+}
+html[data-theme=dark]{
+  --bg:#101114;--bg2:#17181c;--bg3:#20222a;--bg4:#262932;
+  --line:#2b2e37;--line2:#383c47;
+  --fg:#ececef;--muted:#9298a3;--faint:#5d626e;
+  --accent:#d9a54e;--accent-soft:rgba(217,165,78,.16);--accent-fg:#191104;
+  --green:#7fb069;--red:#e06c6c;--blue:#6fa8dc;--pink:#cf8fb8;--cyan:#4fb3c4;
+  --gauge-track:#2b2e37;--gauge-tick:#4a4f5b;
+  --shadow:0 6px 20px rgba(0,0,0,.28);
+  --hdr:rgba(16,17,20,.85);
+}
+html[data-theme=light]{
+  --bg:#eef0f3;--bg2:#f8f9fb;--bg3:#ffffff;--bg4:#f0f1f4;
+  --line:#dfe2e8;--line2:#c9cdd6;
+  --fg:#1c1d21;--muted:#7b8089;--faint:#a9adb5;
+  --accent:#b07a17;--accent-soft:rgba(176,122,23,.13);--accent-fg:#ffffff;
+  --green:#55803e;--red:#c23b32;--blue:#3a6ea5;--pink:#b05a8a;--cyan:#1f8fa3;
+  --gauge-track:#e4e6ec;--gauge-tick:#b9bdc7;
+  --shadow:0 1px 2px rgba(20,22,28,.05),0 8px 22px rgba(20,22,28,.06);
+  --hdr:rgba(248,249,251,.88);
+}
+/* ============ БАЗА ============ */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.5 var(--font-ui)}
+body{min-height:100vh}
+[hidden]{display:none!important}
+.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+::selection{background:var(--accent-soft)}
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 18px;border-bottom:1px solid var(--line);background:var(--hdr);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:30px;height:30px;display:block}
+.brand b{font-size:15px;letter-spacing:.14em}
+.brand .ver{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--line);padding:1px 7px;border-radius:20px}
+.spacer{flex:1}
+.chip{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--line);background:var(--bg2);
+  padding:4px 10px;border-radius:20px;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,transparent)}
+.chip.err{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+.chip.st-planned{color:var(--faint)}.chip.st-active{color:var(--cyan)}
+.chip.st-aging{color:var(--accent)}.chip.st-done{color:var(--green)}
+.dirty-dot{color:var(--accent);font-weight:700}
+/* ============ КНОПКИ ============ */
+.btn{background:var(--bg3);border:1px solid var(--line);color:var(--fg);padding:8px 14px;border-radius:10px;
+  cursor:pointer;font:600 13px var(--font-ui);transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn-ghost:hover{color:var(--fg);border-color:var(--line)}
+.btn-danger{background:color-mix(in srgb,var(--red) 12%,transparent);border-color:color-mix(in srgb,var(--red) 35%,transparent);color:var(--red)}
+.btn--icon{width:38px;height:38px;padding:0;border-radius:50%;justify-content:center;font-size:15px}
+@keyframes savepulse{0%{box-shadow:0 0 0 0 var(--accent-soft)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.btn.pulse{animation:savepulse 1.8s infinite}
+/* ============ КАРТОЧКИ / ПОЛЯ ============ */
+.container{max-width:1080px;margin:0 auto;padding:20px 18px 70px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 5px;font-weight:600}
+input,select,textarea{width:100%;background:var(--bg4);color:var(--fg);border:1px solid var(--line);
+  border-radius:9px;padding:8px 10px;font:14px var(--font-ui);transition:border-color .15s}
+input[type=number],input.mono{font-family:var(--font-mono)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[readonly]{opacity:.7;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:150px}
+.hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+.warn{color:var(--red);font-size:12.5px;font-weight:600;margin-top:8px}
+details{background:var(--bg4);border:1px solid var(--line);border-radius:11px;padding:10px 14px;margin-top:12px}
+summary{cursor:pointer;font-weight:650;font-size:13px;user-select:none}
+summary::marker{color:var(--accent)}
+/* ============ ДАШБОРД ============ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.stat .v{font:600 30px/1 var(--font-mono);letter-spacing:-.02em}
+.stat .l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:7px;display:flex;align-items:center;gap:6px;font-weight:600}
+.stat .l i{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+i.sd-planned{background:var(--faint)}i.sd-active{background:var(--cyan)}
+i.sd-aging{background:var(--accent)}i.sd-done{background:var(--green)}
+/* ============ СПИСОК ПАРТИЙ ============ */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.batch{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;cursor:pointer;
+  transition:.16s;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.batch:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.b-top{display:flex;align-items:center;gap:8px}
+.b-name{font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sdot.planned{background:var(--faint)}.sdot.active{background:var(--cyan)}
+.sdot.aging{background:var(--accent)}.sdot.done{background:var(--green)}
+.tag{font:600 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.tag.t-classic{color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.tag.t-petnat{color:var(--green);background:color-mix(in srgb,var(--green) 15%,transparent)}
+.tag.t-still{color:var(--blue);background:color-mix(in srgb,var(--blue) 15%,transparent)}
+.tag.t-solera{color:var(--pink);background:color-mix(in srgb,var(--pink) 15%,transparent)}
+.b-code{font:11.5px var(--font-mono);color:var(--muted)}
+.b-stats{display:flex;gap:8px}
+.mini{flex:1;background:var(--bg4);border:1px solid var(--line);border-radius:8px;padding:5px 8px;
+  font:10px var(--font-mono);color:var(--muted);display:flex;align-items:baseline;gap:4px}
+.mini b{font:600 13px var(--font-mono);color:var(--fg)}
+.b-notes{font-size:12px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* ============ LCD-ДИСПЛЕИ (всегда тёмные) ============ */
+.lcd{background:#0b0d10;border:1px solid #000;border-radius:10px;padding:10px 12px;min-width:0;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.04)}
+.lcd .lbl{font:600 9px var(--font-mono);letter-spacing:.2em;text-transform:uppercase;color:#8a6a35;margin-bottom:3px}
+.lcd .val{font:600 21px/1.1 var(--font-mono);color:#f2ba60;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcd .val .u{font-size:11px;color:#a8843e;margin-left:3px}
+.lcd .sub{font:10px var(--font-mono);color:#6b5730;margin-top:3px}
+.lcd.warn .val{color:#ff9d76}
+.lcd-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin:12px 0}
+/* ============ ДАТЧИК-ШКАЛА ============ */
+.gauge-wrap{display:flex;justify-content:center;padding:6px 0}
+.gauge{width:150px;height:150px;display:block}
+.gauge text.gv{font:600 24px var(--font-mono);fill:var(--fg)}
+.gauge text.gu{font:600 11px var(--font-mono);fill:var(--muted)}
+.gauge text.gl{font:600 9px var(--font-ui);fill:var(--muted);letter-spacing:.1em}
+/* ============ ТУМБЛЕР / КЛАВИШИ / СЕГМЕНТЫ ============ */
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:4px 0}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.sw-track{width:46px;height:26px;border-radius:13px;background:var(--bg4);border:1px solid var(--line2);
+  position:relative;transition:.2s;flex-shrink:0}
+.sw-track::before{content:'ON';position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  font:700 8px var(--font-mono);color:var(--accent);opacity:0;transition:.2s}
+.sw-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:var(--faint);transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.switch input:checked~.sw-track{background:var(--accent-soft);border-color:var(--accent)}
+.switch input:checked~.sw-track::before{opacity:1}
+.switch input:checked~.sw-track .sw-thumb{left:23px;background:var(--accent)}
+.sw-text{font-size:13px}
+.keys{display:flex;flex-wrap:wrap;gap:6px}
+.keys button{background:var(--bg4);border:1px solid var(--line);border-radius:9px;color:var(--muted);
+  font:600 12px var(--font-mono);padding:7px 11px;cursor:pointer;transition:.15s}
+.keys button:hover{border-color:var(--accent);color:var(--fg)}
+.keys button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.seg{display:flex;gap:4px;background:var(--bg4);border:1px solid var(--line);border-radius:11px;padding:4px;overflow-x:auto}
+.seg button{flex:1;white-space:nowrap;border:none;background:transparent;color:var(--muted);
+  font:600 12px var(--font-ui);padding:7px 12px;border-radius:8px;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--fg)}
+.seg button.on{background:var(--bg3);color:var(--fg);box-shadow:var(--shadow)}
+.seg.accent button.on{background:var(--accent);color:var(--accent-fg)}
+.rate{display:flex;gap:7px}
+.rate button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg4);
+  cursor:pointer;color:var(--faint);font:600 12px var(--font-mono);transition:.15s}
+.rate button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+/* ============ ЭТАПЫ ============ */
+.stage{scroll-margin-top:120px}
+.stage h3{margin:0 0 14px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:10px;font-weight:700}
+.stage h3 .n{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-fg);
+  display:inline-flex;align-items:center;justify-content:center;font:700 11px var(--font-mono);flex-shrink:0}
+.stage h3::after{content:'';flex:1;height:1px;background:var(--line)}
+.panel{background:var(--bg4);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+.panel-head{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:13px}
+.panel-head span{font:10px var(--font-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.head-fields{display:grid;grid-template-columns:1.2fr 1.6fr 1fr;gap:12px;margin:14px 0}
+.edit-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* этикетка */
+.label-card{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:var(--bg4);
+  border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.label-preview{width:170px;min-height:170px;background:var(--bg3);border:1px dashed var(--line2);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12px;text-align:center;padding:8px;overflow:hidden}
+.label-preview img{max-width:100%;max-height:240px;border-radius:8px;display:block}
+.label-controls{flex:1;min-width:220px;display:flex;flex-direction:column;gap:8px}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap}
+.label-filename{color:var(--muted);font:11.5px var(--font-mono);word-break:break-all}
+/* строки подкормок/замеров */
+.nrow{display:grid;grid-template-columns:130px 1fr 110px 1fr 38px;gap:8px;margin-bottom:8px;align-items:end}
+.mrow{display:grid;grid-template-columns:130px 1fr 90px 1fr 38px;gap:8px;margin-bottom:8px;align-items:end}
+.del{width:38px;height:36px;background:color-mix(in srgb,var(--red) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--red) 30%,transparent);color:var(--red);border-radius:9px;cursor:pointer}
+@media(max-width:720px){
+  .nrow,.mrow{grid-template-columns:repeat(2,1fr)}
+  .nrow>button,.mrow>button{grid-column:1/-1}
+  .head-fields{grid-template-columns:1fr}
+}
+/* кривая брожения — как осциллограф */
+.fchart{border-radius:10px;padding:10px;background:#0b0d10;border:1px solid #000;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.55);margin-top:10px}
+.fchart svg{width:100%;height:150px;display:block}
+.fchart text.axis{font:9px var(--font-mono);fill:#6b5730}
+/* ============ КАЛЕНДАРЬ ============ */
+.modal-bg{position:fixed;inset:0;background:rgba(8,9,12,.55);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  max-width:860px;width:100%;max-height:90vh;overflow:auto;padding:20px}
+.modal-head{display:flex;align-items:center;gap:10px}
+.modal-head h2{margin:0;font-size:16px;flex:1}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:12px 0 5px}
+.cal-wd{text-align:center;font:600 10px var(--font-mono);letter-spacing:.12em;color:var(--muted);
+  padding:4px 0;text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-day{background:var(--bg4);border:1px solid var(--line);border-radius:9px;min-height:64px;padding:5px;font-size:11px;position:relative}
+.cal-day.empty{background:transparent;border-color:transparent}
+.cal-day .d{font:600 11px var(--font-mono);color:var(--muted)}
+.cal-day.today{border-color:var(--accent)}
+.cal-day.today .d{color:var(--accent)}
+.cal-day .ev{display:block;font:9.5px var(--font-mono);border-radius:4px;padding:1px 4px;margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev.t-classic{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent)}
+.ev.t-petnat{background:color-mix(in srgb,var(--green) 20%,transparent);color:var(--green)}
+.ev.t-still{background:color-mix(in srgb,var(--blue) 20%,transparent);color:var(--blue)}
+.ev.t-solera{background:color-mix(in srgb,var(--pink) 20%,transparent);color:var(--pink)}
+
+/* ============ v2.3 ============ */
+.status-attention{color:var(--red)!important;border-color:color-mix(in srgb,var(--red) 45%,transparent)!important}
+.sdot.attention{background:var(--red)}
+i.sd-attention{background:var(--red)}
+.timeline{margin-top:14px;overflow:auto;padding:4px 2px 12px}
+.tl-head{display:grid;grid-template-columns:220px minmax(720px,1fr);gap:10px;margin-bottom:6px;position:sticky;top:0;background:var(--bg2);z-index:2;padding-bottom:5px}
+.tl-scale{position:relative;height:30px;border-bottom:1px solid var(--line)}
+.tl-scale span{position:absolute;bottom:4px;transform:translateX(-50%);font:9px var(--font-mono);color:var(--muted);white-space:nowrap}
+.tl-row{display:grid;grid-template-columns:220px minmax(720px,1fr);gap:10px;align-items:center;margin:7px 0}
+.tl-name{min-width:0}
+.tl-name b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-name small{color:var(--muted);font:10px var(--font-mono)}
+.tl-track{height:42px;position:relative;background:repeating-linear-gradient(90deg,var(--bg4) 0,var(--bg4) calc(14.285% - 1px),var(--line) 14.285%,var(--bg4) calc(14.285% + 1px));border:1px solid var(--line);border-radius:8px;min-width:720px}
+.tl-seg{position:absolute;top:8px;height:24px;border-radius:7px;min-width:5px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.tl-seg:hover{filter:brightness(1.12)}
+.tl-seg.planned{background:color-mix(in srgb,var(--faint) 45%,transparent)}
+.tl-seg.active{background:color-mix(in srgb,var(--cyan) 55%,transparent)}
+.tl-seg.aging{background:color-mix(in srgb,var(--accent) 60%,transparent)}
+.tl-seg.done{background:color-mix(in srgb,var(--green) 60%,transparent)}
+.tl-seg.attention{background:color-mix(in srgb,var(--red) 65%,transparent)}
+.tl-seg span{font:9px var(--font-mono);padding:0 6px;white-space:nowrap;color:var(--fg);display:block;overflow:hidden;text-overflow:ellipsis}
+.tl-today{position:absolute;top:0;bottom:0;width:2px;background:var(--red);z-index:3;box-shadow:0 0 0 1px color-mix(in srgb,var(--red) 15%,transparent)}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.calc-result{background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:10px}
+.calc-result b{display:block;font:600 18px var(--font-mono)}
+.calc-result small{color:var(--muted)}
+.notice{padding:9px 11px;border-radius:9px;background:color-mix(in srgb,var(--accent) 9%,transparent);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);font-size:12px;margin-top:10px}
+.notice.danger{background:color-mix(in srgb,var(--red) 10%,transparent);border-color:color-mix(in srgb,var(--red) 35%,transparent)}
+.notice.ok{background:color-mix(in srgb,var(--green) 9%,transparent);border-color:color-mix(in srgb,var(--green) 30%,transparent)}
+.measure-table{overflow:auto}
+.measure-table .mrow{min-width:1040px}
+
+/* ============ ТОСТ ============ */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg3);color:var(--fg);border:1px solid var(--accent);
+  padding:10px 16px;border-radius:11px;z-index:200;font-size:13px;box-shadow:var(--shadow);
+  opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;max-width:340px}
+.toast.show{opacity:1;transform:none}
+.save-bar{display:flex;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="21" r="15" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+      <path d="M20 12c-2.6 3.4-4 6-4 8.6 0 3.4 2.2 6 4 6s4-2.6 4-6c0-2.6-1.4-5.2-4-8.6z" fill="var(--accent)"/>
+      <path d="M20 12c.2-2.4 1.4-3.8 3.4-4.6" stroke="var(--green)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <b>CIDREMAKER</b><span class="ver">v2.3</span>
+  </div>
+  <span id="dirtyDot" class="dirty-dot" hidden title="Есть несохранённые изменения">●</span>
+  <span id="folderStatus" class="chip">папка не выбрана</span>
+  <div class="spacer"></div>
+  <button id="btnTheme" class="btn btn--icon" title="Тема">☀</button>
+  <button id="btnPick" class="btn btn--icon" title="Выбрать папку с данными">📁</button>
+  <button id="btnCalendar" class="btn btn--icon" title="Календарь">📅</button>
+  <button id="btnNew" class="btn btn-primary">＋ Партия</button>
+  <button id="btnSave" class="btn btn-primary">💾 Сохранить</button>
+</header>
+
+<main class="container">
+
+<!-- ================= СПИСОК ================= -->
+<section id="listView">
+  <div class="stats" id="dashStats"></div>
+  <div class="card filters">
+    <div class="row">
+      <div style="flex:2;min-width:200px"><label>Поиск</label>
+        <input id="search" placeholder="название · код · сорта · заметки"></div>
+      <div><label>Сортировка</label>
+        <select id="sort">
+          <option value="created-desc">По созданию ↓</option><option value="created-asc">По созданию ↑</option>
+          <option value="year-desc">По году ↓</option><option value="year-asc">По году ↑</option>
+          <option value="name-asc">Имя А→Я</option><option value="name-desc">Имя Я→А</option>
+          <option value="type">По типу</option><option value="status">По статусу</option>
+        </select></div>
+      <div><label>Тип</label>
+        <select id="filterType">
+          <option value="">Все</option><option value="classic">Классик</option>
+          <option value="petnat">Петнат</option><option value="still">Тихий</option>
+          <option value="solera">Коль Фандо</option>
+        </select></div>
+      <div><label>Статус</label>
+        <select id="filterStatus">
+          <option value="">Все</option><option value="planned">План</option>
+          <option value="active">Брожение</option><option value="aging">Выдержка</option>
+          <option value="done">Готово</option>
+        </select></div>
+      <div style="flex:0 0 auto;display:flex;align-items:flex-end">
+        <button id="btnBackup" class="btn" type="button" title="Скачать копию JSON">⇩ Бэкап</button></div>
+    </div>
+  </div>
+  <div id="batchList" class="list"></div>
+</section>
+
+<!-- ================= РЕДАКТОР ================= -->
+<section id="editView" hidden>
+  <div class="card">
+    <div class="edit-top">
+      <button id="btnBack" class="btn btn--icon" title="К списку">←</button>
+      <b id="editTitle" style="font-size:16px;flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b>
+      <span id="editTitleTag" class="tag"></span>
+      <span id="editStatusChip" class="chip"></span>
+      <button id="btnDuplicate" class="btn btn--icon" title="Дублировать партию">⧉</button>
+      <button id="btnDelete" class="btn btn-danger" title="Удалить">🗑</button>
+    </div>
+    <div class="head-fields">
+      <div><label>Код партии (авто)</label><input id="fCode" class="mono"></div>
+      <div><label>Название партии</label><input id="fName" placeholder="Дикобраз_2025"></div>
+      <div><label>Дата создания</label><input type="date" id="fCreatedDate"></div>
+      <div><label>Статус партии</label><select id="fStatus">
+        <option value="planned">План</option><option value="active">Брожение</option>
+        <option value="aging">Выдержка</option><option value="done">Готово</option>
+        <option value="attention">Требует внимания</option></select></div>
+    </div>
+    <div class="label-card">
+      <div class="label-preview" id="labelPreview">Фото не выбрано</div>
+      <div class="label-controls">
+        <b style="font-size:13px">📸 Этикетка партии</b>
+        <div class="hint">Сохраняется в <code>pix/</code> рядом с cider_data.json · сжимается до 1280px</div>
+        <div class="row-btns">
+          <button id="btnUploadLabel" class="btn" type="button">📤 Выбрать фото</button>
+          <button id="btnDeleteLabel" class="btn btn-danger" type="button">🗑 Удалить</button>
+        </div>
+        <div class="label-filename" id="labelFilename">—</div>
+      </div>
+    </div>
+    <div class="seg accent stage-nav">
+      <button type="button" data-go="stage1">1 · Сырьё</button>
+      <button type="button" data-go="stage2">2 · Брожение</button>
+      <button type="button" data-go="stage3">3 · Розлив</button>
+      <button type="button" data-go="stage4">4 · Выдержка</button>
+      <button type="button" data-go="stage5">5 · Контроль</button>
+    </div>
+  </div>
+
+  <div class="card stage" id="stage1">
+    <h3><span class="n">1</span>Сырьё и отжим</h3>
+    <div class="row" style="align-items:stretch">
+      <div style="flex:2.2;min-width:260px">
+        <div class="grid">
+          <div><label>Дата отжима</label><input type="date" data-f="stage1.date"></div>
+          <div><label>Регион</label><input data-f="stage1.region"></div>
+          <div><label>Объём сока, л</label><input type="number" step="0.1" data-f="stage1.volume"></div>
+          <div><label>Сорта (соотношение)</label><input data-f="stage1.varieties"></div>
+          <div><label>Начальный Brix</label><input type="number" step="0.1" data-f="stage1.brix"></div>
+          <div><label>Факт. ABV</label><input type="number" step="0.1" data-f="stage1.actualAbv"></div>
+          <div><label>pH</label><input type="number" step="0.01" data-f="stage1.ph"></div>
+          <div><label>TA, г/л</label><input type="number" step="0.1" data-f="stage1.ta"></div>
+          <div><label>Тип сидра</label>
+            <select data-f="type" id="typeSel">
+              <option value="classic">Классик (шампенуаз)</option>
+              <option value="petnat">Петнат</option>
+              <option value="still">Тихий</option>
+              <option value="solera">Коль Фандо (Solera)</option>
+            </select></div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="gauge-wrap" id="abvGauge"></div>
+        <div class="hint">Прогноз крепости · Brix × 0.55</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">🧮 Калькулятор ABV <span>ΔBrix × 0.55</span></div>
+      <div class="row" style="margin-top:10px">
+        <div><label>Начальный Brix</label><input type="number" step="0.1" id="cStartBrix"></div>
+        <div><label>Конечный Brix</label><input type="number" step="0.1" id="cEndBrix" value="0"></div>
+        <div class="lcd" style="flex:1;min-width:140px">
+          <div class="lbl">ABV расчёт</div>
+          <div class="val"><span id="cAbvLcd">0.00</span><span class="u">%</span></div>
+        </div>
+        <div style="flex:0 0 auto;display:flex;align-items:flex-end">
+          <button id="cApply" class="btn" type="button">→ в факт.</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card stage" id="stage2">
+    <h3><span class="n">2</span>Брожение</h3>
+    <div class="grid">
+      <div><label>Т старта, °C</label><input type="number" step="0.1" data-f="stage2.tempStart"></div>
+      <div><label>Дрожжи (штамм)</label><input data-f="stage2.yeast"></div>
+      <div><label>Дата внесения дрожжей</label><input type="date" data-f="stage2.yeastDate"></div>
+      <div><label>Начало брожения</label><input type="date" data-f="stage2.startDate"></div>
+      <div><label>Снятие с осадка</label><input type="date" data-f="stage2.rackingDate"></div>
+    </div>
+    <details open><summary>Питание дрожжей (подкормки)</summary>
+      <div id="nutrients" style="margin-top:10px"></div>
+      <button id="addNutrient" class="btn" type="button" style="margin-top:8px">+ Добавить подкормку</button>
+    </details>
+    <details open><summary>Ежедневные замеры</summary>
+      <div id="measurements" style="margin-top:10px"></div>
+      <button id="addMeasure" class="btn" type="button" style="margin-top:8px">+ Добавить замер</button>
+      <div class="fchart" id="fchart"></div>
+    </details>
+  </div>
+
+  <div class="card stage" id="stage3"><h3><span class="n">3</span>Розлив</h3><div id="stage3Body"></div></div>
+  <div class="card stage" id="stage4"><h3><span class="n">4</span>Выдержка / финиш</h3><div id="stage4Body"></div></div>
+
+  <div class="card stage" id="stage5">
+    <h3><span class="n">5</span>Контроль качества</h3>
+    <div class="grid">
+      <div><label>Дата дегустации</label><input type="date" data-f="stage5.tastingDate"></div>
+      <div><label>Игристость (1–5)</label>
+        <input type="hidden" data-f="stage5.sparkling">
+        <div class="rate" id="rateSpark"></div></div>
+      <div><label>Оценка вкуса</label><input data-f="stage5.tasteNotes"></div>
+      <div><label>Дата упаковки</label><input type="date" data-f="stage5.packDate"></div>
+    </div>
+    <label style="margin-top:10px">Общие заметки</label>
+    <textarea data-f="generalNotes" rows="4"></textarea>
+  </div>
+
+  <div class="card"><details><summary>v2.3 · что изменилось</summary><div class="hint" style="margin-top:8px">Коррекция Pet-Nat по Brix/SG/ABV/температуре · расширенный журнал замеров · визуальный timeline · явные статусы · безопасная смена типа · усиленная валидация · автосохранение 2.5 с · Solera с историей операций · исправлен расчёт ликёра · улучшены рекомендации по выдержке.</div></details></div>
+  <div class="card save-bar"><button id="btnSave2" class="btn btn-primary" type="button">💾 Сохранить партию</button></div>
+</section>
+</main>
+
+<!-- ================= КАЛЕНДАРЬ ================= -->
+<div class="modal-bg" id="calModal">
+  <div class="modal">
+    <div class="modal-head"><h2>📅 Календарь производства</h2>
+      <button id="calClose" class="btn btn--icon" type="button">✕</button></div>
+    <div class="row" style="align-items:center;margin:14px 0 4px">
+      <div style="flex:0 0 130px"><select id="calYear"></select></div>
+      <div style="flex:0 0 150px"><select id="calStatus">
+        <option value="">все статусы</option><option value="planned">план</option>
+        <option value="active">брожение</option><option value="aging">выдержка</option>
+        <option value="done">готово</option><option value="attention">внимание</option></select></div>
+      <div style="flex:0 0 140px"><select id="calType">
+        <option value="">все типы</option><option value="classic">Классик</option>
+        <option value="petnat">Петнат</option><option value="still">Тихий</option>
+        <option value="solera">Коль Фандо</option></select></div>
+      <div class="spacer" style="flex:1;min-width:20px"></div>
+      <button id="calPrev" class="btn btn--icon" type="button">‹</button>
+      <b id="calMonth" style="min-width:150px;text-align:center;text-transform:capitalize"></b>
+      <button id="calNext" class="btn btn--icon" type="button">›</button>
+    </div>
+    <div class="cal-week">
+      <div class="cal-wd">пн</div><div class="cal-wd">вт</div><div class="cal-wd">ср</div>
+      <div class="cal-wd">чт</div><div class="cal-wd">пт</div><div class="cal-wd">сб</div><div class="cal-wd">вс</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="calStats" class="hint" style="margin-top:10px"></div>
+    <details open style="margin-top:14px"><summary>Визуальный timeline партий</summary>
+      <div id="timeline" class="timeline"></div>
+    </details>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="labelFileInput" accept="image/*" hidden>
+
+<script>
+'use strict';
+/* ============ УТИЛИТЫ ============ */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const parseDate=s=>s?new Date(s.length===10?s+'T00:00:00':s):null;   // таймзона-безопасно
+const fmtDate=d=>{const x=parseDate(d);return x?x.toLocaleDateString('ru-RU'):'—';};
+const fmtN=(v,d=1)=>{const n=parseFloat(v);return isFinite(n)?(+n.toFixed(d)).toString():'—';};
+const TYPE_LABELS={classic:'Классик',petnat:'Петнат',still:'Тихий',solera:'Коль Фандо'};
+let toastTimer=null;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ============ СОСТОЯНИЕ ============ */
+let dirHandle=null, data=[], currentId=null, calDate=new Date();
+let fileCorrupted=false, dirty=false, currentLabelUrl=null;
+
+/* ============ IndexedDB (handle папки) ============ */
+const DB_NAME='cidremaker',DB_STORE='fs',DB_KEY='handle';
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);
+  r.onupgradeneeded=()=>r.result.createObjectStore(DB_STORE);
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function saveHandle(h){const db=await openDB();
+  await new Promise((res,rej)=>{const tx=db.transaction(DB_STORE,'readwrite');
+    tx.objectStore(DB_STORE).put(h,DB_KEY);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});}
+async function loadHandle(){const db=await openDB();
+  return new Promise(res=>{const tx=db.transaction(DB_STORE,'readonly');
+    const r=tx.objectStore(DB_STORE).get(DB_KEY);
+    r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);});}
+
+/* ============ ЧТЕНИЕ / ЗАПИСЬ JSON (с защитой и бэкапом) ============ */
+async function readJSON(){
+  if(!dirHandle)return null;
+  try{
+    const fh=await dirHandle.getFileHandle('cider_data.json');
+    return JSON.parse(await (await fh.getFile()).text());
+  }catch(e){
+    if(e&&e.name==='NotFoundError')return null;   // файла ещё нет — норма
+    fileCorrupted=true;                            // повреждён / не читается
+    console.error('readJSON:',e);
+    return null;
+  }
+}
+async function writeJSON(obj){
+  if(!dirHandle)throw new Error('Папка не выбрана');
+  if(fileCorrupted&&!confirm('cider_data.json не удалось прочитать (возможно, повреждён).\nПерезаписать его текущими данными?'))
+    throw new Error('Сохранение отменено');
+  try{ // бэкап предыдущей версии
+    const old=await dirHandle.getFileHandle('cider_data.json');
+    const txt=await (await old.getFile()).text();
+    const bk=await dirHandle.getFileHandle('cider_data.backup.json',{create:true});
+    const bw=await bk.createWritable();await bw.write(txt);await bw.close();
+  }catch(e){/* старого файла нет — ок */}
+  const fh=await dirHandle.getFileHandle('cider_data.json',{create:true});
+  const w=await fh.createWritable();
+  await w.write(JSON.stringify(obj,null,2));
+  await w.close();
+  fileCorrupted=false;
+}
+async function load(){
+  const loaded=await readJSON();
+  if(loaded===null){data=[];return;}
+  if(Array.isArray(loaded))data=loaded;
+  else if(Array.isArray(loaded.batches))data=loaded.batches;
+  else data=[loaded];
+  data.forEach(migrateBatch);
+  fileCorrupted=false;
+}
+
+/* ============ ЭТИКЕТКИ (pix/) ============ */
+async function getPixDir(){
+  if(!dirHandle)throw new Error('Папка не выбрана');
+  return dirHandle.getDirectoryHandle('pix',{create:true});
+}
+async function removeLabelFile(name){
+  if(!dirHandle||!name)return;
+  try{await (await getPixDir()).removeEntry(name);}
+  catch(e){console.warn('removeEntry:',e);}
+}
+async function showLabelImage(b){
+  if(currentLabelUrl){URL.revokeObjectURL(currentLabelUrl);currentLabelUrl=null;}
+  const prev=$('#labelPreview'),fn=$('#labelFilename');
+  if(!b||!b.labelImage){prev.textContent='Фото не выбрано';fn.textContent='—';return;}
+  if(!dirHandle){prev.textContent='Выберите папку с данными';fn.textContent=b.labelImage;return;}
+  try{
+    const fh=await (await getPixDir()).getFileHandle(b.labelImage);
+    const file=await fh.getFile();
+    currentLabelUrl=URL.createObjectURL(file);
+    prev.innerHTML=`<img src="${currentLabelUrl}" alt="этикетка">`;
+    fn.textContent='pix/'+b.labelImage+' · '+(file.size/1024).toFixed(1)+' КБ';
+  }catch(e){
+    prev.textContent='Не удалось загрузить фото';
+    fn.textContent='pix/'+b.labelImage;
+  }
+}
+async function resizeImage(file,maxSide=1280,q=0.85){
+  if(!file.type.startsWith('image/'))return file;
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();img.src=url;
+    await (img.decode?img.decode():new Promise((res,rej)=>{img.onload=res;img.onerror=rej;}));
+    const s=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    if(s>=1)return file;
+    const c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),'image/jpeg',q));
+  }catch(e){return file;}
+  finally{URL.revokeObjectURL(url);}
+}
+async function uploadLabelImage(b){
+  if(!dirHandle){toast('Сначала выберите папку');return;}
+  const input=$('#labelFileInput');input.value='';
+  input.onchange=async()=>{
+    const file=input.files[0];if(!file)return;
+    try{
+      const blob=await resizeImage(file);
+      const newName=`label_${b.id}.jpg`;
+      const pix=await getPixDir();
+      const fh=await pix.getFileHandle(newName,{create:true});
+      const w=await fh.createWritable();
+      await w.write(await blob.arrayBuffer());
+      await w.close();
+      if(b.labelImage&&b.labelImage!==newName)await removeLabelFile(b.labelImage);
+      b.labelImage=newName;b.updatedAt=new Date().toISOString();
+      await showLabelImage(b);markDirty();
+      toast('Фото сохранено: pix/'+newName);
+    }catch(e){console.error(e);toast('Ошибка загрузки: '+e.message);}
+  };
+  input.click();
+}
+async function deleteLabelImage(b){
+  if(!b||!b.labelImage){toast('Фото не выбрано');return;}
+  if(!confirm('Удалить фото этикетки?'))return;
+  await removeLabelFile(b.labelImage);
+  b.labelImage='';b.updatedAt=new Date().toISOString();
+  await showLabelImage(b);markDirty();
+  toast('Фото удалено');
+}
+
+/* ============ СХЕМА ДАННЫХ / v2.3 ============ */
+const APP_VERSION='2.3.0', DATA_SCHEMA_VERSION='2.3';
+
+const emptyBatch=(type='classic')=>({
+  id:uid(),type,
+  status:'planned',statusReason:'',statusUpdatedAt:new Date().toISOString(),
+  stage1:{date:todayISO(),varieties:'',region:'',volume:0,brix:0,predictedAbv:'0.00',actualAbv:0,ph:0,ta:0},
+  stage2:{
+    tempStart:18,yeast:'',yeastDate:'',startDate:'',rackingDate:'',
+    measurements:[],nutrients:[]
+  },
+  stage3:type==='classic'
+    ?{volume:0,desiredPressure:5,bottleSize:0.75,liqueurPerBottle:20,liqueurSugarConcentration:600,
+      cap:'Кронен-пробка',date:'',autolysis:'',totalSugar:0,totalYeast:0,totalBentonite:0,
+      bottleCount:0,totalLiqueur:0,sugarConcentration:0,requiredLiqueurPerBottle:0}
+    :type==='petnat'
+    ?{brix:0,date:'',cap:'Кронен-пробка',control:'',desiredPressure:4,targetBrix:0,
+      pressureUnit:'bar',temperature:18,maxBottlePressure:4.5,safetyMargin:15,
+      refractometerBrix:'',hydrometerSG:'',hydrometerOe:'',hydrometerPlato:'',
+      measurementAlcohol:'',measurementTemp:'',estimatedResidualSugar:'',correctedBrix:'',
+      correctedSG:'',estimatedABV:'',targetSugar:'',targetRefractometerBrix:'',
+      calculationMode:'advanced',correctionMethod:'Terrill-compatible',petnatWarnings:[]}
+    :type==='still'
+    ?{volume:0,sugar:0,date:'',cap:'Кронен-пробка',stabilization:''}
+    :{volume:0,soleraYear:0,fraction:0,date:'',cap:'Кронен-пробка',
+      operations:[],initialVolume:0,sourceAgeYears:0,averageAgeYears:0},
+  stage4:type==='classic'
+    ?{disgorging:'',liqueurSugar:0,finalCap:'Кронен-пробка',agingMonths:15,leesAging:false,leesMonths:0,
+      batonnage:false,batonnageSchedule:[] ,finalCode:''}
+    :type==='petnat'
+    ?{finalCap:'Кронен-пробка',petnatRacked:false,rackingDatePet:'',agingMonths:6,finalCode:''}
+    :type==='still'
+    ?{agingMonths:6,rackingDate:'',finalCap:'Кронен-пробка',finalCode:''}
+    :{agingMonths:12,rackingDate:'',finalCap:'Кронен-пробка',finalCode:''},
+  stage5:{tastingDate:'',sparkling:0,tasteNotes:'',packDate:''},
+  code:'',name:'',createdDate:todayISO(),generalNotes:'',
+  createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+  tastings:[],labelImage:'',typeHistory:[]
+});
+
+function migrateBatch(b){
+  b.stage1=b.stage1||{};b.stage2=b.stage2||{};b.stage3=b.stage3||{};
+  b.stage4=b.stage4||{};b.stage5=b.stage5||{};
+  b.stage2.measurements=Array.isArray(b.stage2.measurements)?b.stage2.measurements:[];
+  b.stage2.nutrients=Array.isArray(b.stage2.nutrients)?b.stage2.nutrients:[];
+  b.stage4.batonnageSchedule=Array.isArray(b.stage4.batonnageSchedule)?b.stage4.batonnageSchedule:[];
+  b.tastings=Array.isArray(b.tastings)?b.tastings:[];
+  b.labelImage=b.labelImage||'';b.type=b.type||'classic';
+  b.typeHistory=Array.isArray(b.typeHistory)?b.typeHistory:[];
+  b.status=b.status||'';
+  b.statusReason=b.statusReason||'';
+  b.statusUpdatedAt=b.statusUpdatedAt||b.updatedAt||new Date().toISOString();
+
+  if(b.stage1.predictedAbv===undefined)b.stage1.predictedAbv=((parseFloat(b.stage1.brix)||0)*0.55).toFixed(2);
+
+  if(b.type==='classic'){
+    b.stage3.liqueurSugarConcentration=Number(b.stage3.liqueurSugarConcentration)||600;
+    b.stage3.requiredLiqueurPerBottle=Number(b.stage3.requiredLiqueurPerBottle)||0;
+  }
+  if(b.type==='petnat'){
+    const defaults=emptyBatch('petnat').stage3;
+    for(const k of Object.keys(defaults))if(b.stage3[k]===undefined)b.stage3[k]=defaults[k];
+    b.stage3.petnatWarnings=Array.isArray(b.stage3.petnatWarnings)?b.stage3.petnatWarnings:[];
+  }
+  if(b.type==='solera'){
+    b.stage3.operations=Array.isArray(b.stage3.operations)?b.stage3.operations:[];
+    b.stage3.initialVolume=Number(b.stage3.initialVolume)||Number(b.stage3.volume)||0;
+    b.stage3.averageAgeYears=Number(b.stage3.averageAgeYears)||0;
+  }
+  return b;
+}
+
+/* ============ СТАТУСЫ ============ */
+const STATUS_LABELS={
+  planned:'План',active:'Брожение',aging:'Выдержка',done:'Готово',attention:'Требует внимания'
+};
+const VALID_STATUSES=new Set(Object.keys(STATUS_LABELS));
+
+function getFinalDate(b){
+  const d=b.stage4?.disgorging||b.stage5?.packDate||b.stage5?.tastingDate;
+  return parseDate(d);
+}
+function inferBatchStatus(b){
+  const today=new Date();
+  const f=getFinalDate(b);if(f&&f<=today)return 'done';
+  const rack=parseDate(b.stage2?.rackingDate)||parseDate(b.stage4?.rackingDatePet)||parseDate(b.stage4?.rackingDate);
+  if(rack&&rack<=today)return 'aging';
+  const st=parseDate(b.stage2?.startDate);
+  if(st&&st<=today)return 'active';
+  const pr=parseDate(b.stage1?.date);
+  if(pr&&pr>today)return 'planned';
+  if(pr&&pr<=today)return 'active';
+  return 'planned';
+}
+function batchNeedsAttention(b){
+  const issues=[];
+  const now=new Date();
+  const ms=b.stage2?.measurements||[];
+  if(ms.length){
+    const recent=[...ms].sort((a,c)=>(c.date||'').localeCompare(a.date||''))[0];
+    if(recent?.date){
+      const age=(now-parseDate(recent.date))/86400000;
+      if(age>14 && inferBatchStatus(b)==='active')issues.push('давно нет замеров');
+    }
+    const bx=ms.map(x=>parseFloat(x.refractometerBrix??x.brix??x.density)).filter(isFinite);
+    if(b.stage2?.startDate && bx.length>=3){
+      const last=bx.slice(-3);
+      if(Math.max(...last)-Math.min(...last)<0.15)issues.push('Brix почти не меняется');
+    }
+  }
+  const ph=parseFloat(b.stage1?.ph);
+  if(isFinite(ph)&&ph>0&&(ph<2.5||ph>4.5))issues.push('pH вне 2.5–4.5');
+  if(b.type==='petnat'){
+    const s=b.stage3||{};
+    const p=parseFloat(s.pressureEstimate);
+    const max=parseFloat(s.maxBottlePressure)||0;
+    const margin=Math.max(0,1-(parseFloat(s.safetyMargin)||15)/100);
+    if(isFinite(p)&&max>0&&p>=max*margin)issues.push('давление близко к пределу');
+    if((s.petnatWarnings||[]).some(x=>/опас|противореч|недостат/i.test(x)))issues.push('Pet-Nat требует проверки');
+  }
+  return issues;
+}
+function getBatchStatus(b){
+  if(!b.status){b.status=inferBatchStatus(b);b.statusUpdatedAt=new Date().toISOString();}
+  if(b.status!=='attention'){
+    const issues=batchNeedsAttention(b);
+    if(issues.length)return 'attention';
+  }
+  return VALID_STATUSES.has(b.status)?b.status:inferBatchStatus(b);
+}
+function getYear(b){
+  const d=b.stage1?.date||b.createdDate||b.createdAt;
+  const y=parseInt(String(d||'').slice(0,4));return isNaN(y)?0:y;
+}
+
+/* ============ ПАПКА / ЗАПУСК ============ */
+function updateFolderUI(ok){
+  const el=$('#folderStatus');
+  if(ok){el.textContent='📂 '+dirHandle.name;el.className='chip ok';}
+  else if(!('showDirectoryPicker' in window)){el.textContent='FS API не поддерж.';el.className='chip err';}
+  else{el.textContent='папка не выбрана';el.className='chip';}
+}
+async function requestFolder(){
+  if(!('showDirectoryPicker' in window)){toast('Браузер не поддерживает FS Access API');return;}
+  try{
+    const saved=await loadHandle();
+    if(saved){
+      let p=await saved.queryPermission({mode:'readwrite'}).catch(()=>'prompt');
+      if(p!=='granted')p=await saved.requestPermission({mode:'readwrite'}).catch(()=>'denied');
+      if(p==='granted')dirHandle=saved;
+    }
+    if(!dirHandle){
+      const h=await showDirectoryPicker({mode:'readwrite'});
+      dirHandle=h;await saveHandle(h);
+    }
+    updateFolderUI(true);
+    await load();
+    if(fileCorrupted)toast('⚠ cider_data.json не читается — проверьте файл');
+    if(currentId)closeBatch();
+    renderDashboard();renderList();
+  }catch(e){console.warn(e);}
+}
+async function bootstrap(){
+  let ok=false;
+  if('showDirectoryPicker' in window){
+    const saved=await loadHandle();
+    if(saved){
+      const p=await saved.queryPermission({mode:'readwrite'}).catch(()=>'denied');
+      if(p==='granted'){dirHandle=saved;ok=true;}
+    }
+  }
+  updateFolderUI(ok);
+  if(ok){await load();if(fileCorrupted)toast('⚠ cider_data.json не читается');}
+  renderDashboard();renderList();
+}
+
+/* ============ ДАШБОРД / СПИСОК ============ */
+function renderDashboard(){
+  const c={planned:0,active:0,aging:0,done:0,attention:0};
+  data.forEach(b=>c[getBatchStatus(b)]++);
+  const vol=data.reduce((s,b)=>s+(parseFloat(b.stage1?.volume)||0),0);
+  const card=(v,l,cls='')=>`<div class="stat"><div class="v">${v}</div><div class="l">${cls?`<i class="sd ${cls}"></i>`:''}${l}</div></div>`;
+  $('#dashStats').innerHTML=
+    card(data.length,'всего партий')+
+    card(c.planned,'план','planned')+
+    card(c.active,'брожение','active')+
+    card(c.aging,'выдержка','aging')+
+    card(c.done,'готово','done')+
+    card(vol.toFixed(0),'литров сока');
+}
+function sortBatches(arr,mode){
+  const cp=[...arr];
+  const ord={planned:0,active:1,aging:2,done:3,attention:4};
+  switch(mode){
+    case 'created-desc':cp.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));break;
+    case 'created-asc':cp.sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''));break;
+    case 'year-desc':cp.sort((a,b)=>getYear(b)-getYear(a));break;
+    case 'year-asc':cp.sort((a,b)=>getYear(a)-getYear(b));break;
+    case 'name-asc':cp.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ru'));break;
+    case 'name-desc':cp.sort((a,b)=>(b.name||'').localeCompare(a.name||'','ru'));break;
+    case 'type':cp.sort((a,b)=>(a.type||'').localeCompare(b.type||''));break;
+    case 'status':cp.sort((a,b)=>(ord[getBatchStatus(a)]||0)-(ord[getBatchStatus(b)]||0));break;
+  }
+  return cp;
+}
+function renderList(){
+  const q=($('#search').value||'').trim().toLowerCase();
+  const typeF=$('#filterType').value,statusF=$('#filterStatus').value,sort=$('#sort').value;
+  let arr=data.slice();
+  if(q)arr=arr.filter(b=>(b.name||'').toLowerCase().includes(q)||(b.code||'').toLowerCase().includes(q)
+    ||(b.stage1?.varieties||'').toLowerCase().includes(q)||(b.generalNotes||'').toLowerCase().includes(q));
+  if(typeF)arr=arr.filter(b=>b.type===typeF);
+  if(statusF)arr=arr.filter(b=>getBatchStatus(b)===statusF);
+  arr=sortBatches(arr,sort);
+  const host=$('#batchList');host.innerHTML='';
+  if(!arr.length){host.innerHTML='<div class="card" style="text-align:center;color:var(--muted);grid-column:1/-1">Партии не найдены</div>';return;}
+  for(const b of arr){
+    const el=document.createElement('div');el.className='batch';
+    el.innerHTML=`
+      <div class="b-top">
+        <span class="sdot ${getBatchStatus(b)}" title="${STATUS_LABELS[getBatchStatus(b)]}"></span>
+        <span class="b-name">${esc(b.name)||'(без названия)'}</span>
+        <span class="tag t-${esc(b.type)}">${TYPE_LABELS[b.type]||esc(b.type)}</span>
+      </div>
+      <div class="b-code">${esc(b.code||'—')} · ${fmtDate(b.stage1?.date||b.createdDate)}${b.labelImage?' · 📷':''}</div>
+      <div class="b-stats">
+        <span class="mini"><b>${fmtN(b.stage1?.brix)}</b>Bx</span>
+        <span class="mini"><b>${fmtN(b.stage1?.actualAbv||b.stage1?.predictedAbv)}</b>%</span>
+        <span class="mini"><b>${fmtN(b.stage1?.volume,0)}</b>л</span>
+      </div>
+      ${b.generalNotes?`<div class="b-notes">${esc(b.generalNotes.slice(0,90))}</div>`:''}`;
+    el.onclick=()=>openBatch(b.id);
+    host.appendChild(el);
+  }
+}
+
+/* ============ ОТКРЫТИЕ / ЗАКРЫТИЕ ============ */
+function openBatch(id){
+  currentId=id;
+  const b=data.find(x=>x.id===id);if(!b)return;
+  $('#listView').hidden=true;$('#editView').hidden=false;
+  $('#editTitle').textContent=b.name||'(без названия)';
+  const tag=$('#editTitleTag');tag.textContent=TYPE_LABELS[b.type]||b.type;tag.className='tag t-'+b.type;
+  const st=getBatchStatus(b),chip=$('#editStatusChip');
+  chip.textContent=STATUS_LABELS[st];chip.className='chip st-'+st+(st==='attention'?' status-attention':'');
+  $('#fCode').value=b.code||'';$('#fName').value=b.name||'';$('#fCreatedDate').value=b.createdDate||'';
+  $('#fStatus').value=VALID_STATUSES.has(b.status)?b.status:inferBatchStatus(b);
+  renderStage3();renderStage4();renderNutrients();renderMeasurements();
+  fillForm(b);
+  updateABV();syncRate();syncStage4Dynamic();updateFinalCodeUI();
+  showLabelImage(b);
+  window.scrollTo({top:0});
+}
+function closeBatch(){
+  if(currentLabelUrl){URL.revokeObjectURL(currentLabelUrl);currentLabelUrl=null;}
+  currentId=null;
+  $('#editView').hidden=true;$('#listView').hidden=false;
+  renderDashboard();renderList();
+}
+
+/* ============ ФОРМА ============ */
+function fillForm(b){
+  $$('[data-f]').forEach(el=>{
+    const path=el.dataset.f.split('.');
+    let v=b;for(const p of path)v=v?.[p];
+    if(v===undefined||v===null)v='';
+    if(el.type==='checkbox')el.checked=!!v;else el.value=v;
+  });
+  $('#cStartBrix').value=b.stage1?.brix??0;
+  updateCalc();
+}
+function collectForm(){
+  const b=data.find(x=>x.id===currentId);if(!b)return null;
+  $$('[data-f]').forEach(el=>{
+    const path=el.dataset.f.split('.');
+    let o=b;for(let i=0;i<path.length-1;i++)o=o[path[i]]=o[path[i]]||{};
+    let val;
+    if(el.type==='checkbox')val=el.checked;
+    else if(el.type==='number')val=el.value===''?0:(parseFloat(el.value)||0);
+    else val=el.value;
+    if(el.dataset.f==='stage5.sparkling'&&val!=='')val=Number(val);
+    o[path[path.length-1]]=val;
+  });
+  b.code=$('#fCode').value.trim()||generateCode(b);
+  b.name=$('#fName').value.trim();
+  b.createdDate=$('#fCreatedDate').value||b.createdDate;
+  if($('#fStatus')){
+    const next=$('#fStatus').value;
+    if(VALID_STATUSES.has(next)&&next!==b.status){
+      b.status=next;b.statusUpdatedAt=new Date().toISOString();
+    }
+  }
+  b.updatedAt=new Date().toISOString();
+  const br=parseFloat(b.stage1.brix)||0;
+  b.stage1.predictedAbv=(br*0.55).toFixed(2);
+  if(b.stage4)b.stage4.finalCode=b.stage4.finalCode||generateFinalCode(b);
+  updateFinalCodeUI();
+  return b;
+}
+function generateCode(b){
+  const d=(b.stage1?.date||'').replace(/-/g,'').slice(2);
+  const varieties=(b.stage1?.varieties||'').trim();
+  let initials='';
+  if(varieties)initials=varieties.split(/[,+]/).map(s=>s.trim()).filter(Boolean)
+    .map(s=>s[0]?.toUpperCase()||'').slice(0,3).join('');
+  return `СИДР-${d||'000000'}-${initials||'NEW'}`;
+}
+function generateFinalCode(b){
+  const base=b.code||generateCode(b);
+  const cap=(b.stage4?.finalCap||'').slice(0,1)||'C';
+  const dis=(b.stage4?.disgorging||'').replace(/-/g,'').slice(-4)||'0000';
+  return `${base}-${cap}-${dis}`;
+}
+function updateFinalCodeUI(){
+  const b=data.find(x=>x.id===currentId);
+  const el=$('#finalCodeLcd');
+  if(el&&b&&b.stage4)el.textContent=b.stage4.finalCode||generateFinalCode(b);
+}
+function syncStage4Dynamic(){
+  const chk=$('[data-f="stage4.batonnage"]'),block=$('#batBlock');
+  if(chk&&block)block.style.display=chk.checked?'block':'none';
+}
+
+/* ============ ДАТЧИК-ШКАЛА (SVG) ============ */
+function gaugeSVG(val,max,unit,label){
+  const S=150,cx=S/2,cy=S/2,r=S/2-16;
+  const a0=Math.PI*.75,a1=Math.PI*2.25;
+  const frac=Math.max(0,Math.min(1,max>0?(Number(val)||0)/max:0));
+  const pol=(rr,a)=>[(cx+rr*Math.cos(a)).toFixed(2),(cy+rr*Math.sin(a)).toFixed(2)];
+  const arc=(rr,from,to)=>{
+    const [x0,y0]=pol(rr,from),[x1,y1]=pol(rr,to);
+    return `M ${x0} ${y0} A ${rr} ${rr} 0 ${(to-from)>Math.PI?1:0} 1 ${x1} ${y1}`;
+  };
+  let ticks='';
+  for(let i=0;i<=10;i++){
+    const a=a0+(a1-a0)*i/10;
+    const [x1,y1]=pol(r-13,a),[x2,y2]=pol(r-7,a);
+    ticks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--gauge-tick)" stroke-width="${i%5===0?2:1}"/>`;
+  }
+  const v=Number(val)||0;
+  return `<svg class="gauge" viewBox="0 0 ${S} ${S}" role="img" aria-label="${label}: ${v}${unit}">
+    <path d="${arc(r,a0,a1)}" fill="none" stroke="var(--gauge-track)" stroke-width="9" stroke-linecap="round"/>
+    ${frac>0?`<path d="${arc(r,a0,a0+(a1-a0)*frac)}" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"/>`:''}
+    ${ticks}
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" class="gv">${v.toFixed(1)}<tspan class="gu" dx="2">${unit}</tspan></text>
+    <text x="${cx}" y="${cy+24}" text-anchor="middle" class="gl">${label}</text>
+  </svg>`;
+}
+const lcd=(lbl,id,unit,sub,cls='')=>`<div class="lcd ${cls}"><div class="lbl">${lbl}</div>
+  <div class="val"><span id="${id}">—</span><span class="u">${unit}</span></div>
+  ${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+
+/* ============ ПОДКОРМКИ / ЗАМЕРЫ ============ */
+function renderNutrients(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#nutrients');host.innerHTML='';
+  (b.stage2.nutrients||[]).forEach((n,i)=>{
+    const row=document.createElement('div');row.className='nrow';
+    row.innerHTML=`
+      <div><label>Дата</label><input type="date" value="${esc(n.date||'')}" data-k="date"></div>
+      <div><label>Продукт</label><input value="${esc(n.product||'')}" data-k="product" placeholder="DAP / Fermaid O…"></div>
+      <div><label>Дозировка</label><input value="${esc(n.dosage||'')}" data-k="dosage"></div>
+      <div><label>Заметка</label><input value="${esc(n.note||'')}" data-k="note"></div>
+      <button class="del" type="button" title="Удалить">✕</button>`;
+    row.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{n[inp.dataset.k]=inp.value;});
+    row.querySelector('.del').onclick=()=>{b.stage2.nutrients.splice(i,1);renderNutrients();markDirty();};
+    host.appendChild(row);
+  });
+}
+function renderMeasurements(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#measurements');host.innerHTML='';
+  const ms=[...(b.stage2.measurements||[])].sort((x,y)=>(x.date||'').localeCompare(y.date||''));
+  ms.forEach(m=>{
+    const i=b.stage2.measurements.indexOf(m);
+    const row=document.createElement('div');row.className='mrow';
+    row.innerHTML=`
+      <div><label>Дата</label><input type="date" value="${esc(m.date||'')}" data-k="date"></div>
+      <div><label>Время</label><input type="time" value="${esc(m.time||'')}" data-k="time"></div>
+      <div><label>Рефрактометр, °Bx</label><input type="number" step="0.1" value="${esc(m.refractometerBrix??m.brix??m.density??'')}" data-k="refractometerBrix"></div>
+      <div><label>Ареометр, SG</label><input type="number" step="0.0001" value="${esc(m.hydrometerSG??'')}" data-k="hydrometerSG"></div>
+      <div><label>Темп., °C</label><input type="number" step="0.1" value="${esc(m.temp??'')}" data-k="temp"></div>
+      <div><label>pH</label><input type="number" step="0.01" value="${esc(m.ph??'')}" data-k="ph"></div>
+      <div><label>ABV, %</label><input type="number" step="0.1" value="${esc(m.alcohol??'')}" data-k="alcohol"></div>
+      <div><label>Давление, bar</label><input type="number" step="0.1" value="${esc(m.pressure??'')}" data-k="pressure"></div>
+      <div><label>Метод</label><select data-k="method">
+        <option ${m.method==='refractometer'?'selected':''} value="refractometer">Рефрактометр</option>
+        <option ${m.method==='hydrometer'?'selected':''} value="hydrometer">Ареометр</option>
+        <option ${m.method==='both'?'selected':''} value="both">Оба</option>
+        <option ${m.method==='lab'?'selected':''} value="lab">Лаборатория</option>
+        <option ${m.method==='calc'?'selected':''} value="calc">Расчёт</option>
+      </select></div>
+      <div style="grid-column:span 2"><label>Заметка</label><input value="${esc(m.note||'')}" data-k="note"></div>
+      <button class="del" type="button" title="Удалить">✕</button>`;
+    row.querySelectorAll('[data-k]').forEach(inp=>{
+      inp.oninput=()=>{
+        m[inp.dataset.k]=inp.value;
+        if(inp.dataset.k==='refractometerBrix'||inp.dataset.k==='hydrometerSG')renderFermentChart();
+        markDirty();
+      };
+    });
+    row.querySelector('.del').onclick=()=>{b.stage2.measurements.splice(i,1);renderMeasurements();markDirty();};
+    host.appendChild(row);
+  });
+  renderFermentChart();
+}
+function renderFermentChart(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#fchart');if(!host)return;
+  const ms=(b.stage2.measurements||[]).map(m=>({
+    d:m.date,v:parseFloat(m.refractometerBrix??m.brix??m.density)
+  })).filter(m=>m.d&&isFinite(m.v)).sort((a,c)=>a.d<c.d?-1:1);
+  if(ms.length<2){host.innerHTML='<div class="hint" style="padding:6px 4px">≥ 2 замера с Brix — появится кривая брожения</div>';return;}
+  const W=600,H=160,P=36;
+  let vmin=Math.min(...ms.map(m=>m.v)),vmax=Math.max(...ms.map(m=>m.v));
+  if(vmax===vmin){vmax+=1;vmin-=1;}
+  const pad=(vmax-vmin)*.12;vmin-=pad;vmax+=pad;
+  const x=i=>P+(W-2*P)*(i/(ms.length-1));
+  const y=v=>H-P-(H-2*P)*((v-vmin)/(vmax-vmin));
+  let path='';ms.forEach((m,i)=>path+=(i?'L':'M')+x(i).toFixed(1)+','+y(m.v).toFixed(1)+' ');
+  const dots=ms.map((m,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(m.v).toFixed(1)}" r="3" fill="#f2ba60"><title>${esc(m.d)} · ${m.v}°Bx</title></circle>`).join('');
+  const grid=[vmax,(vmax+vmin)/2,vmin].map(v=>
+    `<line x1="${P}" y1="${y(v).toFixed(1)}" x2="${W-P}" y2="${y(v).toFixed(1)}" stroke="#23262d"/>
+     <text x="${P-6}" y="${(y(v)+3).toFixed(1)}" text-anchor="end" class="axis">${v.toFixed(1)}</text>`).join('');
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${grid}
+    <path d="${path}" fill="none" stroke="#f2ba60" stroke-width="2"/>${dots}
+    <text x="${P}" y="${H-4}" class="axis">${esc(ms[0].d)}</text>
+    <text x="${W-P}" y="${H-4}" class="axis" text-anchor="end">${esc(ms[ms.length-1].d)}</text></svg>`;
+}
+
+/* ============ РАСЧЁТЫ ============ */
+function updateCalc(){
+  const s=parseFloat($('#cStartBrix').value)||0;
+  const e=parseFloat($('#cEndBrix').value)||0;
+  $('#cAbvLcd').textContent=Math.max(0,(s-e)*0.55).toFixed(2);
+  $('#cAbvNote').textContent='Ориентировочно; после ферментации рефрактометр требует алкогольной коррекции.';
+}
+function updateABV(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const el=$('[data-f="stage1.brix"]');if(!el)return;
+  const br=parseFloat(el.value)||0;
+  const abv=br*0.55;
+  const pred=$('[data-f="stage1.predictedAbv"]');
+  if(pred)pred.value=abv.toFixed(2);
+  const gauge=$('#abvGauge');if(gauge)gauge.innerHTML=gaugeSVG(abv,15,'%','ABV ПРОГНОЗ');
+}
+
+/* ---------- Pet-Nat / alcohol correction ---------- */
+function clamp(n,a,b){return Math.min(b,Math.max(a,n));}
+function brixToSG(bx){
+  const b=Number(bx);
+  if(!isFinite(b))return NaN;
+  return 1 + b/(258.6-((b/258.2)*227.1));
+}
+function sgToBrix(sg){
+  const s=Number(sg);
+  if(!isFinite(s)||s<=0)return NaN;
+  return 258.6*((s-1)/(258.6-227.1*(s-1)));
+}
+function oeFromSG(sg){return (Number(sg)-1)*1000;}
+function platoFromSG(sg){return sgToBrix(sg);}
+function terrillCorrectedSG(originalBrix, observedBrix){
+  const R=Number(observedBrix), B=Number(originalBrix);
+  if(!isFinite(R)||!isFinite(B))return NaN;
+  return 1.001843
+    -0.002318474*R
+    -0.000007775*R*R
+    -0.000000034*R*R*R
+    +0.00574*B
+    +0.00003344*B*B
+    +0.000000086*B*B*B;
+}
+function estimateABVFromOGSG(og,fg){
+  if(!isFinite(og)||!isFinite(fg)||og<=fg)return 0;
+  return clamp((og-fg)*131.25,0,20);
+}
+function normalizePressureBar(value,unit){
+  const p=Number(value)||0;
+  return unit==='atm'?p*1.01325:p;
+}
+function pressureFromSugar(sugarGPerL){
+  return Math.max(0,Number(sugarGPerL)||0)/4;
+}
+function sugarFromPressure(pressureBar){
+  return Math.max(0,Number(pressureBar)||0)*4/1.01325;
+}
+function measurementConsistency(originalBrix, refrBrix, hydSG, abv){
+  const out={warnings:[],score:'insufficient'};
+  const r=Number(refrBrix), sg=Number(hydSG), og=brixToSG(originalBrix);
+  if(!isFinite(r)&&!isFinite(sg)){out.warnings.push('Недостаточно текущих измерений: нужен Brix рефрактометра и/или SG ареометра.');return out;}
+  if(isFinite(r)&&isFinite(sg)&&isFinite(og)){
+    const terrSG=terrillCorrectedSG(originalBrix,r);
+    if(isFinite(terrSG)){
+      const delta=Math.abs(terrSG-sg);
+      if(delta>0.008)out.warnings.push(`Brix и SG расходятся существенно (ΔSG ≈ ${delta.toFixed(3)}).`);
+      else if(delta>0.004)out.warnings.push(`Brix и SG расходятся заметно (ΔSG ≈ ${delta.toFixed(3)}).`);
+      else out.score='good';
+    }
+  }
+  if(isFinite(abv)&&abv>0&&isFinite(r)&&isFinite(og)){
+    const terrSG=terrillCorrectedSG(originalBrix,r);
+    const calc=estimateABVFromOGSG(og,terrSG);
+    if(Math.abs(calc-abv)>1.2)out.warnings.push(`Введённый ABV (${abv.toFixed(1)}%) не согласуется с оценкой по OG/SG (${calc.toFixed(1)}%).`);
+  }
+  if(out.score==='insufficient'&&out.warnings.length===0)out.score='single-source';
+  return out;
+}
+function calculatePetnat(s){
+  const originalBrix=Number(s.originalBrix);
+  const refr=Number(s.refractometerBrix);
+  const hydSG=Number(s.hydrometerSG);
+  const temp=Number(s.measurementTemp||s.temperature||18);
+  const abvInput=Number(s.measurementAlcohol);
+  const targetBar=normalizePressureBar(s.desiredPressure,s.pressureUnit||'bar');
+  const maxBottle=Number(s.maxBottlePressure)||4.5;
+  const safety=(Number(s.safetyMargin)||15)/100;
+  const result={
+    originalBrix, refractometerBrix:isFinite(refr)?refr:NaN,
+    hydrometerSG:isFinite(hydSG)?hydSG:NaN,temp,
+    targetPressureBar:targetBar, maxBottlePressure:maxBottle, warnings:[]
+  };
+
+  // Temperature is intentionally displayed/validated, but generic refractometer temperature
+  // correction is not invented here because it is instrument-specific.
+  if(!isFinite(temp)||temp<0||temp>45)result.warnings.push('Температура образца выглядит необычно — проверьте прибор и калибровку.');
+  result.warnings.push('Температурная поправка рефрактометра не применяется автоматически без модели/таблицы конкретного прибора.');
+
+  let correctedSG=NaN, correctedBrix=NaN, estimatedABV=NaN;
+  if(isFinite(hydSG)){
+    correctedSG=hydSG;
+    correctedBrix=sgToBrix(hydSG);
+  }
+  if(isFinite(refr)&&isFinite(originalBrix)){
+    const terrSG=terrillCorrectedSG(originalBrix,refr);
+    if(!isFinite(correctedSG)){correctedSG=terrSG;correctedBrix=sgToBrix(terrSG);}
+    else{
+      const delta=Math.abs(terrSG-correctedSG);
+      if(delta>0.004)result.warnings.push(`Рефрактометр после алкогольной коррекции и ареометр расходятся на ΔSG ${delta.toFixed(3)}.`);
+    }
+  }
+  if(isFinite(correctedSG)&&isFinite(originalBrix)){
+    estimatedABV=estimateABVFromOGSG(brixToSG(originalBrix),correctedSG);
+  }
+  if(isFinite(abvInput)&&abvInput>0)estimatedABV=abvInput;
+
+  result.correctedSG=correctedSG;
+  result.correctedBrix=correctedBrix;
+  result.estimatedABV=estimatedABV;
+
+  // Residual sugar is an estimate. If user provides a direct value later, it should take precedence.
+  let sugar=Number(s.estimatedResidualSugar);
+  if(!isFinite(sugar)||sugar<0){
+    if(isFinite(correctedBrix)){
+      sugar=correctedBrix*10;
+      result.warnings.push('Остаточный сахар оценён из Brix-equivalent; это не лабораторный анализ ферментируемого сахара.');
+    }else sugar=NaN;
+  }
+  result.residualSugar=sugar;
+
+  const predictedBar=isFinite(sugar)?pressureFromSugar(sugar):NaN;
+  result.pressureBar=predictedBar;
+  result.targetSugar=sugarFromPressure(targetBar);
+
+  // Target refractometer reading: solve Terrill-compatible equation against target SG
+  // using target sugar as a Brix-equivalent. This is a planning estimate, not a direct
+  // prediction of bottle pressure.
+  const targetBrixEquivalent=result.targetSugar/10;
+  result.targetBrixEquivalent=targetBrixEquivalent;
+  result.targetRefractometerBrix=NaN;
+  if(isFinite(originalBrix)){
+    const targetSG=brixToSG(targetBrixEquivalent);
+    let best={r:NaN,d:Infinity};
+    for(let r=0;r<=35;r+=0.02){
+      const sg=terrillCorrectedSG(originalBrix,r);
+      if(isFinite(sg)){
+        const d=Math.abs(sg-targetSG);
+        if(d<best.d)best={r,d};
+      }
+    }
+    result.targetRefractometerBrix=best.r;
+    result.warnings.push('Целевой Brix рефрактометра — расчётный эквивалент по выбранной модели; фактическое показание зависит от состава и прибора.');
+  }
+
+  if(!isFinite(refr)&&!isFinite(hydSG))
+    result.warnings.push('Нет текущего Brix/SG: расчёт фактического остаточного сахара невозможен.');
+  if(isFinite(predictedBar)&&isFinite(maxBottle)){
+    const limit=maxBottle*(1-safety);
+    if(predictedBar>=limit)
+      result.warnings.push(`ОПАСНО: расчётное давление ${predictedBar.toFixed(2)} bar приближается к пределу бутылки ${maxBottle.toFixed(2)} bar с учётом запаса.`);
+  }
+  const consistency=measurementConsistency(originalBrix,refr,hydSG,abvInput);
+  result.warnings.push(...consistency.warnings);
+  result.confidence=consistency.score;
+  return result;
+}
+
+/* ============ ЭТАП 3 ============ */
+function updateCalc(){
+  const s=parseFloat($('#cStartBrix').value)||0;
+  const e=parseFloat($('#cEndBrix').value)||0;
+  $('#cAbvLcd').textContent=Math.max(0,(s-e)*0.55).toFixed(2);
+}
+function updateABV(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const br=parseFloat($('[data-f="stage1.brix"]').value)||0;
+  const abv=br*0.55;
+  $('[data-f="stage1.predictedAbv"]').value=abv.toFixed(2);
+  $('#abvGauge').innerHTML=gaugeSVG(abv,15,'%','ABV ПРОГНОЗ');
+}
+
+/* ============ ЭТАП 3 ============ */
+function renderStage3(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#stage3Body');host.innerHTML='';
+  if(b.type==='classic')host.appendChild(buildClassicStage3(b));
+  else if(b.type==='petnat')host.appendChild(buildPetnatStage3(b));
+  else if(b.type==='still')host.appendChild(buildStillStage3(b));
+  else if(b.type==='solera')host.appendChild(buildSoleraStage3(b));
+}
+function buildClassicStage3(b){
+  const s=b.stage3;
+  if(s.liqueurPerBottle===undefined)s.liqueurPerBottle=20;
+  if(s.bottleSize===undefined)s.bottleSize=0.75;
+  if(s.desiredPressure===undefined)s.desiredPressure=5;
+  if(s.liqueurSugarConcentration===undefined)s.liqueurSugarConcentration=600;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="panel">
+    <div class="panel-head">🍾 Тиражный ликёр <span>liqueur de tirage</span></div>
+    <div class="hint">Базовая оценка: 4 г/л ферментируемого сахара ≈ 1 bar. Дозировки дрожжей/бентонита — шаблон, проверяйте инструкцию производителя.</div>
+    <div class="grid" style="margin-top:10px">
+      <div><label>Целевое давление, bar</label><input type="number" step="0.1" id="cDesiredP" value="${s.desiredPressure||0}"></div>
+      <div><label>Объём сухого сидра, л</label><input type="number" step="0.1" id="cVolume" value="${s.volume||0}"></div>
+      <div><label>Концентрация сахара в ликёре, g/L</label><input type="number" step="1" id="cLiqueurConc" value="${s.liqueurSugarConcentration||600}">
+        <div class="hint">Укажите фактическую концентрацию вашего ликёра.</div></div>
+    </div>
+    <div class="lcd-row">
+      ${lcd('Сахар','lcSugar','г','P × 4 × V')}
+      ${lcd('Дрожжи','lcYeast','г','шаблон V / 10')}
+      ${lcd('Бентонит','lcBent','г','шаблон V × 1')}
+    </div>
+    <div class="grid">
+      <div><label>Бутылка, л</label>
+        <select id="cBottleSel">
+          <option value="0.33">0.33</option><option value="0.45">0.45</option><option value="0.5">0.50</option>
+          <option value="0.75">0.75</option><option value="1.5">1.50</option><option value="custom">своя…</option>
+        </select></div>
+      <div><label>или свой объём, л</label><input type="number" step="0.01" id="cBottleCustom" placeholder="0.33"></div>
+      <div><label>Ликёра на бутылку, мл</label><input type="number" step="0.5" id="cLiqueurPerBottle" value="${s.liqueurPerBottle||0}">
+        <div class="hint">Это фактический/планируемый объём ликёра.</div></div>
+    </div>
+    <div class="lcd-row">
+      ${lcd('Бутылок','lcBottles','шт','V / объём')}
+      ${lcd('Ликёр всего','lcTotal','мл','')}
+      ${lcd('Сахар из ликёра','lcConc','г/л','фактический вклад')}
+      ${lcd('Нужно на бутылку','lcNeed','мл','для заданной концентрации')}
+    </div>
+    <div id="cWarn"></div>
+  </div>
+  <div class="grid">
+    <div><label>Укупорка</label><select data-f="stage3.cap">
+      <option>Кронен-пробка</option><option>Корковая + мюзле</option><option>Пластиковая (ПЭТ)</option><option>Другое</option></select></div>
+    <div><label>Дата укупорки</label><input type="date" data-f="stage3.date"></div>
+    <div><label>Начало автолиза</label><input type="date" data-f="stage3.autolysis"></div>
+  </div>`;
+  const bind=(id,key)=>wrap.querySelector(id).addEventListener('input',e=>{s[key]=parseFloat(e.target.value)||0;recalc();markDirty();});
+  bind('#cDesiredP','desiredPressure');bind('#cVolume','volume');bind('#cLiqueurConc','liqueurSugarConcentration');
+  const sel=wrap.querySelector('#cBottleSel'),custom=wrap.querySelector('#cBottleCustom');
+  sel.onchange=()=>{
+    if(sel.value==='custom'){custom.focus();s.bottleSize=parseFloat(custom.value)||0;}
+    else{s.bottleSize=parseFloat(sel.value);custom.value='';}
+    recalc();markDirty();
+  };
+  custom.oninput=()=>{s.bottleSize=parseFloat(custom.value)||0;recalc();markDirty();};
+  wrap.querySelector('#cLiqueurPerBottle').oninput=e=>{s.liqueurPerBottle=parseFloat(e.target.value)||0;recalc();markDirty();};
+  const sizes=['0.33','0.45','0.5','0.75','1.5'];
+  if(sizes.includes(String(s.bottleSize)))sel.value=String(s.bottleSize);
+  else{sel.value='custom';custom.value=s.bottleSize||'';}
+  function recalc(){
+    const p=Number(s.desiredPressure)||0,v=Number(s.volume)||0,bs=Number(s.bottleSize)||0;
+    const lp=Number(s.liqueurPerBottle)||0, conc=Number(s.liqueurSugarConcentration)||0;
+    const sugar=p*4*v, yeast=v/10, bent=v;
+    const bottles=bs>0?v/bs:0;
+    const total=lp*bottles;
+    const sugarAddedPerBottle=(lp/1000)*conc;
+    const sugarAddedTotal=sugarAddedPerBottle*bottles;
+    const sugarContribution=sugarAddedTotal/(v||1);
+    const requiredTotalLiqueur=conc>0?sugar/conc:0;
+    const requiredPerBottle=bottles>0?(requiredTotalLiqueur*1000/bottles):0;
+    wrap.querySelector('#lcSugar').textContent=sugar.toFixed(0);
+    wrap.querySelector('#lcYeast').textContent=yeast.toFixed(1);
+    wrap.querySelector('#lcBent').textContent=bent.toFixed(1);
+    wrap.querySelector('#lcBottles').textContent=bottles.toFixed(0);
+    wrap.querySelector('#lcTotal').textContent=total.toFixed(0);
+    wrap.querySelector('#lcConc').textContent=sugarContribution.toFixed(1);
+    wrap.querySelector('#lcNeed').textContent=requiredPerBottle.toFixed(1);
+    let warn='';
+    if(conc<=0)warn+='<div class="warn">⚠ Укажите положительную концентрацию сахара в ликёре (g/L).</div>';
+    if(bottles<=0)warn+='<div class="warn">⚠ Укажите положительный объём партии и объём бутылки.</div>';
+    if(conc>0&&bottles>0){
+      if(lp+0.001<requiredPerBottle)
+        warn+=`<div class="warn">⚠ Ликёра недостаточно. Для ${sugar.toFixed(0)} г сахара требуется ≈ ${requiredPerBottle.toFixed(1)} мл/бутылку при ${conc.toFixed(0)} g/L.</div>`;
+      else
+        warn+=`<div class="notice ok">✓ При ${lp.toFixed(1)} мл/бутылку будет внесено ≈ ${sugarAddedTotal.toFixed(0)} г сахара (${sugarContribution.toFixed(1)} g/L по объёму партии).</div>`;
+    }
+    wrap.querySelector('#cWarn').innerHTML=warn;
+    s.totalSugar=+sugar.toFixed(2);s.totalYeast=+yeast.toFixed(2);s.totalBentonite=+bent.toFixed(2);
+    s.bottleCount=+bottles.toFixed(2);s.totalLiqueur=+total.toFixed(2);
+    s.sugarConcentration=+sugarContribution.toFixed(2);
+    s.requiredLiqueurPerBottle=+requiredPerBottle.toFixed(2);
+  }
+  recalc();
+  return wrap;
+}
+function buildPetnatStage3(b){
+  const s=b.stage3;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="panel">
+    <div class="panel-head">🧪 Pet-Nat: измерение → коррекция → давление</div>
+    <div class="hint">После появления алкоголя рефрактометр и Brix нельзя трактовать как прямой остаточный сахар. Исходное показание сохраняется, а ниже показывается расчётная коррекция.</div>
+    <div class="grid" style="margin-top:10px">
+      <div><label>Режим точности</label><select id="petMode">
+        <option value="basic">BASIC — только рефрактометр</option>
+        <option value="standard">STANDARD — Brix + исходные данные</option>
+        <option value="advanced">ADVANCED — Brix + SG + ABV + T</option>
+      </select></div>
+      <div><label>Исходный Brix</label><input type="number" step="0.1" id="petOriginalBrix" value="${s.originalBrix??b.stage1?.brix??0}"></div>
+      <div><label>Текущий Brix рефрактометра</label><input type="number" step="0.1" id="petRefract" value="${s.refractometerBrix??s.brix??''}"></div>
+      <div><label>Текущий SG ареометра</label><input type="number" step="0.0001" id="petSG" value="${s.hydrometerSG??''}" placeholder="1.0120"></div>
+      <div><label>Текущий °Oe</label><input type="number" step="0.1" id="petOe" value="${s.hydrometerOe??''}"></div>
+      <div><label>Текущий Plato/Brix эквивалент</label><input type="number" step="0.1" id="petPlato" value="${s.hydrometerPlato??''}"></div>
+      <div><label>ABV, %</label><input type="number" step="0.1" id="petAbv" value="${s.measurementAlcohol??''}"></div>
+      <div><label>Температура образца, °C</label><input type="number" step="0.1" id="petTemp" value="${s.measurementTemp??18}"></div>
+      <div><label>Остаточный ферментируемый сахар, g/L (если известен)</label><input type="number" step="0.1" id="petSugarInput" value="${s.estimatedResidualSugar??''}"></div>
+      <div><label>Целевое давление</label><div class="row">
+        <input type="number" step="0.1" id="pDesired" value="${s.desiredPressure??4}">
+        <select id="pUnit" style="max-width:90px"><option value="bar">bar</option><option value="atm">atm</option></select>
+      </div></div>
+      <div><label>Максимум бутылки, bar</label><input type="number" step="0.1" id="petMaxP" value="${s.maxBottlePressure??4.5}"></div>
+      <div><label>Запас безопасности, %</label><input type="number" step="1" id="petMargin" value="${s.safetyMargin??15}"></div>
+    </div>
+    <div id="petWarnings"></div>
+  </div>
+  <div class="lcd-row">
+    ${lcd('Реальный Brix ≈','petBx','°Bx','корректированный эквивалент')}
+    ${lcd('Остаточный сахар ≈','petSugar','г/л','оценка')}
+    ${lcd('SG','petSGOut','','ареометр')}
+    ${lcd('ABV ≈','petAbvOut','%','расчёт/ввод')}
+    ${lcd('Давление ≈','petP','bar','оценка')}
+    ${lcd('Целевой сахар','petTargetSugar','г/л','для целевого P')}
+  </div>
+  <div class="grid">
+    <div class="calc-result"><small>Целевой рефрактометр</small><b id="petTargetRefract">—</b><small>°Bx, расчётный эквивалент</small></div>
+    <div class="calc-result"><small>Целевой Brix-equivalent</small><b id="petTargetBx">—</b><small>°Bx</small></div>
+    <div class="calc-result"><small>Согласованность</small><b id="petConfidence">—</b><small id="petConfidenceNote">—</small></div>
+  </div>
+  <details style="margin-top:12px"><summary>Как рассчитано?</summary><div id="petExplain" class="hint" style="margin-top:8px"></div></details>
+  <div class="hint">Оценка давления использует ориентир 4 g/L ферментируемого сахара ≈ 1 bar. Реальное давление зависит от температуры, растворимости CO₂, объёма headspace, состава сидра и бутылки. Это не замена контролю ферментации.</div>`;
+  const mode=wrap.querySelector('#petMode');
+  mode.value=s.calculationMode||'advanced';
+  wrap.querySelector('#pUnit').value=s.pressureUnit||'bar';
+
+  const ids=['#petOriginalBrix','#petRefract','#petSG','#petOe','#petPlato','#petAbv','#petTemp','#petSugarInput','#pDesired','#pUnit','#petMaxP','#petMargin','#petMode'];
+  ids.forEach(sel=>wrap.querySelector(sel).addEventListener('input',upd));
+  ids.forEach(sel=>wrap.querySelector(sel).addEventListener('change',upd));
+
+  function upd(){
+    s.calculationMode=mode.value;
+    s.originalBrix=parseFloat(wrap.querySelector('#petOriginalBrix').value)||0;
+    s.refractometerBrix=wrap.querySelector('#petRefract').value;
+    s.hydrometerSG=wrap.querySelector('#petSG').value;
+    s.hydrometerOe=wrap.querySelector('#petOe').value;
+    s.hydrometerPlato=wrap.querySelector('#petPlato').value;
+    s.measurementAlcohol=wrap.querySelector('#petAbv').value;
+    s.measurementTemp=wrap.querySelector('#petTemp').value;
+    s.estimatedResidualSugar=wrap.querySelector('#petSugarInput').value;
+    s.desiredPressure=parseFloat(wrap.querySelector('#pDesired').value)||0;
+    s.pressureUnit=wrap.querySelector('#pUnit').value;
+    s.maxBottlePressure=parseFloat(wrap.querySelector('#petMaxP').value)||4.5;
+    s.safetyMargin=parseFloat(wrap.querySelector('#petMargin').value)||15;
+    if(isFinite(Number(s.hydrometerOe))&&!s.hydrometerSG){
+      s.hydrometerSG=(1+Number(s.hydrometerOe)/1000).toFixed(4);
+    }
+    const r=calculatePetnat(s);
+    s.correctedSG=isFinite(r.correctedSG)?+r.correctedSG.toFixed(5):'';
+    s.correctedBrix=isFinite(r.correctedBrix)?+r.correctedBrix.toFixed(2):'';
+    s.estimatedABV=isFinite(r.estimatedABV)?+r.estimatedABV.toFixed(2):'';
+    s.targetSugar=isFinite(r.targetSugar)?+r.targetSugar.toFixed(2):'';
+    s.targetRefractometerBrix=isFinite(r.targetRefractometerBrix)?+r.targetRefractometerBrix.toFixed(2):'';
+    s.pressureEstimate=isFinite(r.pressureBar)?+r.pressureBar.toFixed(2):'';
+    s.targetBrix=isFinite(r.targetBrixEquivalent)?+r.targetBrixEquivalent.toFixed(2):0;
+    s.petnatWarnings=r.warnings;
+    wrap.querySelector('#petBx').textContent=isFinite(r.correctedBrix)?r.correctedBrix.toFixed(2):'—';
+    wrap.querySelector('#petSugar').textContent=isFinite(r.residualSugar)?r.residualSugar.toFixed(1):'—';
+    wrap.querySelector('#petSGOut').textContent=isFinite(r.correctedSG)?r.correctedSG.toFixed(4):'—';
+    wrap.querySelector('#petAbvOut').textContent=isFinite(r.estimatedABV)?r.estimatedABV.toFixed(2):'—';
+    wrap.querySelector('#petP').textContent=isFinite(r.pressureBar)?r.pressureBar.toFixed(2):'—';
+    wrap.querySelector('#petTargetSugar').textContent=isFinite(r.targetSugar)?r.targetSugar.toFixed(1):'—';
+    wrap.querySelector('#petTargetRefract').textContent=isFinite(r.targetRefractometerBrix)?r.targetRefractometerBrix.toFixed(2):'—';
+    wrap.querySelector('#petTargetBx').textContent=isFinite(r.targetBrixEquivalent)?r.targetBrixEquivalent.toFixed(2):'—';
+    wrap.querySelector('#petConfidence').textContent={
+      good:'хорошая', 'single-source':'один источник', insufficient:'недостаточно данных'
+    }[r.confidence]||'—';
+    wrap.querySelector('#petConfidenceNote').textContent=r.confidence==='good'?'Brix и SG согласуются':r.confidence==='single-source'?'результат зависит от одного измерения':'нужны Brix и/или SG';
+    const warnings=r.warnings;
+    wrap.querySelector('#petWarnings').innerHTML=warnings.length
+      ?warnings.map(w=>`<div class="notice ${/ОПАСНО|расход|недостаточно/i.test(w)?'danger':''}">⚠ ${esc(w)}</div>`).join('')
+      :'<div class="notice ok">✓ Критических расхождений не обнаружено.</div>';
+    wrap.querySelector('#petExplain').innerHTML=
+      `Исходный Brix: <b>${fmtN(s.originalBrix,2)} °Bx</b>.<br>`+
+      `Рефрактометр: <b>${isFinite(Number(s.refractometerBrix))?fmtN(s.refractometerBrix,2)+' °Bx':'нет'}</b>.<br>`+
+      `Ареометр: <b>${isFinite(Number(r.correctedSG))?fmtN(r.correctedSG,4):'нет'}</b> SG.<br>`+
+      `Коррекция рефрактометра: Terrill-compatible alcohol-aware model → расчётный SG. Если есть ареометр, он сохраняется как отдельное измерение и используется для проверки согласованности.<br>`+
+      `Оценочный ферментируемый сахар: <b>${isFinite(r.residualSugar)?fmtN(r.residualSugar,1)+' g/L':'не определён'}</b>.<br>`+
+      `Целевой сахар для ${fmtN(r.targetPressureBar,2)} bar: <b>${fmtN(r.targetSugar,1)} g/L</b>.`;
+    const gauge=wrap.querySelector('#petGauge');
+    if(gauge)gauge.innerHTML=gaugeSVG(isFinite(r.targetBrixEquivalent)?r.targetBrixEquivalent:0,12,'°Bx','ЦЕЛЬ');
+  }
+  upd();
+  return wrap;
+}
+function buildStillStage3(b){
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="grid">
+    <div><label>Объём на розлив, л</label><input type="number" step="0.1" data-f="stage3.volume"></div>
+    <div><label>Сахар, г/л (если полусладкий)</label><input type="number" step="1" data-f="stage3.sugar"></div>
+    <div><label>Дата розлива</label><input type="date" data-f="stage3.date"></div>
+    <div><label>Укупорка</label><select data-f="stage3.cap">
+      <option>Кронен-пробка</option><option>Корковая</option><option>Винтовая</option><option>Другое</option></select></div>
+    <div style="grid-column:1/-1"><label>Стабилизация (сульфит, холод, фильтрация)</label><input data-f="stage3.stabilization"></div>
+  </div>
+  <div class="hint">Тихий сидр: добить брожение до ~0 °Bx и стабилизировать перед розливом.</div>`;
+  return wrap;
+}
+function buildSoleraStage3(b){
+  const s=b.stage3;
+  s.operations=Array.isArray(s.operations)?s.operations:[];
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="panel">
+    <div class="panel-head">♻ Solera — движение объёма и возраста</div>
+    <div class="grid">
+      <div><label>Год закладки</label><input type="number" data-f="stage3.soleraYear"></div>
+      <div><label>Начальный объём, л</label><input type="number" step="0.1" data-f="stage3.initialVolume"></div>
+      <div><label>Текущий объём, л</label><input type="number" step="0.1" data-f="stage3.volume"></div>
+      <div><label>Средний возраст, лет</label><input type="number" step="0.1" data-f="stage3.averageAgeYears"></div>
+      <div><label>Дата операции</label><input type="date" data-f="stage3.date"></div>
+      <div><label>Доля обновления</label><input type="number" step="0.01" min="0" max="1" data-f="stage3.fraction"></div>
+    </div>
+    <div class="lcd-row">${lcd('Доля обновления','solFrac','%','часть системы')}</div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">Операции Solera</div>
+    <div id="soleraOps"></div>
+    <button class="btn" type="button" id="solAdd">+ операция</button>
+    <div id="soleraSummary" class="hint" style="margin-top:8px"></div>
+  </div>`;
+  const fr=wrap.querySelector('[data-f="stage3.fraction"]');
+  const upd=()=>{wrap.querySelector('#solFrac').textContent=((parseFloat(fr.value)||0)*100).toFixed(0);};
+  fr.addEventListener('input',upd);upd();
+
+  function renderOps(){
+    const host=wrap.querySelector('#soleraOps');host.innerHTML='';
+    s.operations.forEach((op,i)=>{
+      const row=document.createElement('div');row.className='mrow';
+      row.innerHTML=`
+        <div><label>Дата</label><input type="date" value="${esc(op.date||'')}" data-k="date"></div>
+        <div><label>Тип</label><select data-k="type">
+          <option value="withdraw" ${op.type==='withdraw'?'selected':''}>Отбор</option>
+          <option value="fill" ${op.type==='fill'?'selected':''}>Пополнение</option>
+          <option value="withdraw-fill" ${op.type==='withdraw-fill'?'selected':''}>Отбор + пополнение</option>
+          <option value="transfer" ${op.type==='transfer'?'selected':''}>Перенос</option>
+        </select></div>
+        <div><label>Отобрано, л</label><input type="number" step="0.1" value="${esc(op.removed??'')}" data-k="removed"></div>
+        <div><label>Добавлено, л</label><input type="number" step="0.1" value="${esc(op.added??'')}" data-k="added"></div>
+        <div><label>Источник</label><input value="${esc(op.source||'')}" data-k="source" placeholder="молодой сидр"></div>
+        <div style="grid-column:span 2"><label>Возраст источника, лет</label><input type="number" step="0.1" value="${esc(op.sourceAgeYears??'')}" data-k="sourceAgeYears"></div>
+        <div style="grid-column:span 2"><label>Заметка</label><input value="${esc(op.note||'')}" data-k="note"></div>
+        <button class="del" type="button">✕</button>`;
+      row.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{
+        const k=inp.dataset.k;op[k]=inp.type==='number'?(inp.value===''?'':parseFloat(inp.value)):inp.value;
+        recalc();
+        markDirty();
+      });
+      row.querySelector('.del').onclick=()=>{s.operations.splice(i,1);renderOps();recalc();markDirty();};
+      host.appendChild(row);
+    });
+  }
+  function recalc(){
+    let volume=Number(s.initialVolume)||Number(s.volume)||0;
+    let weightedAge=(Number(s.sourceAgeYears)||0)*0;
+    let age=Number(s.averageAgeYears)||0;
+    s.operations.forEach(op=>{
+      const removed=Math.max(0,Number(op.removed)||0),added=Math.max(0,Number(op.added)||0);
+      const before=volume;
+      const after=before-removed+added;
+      if(after<0){op.warning='Отбор превышает объём';return;}
+      const srcAge=Math.max(0,Number(op.sourceAgeYears)||0);
+      if(after>0){
+        weightedAge=Math.max(0,(age*before-age*removed+srcAge*added)/after);
+        age=weightedAge;
+      }
+      volume=after;
+      op.volumeBefore=+before.toFixed(3);op.volumeAfter=+after.toFixed(3);
+    });
+    s.volume=+volume.toFixed(3);s.averageAgeYears=+age.toFixed(2);
+    wrap.querySelector('#soleraSummary').textContent=
+      `Текущий объём: ${fmtN(s.volume,2)} л · оценочный средний возраст: ${fmtN(s.averageAgeYears,2)} лет`;
+  }
+  wrap.querySelector('#solAdd').onclick=()=>{
+    s.operations.push({date:todayISO(),type:'withdraw-fill',removed:0,added:0,source:'',sourceAgeYears:0,note:''});
+    renderOps();recalc();markDirty();
+  };
+  renderOps();recalc();
+  return wrap;
+}
+
+/* ============ ЭТАП 4 ============ */
+function agingRecommendation(m,b){
+  const months=Number(m)||0, p=b?.stage1||{}, s=b?.stage3||{};
+  const ph=Number(p.ph), abv=Number(p.actualAbv||p.predictedAbv), sugar=Number(s.sugar||0);
+  let text='';
+  if(months<3)text='Ранняя выдержка: больше свежего фрукта и первичной ароматики; контролируйте резкость и редукцию.';
+  else if(months<9)text='Короткая/средняя выдержка: хороший момент для регулярной дегустации и проверки баланса.';
+  else if(months<15)text='Средняя выдержка: обычно больше интеграции кислотности и текстуры; ориентируйтесь на дегустацию.';
+  else if(months<24)text='Длительная выдержка: возможны более сложные третичные/автолитические ноты, но риск потери свежести растёт.';
+  else text='Очень длительная выдержка: решение принимать по дегустации и состоянию партии, а не по календарю.';
+  const flags=[];
+  if(isFinite(ph)&&ph>3.7)flags.push('повышенный pH — внимательнее к стабильности');
+  if(isFinite(abv)&&abv<5)flags.push('низкий ABV — не ориентироваться на длительную выдержку автоматически');
+  if(b?.type==='petnat')flags.push('для Pet-Nat важнее контроль давления и остаточного сахара');
+  if(b?.type==='solera')flags.push('для Solera ориентируйтесь на динамику системы, а не на один срок');
+  return text+(flags.length?' '+flags.join('; ')+'.':'');
+}
+function renderStage4(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#stage4Body');host.innerHTML='';
+  if(b.type==='classic')host.appendChild(buildClassicStage4(b));
+  else if(b.type==='petnat')host.appendChild(buildPetnatStage4(b));
+  else if(b.type==='still')host.appendChild(buildStillStage4(b));
+  else if(b.type==='solera')host.appendChild(buildSoleraStage4(b));
+}
+function buildClassicStage4(b){
+  const s=b.stage4;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="grid">
+    <div><label>Дегоржаж (дата)</label><input type="date" data-f="stage4.disgorging"></div>
+    <div><label>Экспедиционный ликёр, г/л</label><input type="number" step="1" data-f="stage4.liqueurSugar"></div>
+    <div><label>Финальная укупорка</label><select data-f="stage4.finalCap">
+      <option>Кронен-пробка</option><option>Корковая + мюзле</option><option>Пластиковая (ПЭТ)</option><option>Другое</option></select></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">⏳ Выдержка на осадке <span>sur lie</span></div>
+    <div class="keys" style="margin-top:10px">
+      ${[6,9,15,24,36,48,60].map(m=>`<button type="button" data-v="${m}">${m} мес</button>`).join('')}
+      <button type="button" data-v="custom">свой</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><label>или свой срок, мес</label><input type="number" id="agingCustom" placeholder="18"></div>
+    </div>
+    <input type="hidden" data-f="stage4.agingMonths">
+    <div class="row" style="align-items:center;margin-top:8px">
+      <div style="flex:0 0 150px"><div class="gauge-wrap" id="agingGauge"></div></div>
+      <div style="flex:1;min-width:200px"><div id="agingHint" class="hint" style="font-size:12.5px"></div></div>
+    </div>
+  </div>
+  <details open>
+    <summary>Толстый осадок и батонаж</summary>
+    <div style="margin-top:10px">
+      <label class="switch"><input type="checkbox" data-f="stage4.leesAging">
+        <span class="sw-track"><span class="sw-thumb"></span></span>
+        <span class="sw-text">Выдержка на толстом осадке</span></label>
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <div><label>На толстом осадке, мес</label><input type="number" data-f="stage4.leesMonths"></div>
+    </div>
+    <div style="margin-top:10px">
+      <label class="switch"><input type="checkbox" data-f="stage4.batonnage">
+        <span class="sw-track"><span class="sw-thumb"></span></span>
+        <span class="sw-text">Батонаж (перемешивание осадка)</span></label>
+    </div>
+    <div id="batBlock" style="display:none;margin-top:10px">
+      <label>График батонажа</label>
+      <div id="batList"></div>
+      <button class="btn" type="button" id="batAdd" style="margin-top:6px">+ точка батонажа</button>
+    </div>
+  </details>
+  <div class="lcd-row">${lcd('Финальный код','finalCodeLcd','','пробка · дата дегоржажа')}</div>`;
+  const keys=wrap.querySelectorAll('.keys button');
+  const custom=wrap.querySelector('#agingCustom');
+  const hidden=wrap.querySelector('[data-f="stage4.agingMonths"]');
+  const updGauge=()=>{
+    const m=Number(s.agingMonths)||0;
+    wrap.querySelector('#agingGauge').innerHTML=gaugeSVG(m,60,'мес','НА ОСАДКЕ');
+    wrap.querySelector('#agingHint').textContent=agingRecommendation(m,b);
+  };
+  const sync=()=>{
+    const std=[6,9,15,24,36,48,60];
+    if(std.includes(Number(s.agingMonths))){
+      keys.forEach(k=>k.classList.toggle('on',k.dataset.v!=='custom'&&Number(k.dataset.v)===Number(s.agingMonths)));
+      custom.value='';
+    }else{keys.forEach(k=>k.classList.remove('on'));custom.value=s.agingMonths||'';}
+    hidden.value=s.agingMonths||0;
+  };
+  keys.forEach(k=>k.onclick=()=>{
+    if(k.dataset.v==='custom'){custom.focus();return;}
+    s.agingMonths=Number(k.dataset.v);sync();updGauge();markDirty();
+  });
+  custom.oninput=()=>{s.agingMonths=parseFloat(custom.value)||0;hidden.value=s.agingMonths;updGauge();};
+  wrap.querySelector('[data-f="stage4.batonnage"]').addEventListener('change',e=>{
+    wrap.querySelector('#batBlock').style.display=e.target.checked?'block':'none';
+  });
+  wrap.querySelector('#batAdd').onclick=()=>{
+    s.batonnageSchedule.push({date:todayISO(),note:''});renderBatonnage();markDirty();
+  };
+  sync();updGauge();renderBatonnage();
+  return wrap;
+}
+function renderBatonnage(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const host=$('#batList');if(!host)return;
+  const sch=b.stage4.batonnageSchedule||[];
+  host.innerHTML='';
+  sch.forEach((t,i)=>{
+    const row=document.createElement('div');row.className='mrow';
+    row.innerHTML=`
+      <div><label>Дата</label><input type="date" value="${esc(t.date||'')}"></div>
+      <div style="grid-column:2/-1"><label>Заметка</label><input value="${esc(t.note||'')}"></div>
+      <button class="del" type="button">✕</button>`;
+    const [di,ni]=row.querySelectorAll('input');
+    di.oninput=()=>{t.date=di.value;};
+    ni.oninput=()=>{t.note=ni.value;};
+    row.querySelector('.del').onclick=()=>{sch.splice(i,1);renderBatonnage();markDirty();};
+    host.appendChild(row);
+  });
+}
+function buildPetnatStage4(b){
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="grid">
+    <div><label>Финальная укупорка</label><select data-f="stage4.finalCap">
+      <option>Кронен-пробка</option><option>Корковая + мюзле</option><option>Пластиковая (ПЭТ)</option><option>Другое</option></select></div>
+    <div><label>Снят с осадка</label>
+      <label class="switch"><input type="checkbox" data-f="stage4.petnatRacked">
+        <span class="sw-track"><span class="sw-thumb"></span></span><span class="sw-text">снят</span></label></div>
+    <div><label>Дата снятия</label><input type="date" data-f="stage4.rackingDatePet"></div>
+    <div><label>Выдержка, мес</label><input type="number" data-f="stage4.agingMonths"></div>
+  </div>
+  <div class="hint">Петнат: минимум обработки — снятие с осадка (если нужно) и укупорка; выдержка обычно короче классики.</div>
+  <div class="lcd-row">${lcd('Финальный код','finalCodeLcd','')}</div>`;
+  return wrap;
+}
+function buildStillStage4(b){
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="grid">
+    <div><label>Выдержка, мес</label><input type="number" data-f="stage4.agingMonths"></div>
+    <div><label>Дата снятия с осадка</label><input type="date" data-f="stage4.rackingDate"></div>
+    <div><label>Финальная укупорка</label><select data-f="stage4.finalCap">
+      <option>Кронен-пробка</option><option>Корковая</option><option>Винтовая</option><option>Другое</option></select></div>
+  </div>
+  <div class="hint">Тихие сидры раскрываются через 3–9 мес; следите за редукцией при длительной выдержке.</div>
+  <div class="lcd-row">${lcd('Финальный код','finalCodeLcd','')}</div>`;
+  return wrap;
+}
+function buildSoleraStage4(b){
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+  <div class="grid">
+    <div><label>Выдержка, мес</label><input type="number" data-f="stage4.agingMonths"></div>
+    <div><label>Дата снятия с осадка</label><input type="date" data-f="stage4.rackingDate"></div>
+    <div><label>Финальная укупорка</label><select data-f="stage4.finalCap">
+      <option>Корковая</option><option>Кронен-пробка</option><option>Другое</option></select></div>
+  </div>
+  <div class="hint">Solera: средний возраст системы = число рядов × доля обновления. Записывайте каждое переливание.</div>
+  <div class="lcd-row">${lcd('Финальный код','finalCodeLcd','')}</div>`;
+  return wrap;
+}
+
+/* ============ ОЦЕНКА (1–5) ============ */
+function initRate(){
+  const host=$('#rateSpark');
+  host.innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-r="${i}">${i}</button>`).join('');
+  host.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
+    $('[data-f="stage5.sparkling"]').value=Number(btn.dataset.r);
+    syncRate();markDirty();
+  });
+}
+function syncRate(){
+  const v=Number($('[data-f="stage5.sparkling"]').value)||0;
+  $$('#rateSpark button').forEach(btn=>btn.classList.toggle('on',Number(btn.dataset.r)<=v));
+}
+
+/* ============ ВАЛИДАЦИЯ / СОХРАНЕНИЕ / УДАЛЕНИЕ ============ */
+let autosaveTimer=null, saveInFlight=false;
+function validateBatch(b){
+  const errs=[], warns=[];
+  const seq=[
+    ['отжим',b.stage1?.date],['внесение дрожжей',b.stage2?.yeastDate],['начало брожения',b.stage2?.startDate],
+    ['снятие с осадка',b.stage2?.rackingDate],['розлив',b.stage3?.date],
+    ['дегоржаж',b.stage4?.disgorging||b.stage4?.rackingDatePet||b.stage4?.rackingDate],
+    ['дегустация',b.stage5?.tastingDate],['упаковка',b.stage5?.packDate]
+  ].filter(x=>x[1]);
+  for(let i=1;i<seq.length;i++)if(seq[i][1]<seq[i-1][1])errs.push(`«${seq[i][0]}» раньше «${seq[i-1][0]}»`);
+
+  const positive=[
+    ['Объём сока',b.stage1?.volume],['Brix',b.stage1?.brix],
+    ['ABV',b.stage1?.actualAbv],['температура старта',b.stage2?.tempStart]
+  ];
+  positive.forEach(([label,v])=>{if(v!==''&&v!==null&&v!==undefined&&isFinite(Number(v))&&Number(v)<0)errs.push(`${label}: отрицательное значение`);});
+  const vol=Number(b.stage1?.volume);if(isFinite(vol)&&vol<=0)warns.push('Объём сока не задан или равен нулю.');
+  const br=Number(b.stage1?.brix);if(isFinite(br)&&(br<0||br>40))errs.push('Начальный Brix вне разумного диапазона 0–40.');
+  const abv=Number(b.stage1?.actualAbv);if(isFinite(abv)&&(abv<0||abv>20))warns.push('ABV выглядит необычно — проверьте измерение.');
+  const ph=Number(b.stage1?.ph);if(isFinite(ph)&&ph>0&&(ph<2.5||ph>4.5))warns.push('pH вне диапазона 2.5–4.5 — проверить.');
+  const ta=Number(b.stage1?.ta);if(isFinite(ta)&&ta<0)errs.push('TA не может быть отрицательной.');
+
+  if(b.type==='petnat'){
+    const s=b.stage3||{};
+    const sg=Number(s.hydrometerSG), rb=Number(s.refractometerBrix);
+    if(isFinite(sg)&&(sg<0.95||sg>1.2))errs.push('SG Pet-Nat вне разумного диапазона 0.950–1.200.');
+    if(isFinite(rb)&&(rb<0||rb>35))errs.push('Brix рефрактометра вне разумного диапазона 0–35.');
+    if(Number(s.maxBottlePressure)<=0)warns.push('Не задан предел давления бутылки.');
+    if(Number(s.safetyMargin)<0||Number(s.safetyMargin)>=80)warns.push('Запас безопасности выглядит необычно.');
+    if((s.petnatWarnings||[]).length)warns.push(...s.petnatWarnings);
+  }
+  if(b.type==='solera'){
+    const f=Number(b.stage3?.fraction);
+    if(isFinite(f)&&(f<0||f>1))errs.push('Доля обновления Solera должна быть 0–1.');
+    if(Number(b.stage3?.volume)<0)errs.push('Объём Solera не может быть отрицательным.');
+    (b.stage3?.operations||[]).forEach((op,i)=>{
+      if(Number(op.removed)<0||Number(op.added)<0)errs.push(`Solera операция ${i+1}: отрицательный объём.`);
+      if(Number(op.volumeAfter)<0)errs.push(`Solera операция ${i+1}: итоговый объём отрицательный.`);
+    });
+  }
+  const bottles=Number(b.stage3?.bottleCount);
+  if(isFinite(bottles)&&bottles<0)errs.push('Количество бутылок не может быть отрицательным.');
+  if(!VALID_STATUSES.has(b.status))warns.push('Статус партии будет нормализован.');
+
+  const issues=batchNeedsAttention(b);
+  if(issues.length)warns.push(...issues);
+
+  return {errors:[...new Set(errs)],warnings:[...new Set(warns)]};
+}
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  if(!dirHandle||!dirty)return;
+  autosaveTimer=setTimeout(()=>saveBatch(true),2500);
+}
+function markDirty(){
+  dirty=true;refreshSaveUI();scheduleAutosave();
+}
+function refreshSaveUI(){
+  $('#dirtyDot').hidden=!dirty;
+  $('#btnSave').classList.toggle('pulse',dirty);
+  $('#dirtyDot').title=dirty?'Есть несохранённые изменения':'Все изменения сохранены';
+}
+async function saveBatch(silent=false){
+  if(!dirHandle){if(!silent)toast('Сначала выберите папку (📁)');return false;}
+  if(saveInFlight)return false;
+  const b=collectForm();if(!b){if(!silent)toast('Партия не открыта');return false;}
+  const check=validateBatch(b);
+  if(check.errors.length){
+    if(!silent&&!confirm('Ошибки в данных:\n• '+check.errors.join('\n• ')+'\n\nСохранить всё равно нельзя. Исправьте данные.')){}
+    else if(silent)toast('Автосохранение остановлено: есть ошибки в данных');
+    return false;
+  }
+  if(check.warnings.length&&!silent){
+    if(!confirm('Предупреждения:\n• '+check.warnings.slice(0,12).join('\n• ')+'\n\nСохранить?'))return false;
+  }
+  saveInFlight=true;
+  try{
+    await writeJSON({appVersion:APP_VERSION,dataSchemaVersion:DATA_SCHEMA_VERSION,batches:data});
+    dirty=false;refreshSaveUI();
+    $('#fCode').value=b.code;
+    if(!silent)toast('Сохранено ✓ '+(b.name||b.code));
+    return true;
+  }catch(e){
+    if(!silent)toast('Ошибка сохранения: '+e.message);
+    else toast('❌ Автосохранение: '+e.message);
+    return false;
+  }finally{saveInFlight=false;}
+}
+function newBatch(){
+  const b=emptyBatch('classic');
+  b.code=generateCode(b);
+  data.push(b);markDirty();
+  openBatch(b.id);
+}
+async function deleteBatch(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  if(!confirm(`Удалить партию «${b.name||b.code||'без названия'}»? Файл будет перезаписан.`))return;
+  if(b.labelImage)await removeLabelFile(b.labelImage);
+  data=data.filter(x=>x.id!==currentId);
+  try{await writeJSON(data);}catch(e){toast('Ошибка: '+e.message);return;}
+  dirty=false;refreshSaveUI();closeBatch();toast('Партия удалена');
+}
+function duplicateBatch(){
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const mode=prompt('Дублирование:\n1 — полная копия истории\n2 — создать по технологическому шаблону','1');
+  if(!mode)return;
+  const copy=migrateBatch(JSON.parse(JSON.stringify(b)));
+  copy.id=uid();copy.name=(b.name||'')+(mode==='2'?' (шаблон)':' (копия)');
+  copy.code=generateCode(copy);copy.labelImage='';
+  copy.createdAt=copy.updatedAt=new Date().toISOString();
+  if(mode==='2'){
+    copy.status='planned';copy.statusReason='';copy.statusUpdatedAt=new Date().toISOString();
+    copy.stage1.date=todayISO();copy.stage1.actualAbv=0;
+    copy.stage2.yeastDate='';copy.stage2.startDate='';copy.stage2.rackingDate='';
+    copy.stage2.measurements=[];copy.stage2.nutrients=[];
+    copy.stage5={tastingDate:'',sparkling:0,tasteNotes:'',packDate:''};
+    copy.tastings=[];copy.typeHistory=[];
+    if(copy.type==='solera')copy.stage3.operations=[];
+  }
+  data.push(copy);markDirty();
+  openBatch(copy.id);toast(mode==='2'?'Создана партия по шаблону':'Партия скопирована');
+}
+
+/* ============ КАЛЕНДАРЬ ============ */
+function getBatchTimeline(b){
+  const stages=[];
+  const add=(label,start,end,cls)=>{
+    if(!start)return;
+    const e=end||todayISO();
+    stages.push({label,start,end:e,cls});
+  };
+  const start=b.stage1?.date;
+  add('Сырьё / отжим',start,b.stage2?.startDate||start,'planned');
+  add('Первичная ферментация',b.stage2?.startDate,b.stage2?.rackingDate||b.stage3?.date,'active');
+  if(b.type==='petnat')add('Вторичная ферментация / Pet-Nat',b.stage3?.date,b.stage4?.rackingDatePet||b.stage5?.packDate,'active');
+  else if(b.type==='classic')add('Вторичная ферментация / выдержка',b.stage3?.date,b.stage4?.disgorging||b.stage5?.packDate,'aging');
+  else add('Выдержка',b.stage3?.date,b.stage4?.rackingDate||b.stage5?.packDate,'aging');
+  if(b.stage5?.packDate)add('Готовая партия',b.stage5.packDate,b.stage5.packDate,'done');
+  return stages;
+}
+function renderTimeline(batches){
+  const host=$('#timeline');if(!host)return;
+  if(!batches.length){host.innerHTML='<div class="hint">Нет партий по текущему фильтру.</div>';return;}
+  const dates=[];
+  batches.forEach(b=>getBatchTimeline(b).forEach(s=>{dates.push(parseDate(s.start));dates.push(parseDate(s.end));}));
+  const valid=dates.filter(Boolean);
+  let min=valid.length?new Date(Math.min(...valid.map(x=>x.getTime()))):new Date();
+  let max=valid.length?new Date(Math.max(...valid.map(x=>x.getTime()))):new Date();
+  const today=new Date();
+  if(today<min)min=today;if(today>max)max=today;
+  const span=Math.max(1,max-min);
+  const pad=Math.max(7*86400000,span*.05);min=new Date(min.getTime()-pad);max=new Date(max.getTime()+pad);
+  const pct=d=>clamp(((parseDate(d)-min)/ (max-min))*100,0,100);
+  const ticks=6;
+  const scale=Array.from({length:ticks+1},(_,i)=>{
+    const d=new Date(min.getTime()+(max-min)*i/ticks);
+    return `<span style="left:${(i/ticks*100).toFixed(2)}%">${d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})}</span>`;
+  }).join('');
+  const todayPct=clamp(((today-min)/(max-min))*100,0,100);
+  let html=`<div class="tl-head"><div></div><div class="tl-scale">${scale}<i class="tl-today" style="left:${todayPct.toFixed(2)}%"></i></div></div>`;
+  batches.forEach(b=>{
+    const st=getBatchStatus(b);
+    const segs=getBatchTimeline(b);
+    html+=`<div class="tl-row"><div class="tl-name" title="${esc(b.name||b.code||'')}">
+      <b>${esc(b.name||'(без названия)')}</b><small>${esc(TYPE_LABELS[b.type]||b.type)} · ${esc(STATUS_LABELS[st])}</small>
+    </div><div class="tl-track"><i class="tl-today" style="left:${todayPct.toFixed(2)}%"></i>`;
+    segs.forEach(s=>{
+      const left=pct(s.start), right=pct(s.end), width=Math.max(0.8,right-left);
+      html+=`<div class="tl-seg ${st}" style="left:${left.toFixed(2)}%;width:${width.toFixed(2)}%" title="${esc(s.label)}: ${fmtDate(s.start)} → ${fmtDate(s.end)}" data-id="${esc(b.id)}"><span>${esc(s.label)}</span></div>`;
+    });
+    html+='</div></div>';
+  });
+  host.innerHTML=html;
+  host.querySelectorAll('.tl-seg').forEach(el=>el.onclick=()=>{closeCalendar();openBatch(el.dataset.id);});
+}
+function openCalendar(){
+  const ys=[...new Set(data.map(getYear).filter(Boolean))].sort((a,b)=>b-a);
+  $('#calYear').innerHTML='<option value="">все годы</option>'+ys.map(y=>`<option value="${y}">${y}</option>`).join('');
+  renderCalendar();
+  $('#calModal').classList.add('open');
+}
+function closeCalendar(){$('#calModal').classList.remove('open');}
+function renderCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  $('#calMonth').textContent=calDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+  const yearF=$('#calYear').value,statusF=$('#calStatus').value,typeF=$('#calType').value;
+  const batches=data.filter(b=>{
+    if(yearF&&String(getYear(b))!==yearF)return false;
+    if(statusF&&getBatchStatus(b)!==statusF)return false;
+    if(typeF&&b.type!==typeF)return false;
+    return true;
+  });
+  const ev={};
+  const add=(d,label,type,id)=>{if(!d)return;(ev[d]=ev[d]||[]).push({label,type,id});};
+  batches.forEach(b=>{
+    add(b.stage1?.date,'Отжим',b.type,b.id);
+    add(b.stage2?.startDate,'Брожение',b.type,b.id);
+    add(b.stage2?.rackingDate,'Снятие',b.type,b.id);
+    add(b.stage3?.date,'Розлив',b.type,b.id);
+    add(b.stage4?.disgorging||b.stage4?.rackingDatePet||b.stage4?.rackingDate,'Финиш',b.type,b.id);
+    add(b.stage5?.packDate,'Упаковка',b.type,b.id);
+  });
+  const first=new Date(y,m,1),offset=(first.getDay()+6)%7,daysInMonth=new Date(y,m+1,0).getDate();
+  let html='';
+  for(let i=0;i<offset;i++)html+='<div class="cal-day empty"></div>';
+  let count=0;
+  for(let d=1;d<=daysInMonth;d++){
+    const k=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayEv=ev[k]||[];count+=dayEv.length;
+    html+=`<div class="cal-day${k===todayISO()?' today':''}">
+      <span class="d">${d}</span>
+      ${dayEv.slice(0,3).map(e=>`<span class="ev t-${esc(e.type)}" data-id="${esc(e.id)}">${esc(e.label)}</span>`).join('')}
+      ${dayEv.length>3?`<span class="ev" style="color:var(--muted)">+${dayEv.length-3}</span>`:''}
+    </div>`;
+  }
+  $('#calGrid').innerHTML=html;
+  $('#calGrid').querySelectorAll('.ev[data-id]').forEach(el=>el.onclick=()=>{closeCalendar();openBatch(el.dataset.id);});
+  $('#calStats').textContent=`${batches.length} партий в фильтре · ${count} событий за месяц`;
+  renderTimeline(batches);
+}
+
+/* ============ ТЕМА ============ */
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  localStorage.setItem('cm-theme',t);
+  $('#btnTheme').textContent=t==='dark'?'☀':'🌙';
+  $('#btnTheme').title=t==='dark'?'Включить светлую тему':'Включить тёмную тему';
+}
+
+/* ============ СОБЫТИЯ ============ */
+ $('#btnTheme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+ $('#btnPick').onclick=requestFolder;
+ $('#btnCalendar').onclick=openCalendar;
+ $('#calClose').onclick=closeCalendar;
+ $('#calModal').addEventListener('click',e=>{if(e.target.id==='calModal')closeCalendar();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('#calModal').classList.contains('open'))closeCalendar();
+});
+ $('#calPrev').onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1);renderCalendar();};
+ $('#calNext').onclick=()=>{calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1,1);renderCalendar();};
+['calYear','calStatus','calType'].forEach(id=>$('#'+id).addEventListener('change',renderCalendar));
+
+ $('#btnNew').onclick=newBatch;
+ $('#btnSave').onclick=()=>saveBatch(false);
+ $('#btnSave2').onclick=()=>saveBatch(false);
+ $('#btnBack').onclick=closeBatch;
+ $('#btnDelete').onclick=deleteBatch;
+ $('#btnDuplicate').onclick=duplicateBatch;
+
+ $('#btnBackup').onclick=()=>{
+  if(!data.length){toast('Нет данных для бэкапа');return;}
+  const blob=new Blob([JSON.stringify({appVersion:APP_VERSION,dataSchemaVersion:DATA_SCHEMA_VERSION,batches:data},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`cider_backup_${todayISO()}.json`;
+  a.click();URL.revokeObjectURL(a.href);
+  toast('Бэкап скачан');
+};
+
+['#search','#sort','#filterType','#filterStatus'].forEach(s=>{
+  $(s).addEventListener('input',renderList);
+  $(s).addEventListener('change',renderList);
+});
+
+ $('#btnUploadLabel').onclick=()=>{const b=data.find(x=>x.id===currentId);if(b)uploadLabelImage(b);};
+ $('#btnDeleteLabel').onclick=()=>{const b=data.find(x=>x.id===currentId);if(b)deleteLabelImage(b);};
+
+ $('#addNutrient').onclick=()=>{
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  b.stage2.nutrients.push({date:todayISO(),product:'DAP',dosage:'',note:''});
+  renderNutrients();markDirty();
+};
+ $('#addMeasure').onclick=()=>{
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  b.stage2.measurements.push({date:todayISO(),time:new Date().toTimeString().slice(0,5),refractometerBrix:'',hydrometerSG:'',temp:'',ph:'',alcohol:'',pressure:'',method:'refractometer',note:''});
+  renderMeasurements();markDirty();
+};
+
+ $('#cStartBrix').addEventListener('input',updateCalc);
+ $('#cEndBrix').addEventListener('input',updateCalc);
+ $('#cApply').onclick=()=>{
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const v=parseFloat($('#cAbvLcd').textContent)||0;
+  b.stage1.actualAbv=v;
+  $$('[data-f="stage1.actualAbv"]').forEach(el=>el.value=v);
+  markDirty();toast('ABV перенесён в фактический');
+};
+ const _stage1Brix=$('[data-f="stage1.brix"]');if(_stage1Brix)_stage1Brix.addEventListener('input',()=>{updateABV();markDirty();});
+
+/* смена типа — перестройка этапов 3–4 */
+ $('#typeSel').addEventListener('change',e=>{
+  const b=data.find(x=>x.id===currentId);if(!b)return;
+  const neu=e.target.value;if(neu===b.type)return;
+  if(!confirm('Сменить тип партии? Этапы 3–4 получат значения по умолчанию для «'+TYPE_LABELS[neu]+'».')){
+    e.target.value=b.type;return;
+  }
+  const tpl=emptyBatch(neu);
+  b.type=neu;b.stage3=tpl.stage3;b.stage4=tpl.stage4;
+  renderStage3();renderStage4();
+  fillForm(b);updateABV();updateFinalCodeUI();
+  markDirty();toast('Тип изменён: '+TYPE_LABELS[neu]);
+});
+
+/* v2.3: collect form changes and schedule autosave */
+document.addEventListener('input',e=>{
+  if(e.target.closest('#editView')){markDirty();}
+});
+document.addEventListener('change',e=>{
+  if(e.target.closest('#editView')){markDirty();}
+});
+
+/* ============ DIAGNOSTICS ============ */
+window.CiderJournalV23={
+  version:APP_VERSION,
+  validateBatch,
+  calculatePetnat,
+  terrillCorrectedSG,
+  brixToSG,
+  sgToBrix,
+  pressureFromSugar,
+  sugarFromPressure
+};
+
+/* навигация по этапам */
+ $$('.stage-nav [data-go]').forEach(btn=>btn.onclick=()=>{
+  document.getElementById(btn.dataset.go).scrollIntoView({behavior:'smooth',block:'start'});
+});
+const stageIO=new IntersectionObserver(es=>{
+  es.forEach(en=>{
+    if(en.isIntersecting)
+      $$('.stage-nav [data-go]').forEach(x=>x.classList.toggle('on',x.dataset.go===en.target.id));
+  });
+},{rootMargin:'-140px 0px -60% 0px'});
+['stage1','stage2','stage3','stage4','stage5'].forEach(id=>stageIO.observe(document.getElementById(id)));
+
+/* dirty-трекинг */
+document.addEventListener('input',e=>{
+  if(e.target.closest('.filters')||e.target.id==='search')return;
+  markDirty();
+});
+document.addEventListener('change',e=>{
+  if(e.target.closest('.filters')||e.target.closest('.modal'))return;
+  markDirty();
+});
+window.addEventListener('beforeunload',e=>{
+  if(dirty){e.preventDefault();e.returnValue='Есть несохранённые изменения';}
+});
+
+/* ============ СТАРТ ============ */
+setTheme(localStorage.getItem('cm-theme')||
+  (window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));
+initRate();
+bootstrap();
+</script>
+</body>
+</html>

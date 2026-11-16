@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Recipemaker v1.2 — Конструктор рецептов сидра</title>
+<style>
+:root{
+  --bg:#0f1419; --panel:#1a2028; --panel2:#232b36; --border:#2d3642;
+  --accent:#d4a24c; --accent2:#8fb26a; --danger:#c0504d; --text:#e8e6e1;
+  --muted:#8a94a3; --good:#6fb98f; --warn:#e0a45c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+h1,h2,h3{margin:0 0 10px}
+h1{color:var(--accent);font-size:22px}
+h2{color:var(--accent);font-size:16px;border-bottom:1px solid var(--border);padding-bottom:6px;margin-top:18px}
+h3{color:var(--accent2);font-size:14px;margin-top:10px}
+.topbar{background:var(--panel);padding:12px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topbar h1{margin:0;margin-right:auto}
+button{background:var(--panel2);color:var(--text);border:1px solid var(--border);padding:7px 13px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s}
+button:hover{background:var(--border);border-color:var(--accent)}
+button.primary{background:var(--accent);color:#1a1a1a;border-color:var(--accent);font-weight:600}
+button.primary:hover{background:#e5b35d}
+button.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+button.small{padding:4px 9px;font-size:12px}
+.container{display:grid;grid-template-columns:320px 1fr;gap:0;min-height:calc(100vh - 60px)}
+.sidebar{background:var(--panel);border-right:1px solid var(--border);padding:14px;overflow-y:auto;max-height:calc(100vh - 60px)}
+.main{padding:18px;overflow-y:auto;max-height:calc(100vh - 60px)}
+.search{width:100%;padding:7px 10px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-bottom:10px}
+.recipe-list{display:flex;flex-direction:column;gap:6px}
+.recipe-item{background:var(--panel2);padding:10px;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:.15s}
+.recipe-item:hover{border-color:var(--accent)}
+.recipe-item.active{border-color:var(--accent);background:#2a3340}
+.recipe-item .name{font-weight:600;color:var(--accent)}
+.recipe-item .meta{font-size:11px;color:var(--muted);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field select,.field textarea{background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;color:var(--text);font-size:13px;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:60px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px}
+.addon-row,.yeast-row{background:var(--panel2);padding:10px;border-radius:6px;margin-bottom:8px;border:1px solid var(--border);display:grid;gap:8px}
+.addon-row{grid-template-columns:140px 1fr 100px 120px 30px}
+.yeast-row{grid-template-columns:1fr 80px 80px 30px;align-items:center}
+.score-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:4px}
+.score-fill{height:100%;background:linear-gradient(90deg,var(--warn),var(--good));transition:.3s}
+.tag{display:inline-block;background:var(--panel2);border:1px solid var(--border);padding:2px 8px;border-radius:10px;font-size:11px;margin:2px;color:var(--accent2)}
+.tag.hot{background:#3a2a1a;color:var(--warn);border-color:#5a3a1a}
+.suggestion{background:linear-gradient(135deg,#1f2a20,#1a2028);border:1px solid var(--accent2);border-radius:8px;padding:12px;margin-top:10px}
+.suggestion h3{color:var(--accent2);margin:0 0 6px}
+.empty{color:var(--muted);text-align:center;padding:40px 20px;font-style:italic}
+.yeast-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;transition:.2s}
+.yeast-card.top1{border-color:var(--accent);background:#2a2518}
+.yeast-card.top2{border-color:var(--accent2)}
+.yeast-card.top3{border-color:#6fb9df}
+.yeast-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.yeast-name{font-weight:600;color:var(--accent);font-size:15px}
+.yeast-score{font-size:18px;font-weight:700;color:var(--good)}
+.yeast-reason{font-size:12px;color:var(--muted);margin:4px 0}
+.yeast-specs{font-size:12px;color:var(--text);margin-top:6px;line-height:1.5}
+details{margin-top:8px}
+details summary{cursor:pointer;color:var(--accent);font-size:12px}
+details[open] summary{margin-bottom:6px}
+.hint{background:#1a2028;border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;font-size:12px;color:var(--muted);border-radius:0 6px 6px 0}
+.status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.status.draft{background:#3a3020;color:var(--warn)}
+.status.final{background:#1f3a20;color:var(--good)}
+.tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);font-size:13px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tech-step{background:var(--panel2);padding:10px;border-radius:6px;margin-bottom:6px;border-left:3px solid var(--accent2)}
+.tech-step b{color:var(--accent)}
+.yeast-full{background:#151b23;border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px;font-size:12px;line-height:1.6}
+.yeast-full h4{color:var(--accent2);margin:10px 0 4px;font-size:13px}
+.yeast-full h4:first-child{margin-top:0}
+.yeast-full p{margin:4px 0;color:var(--text);white-space:pre-wrap}
+.yeast-full .section{margin-bottom:8px}
+.yeast-tabs{display:flex;gap:2px;margin:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.yeast-tab{padding:5px 10px;cursor:pointer;font-size:11px;color:var(--muted);border-bottom:2px solid transparent}
+.yeast-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.yeast-section{display:none}
+.yeast-section.active{display:block}
+.db-status{font-size:11px;padding:3px 8px;border-radius:10px;background:var(--panel2);border:1px solid var(--border)}
+.db-status.ok{color:var(--good);border-color:#2a4a2a}
+.db-status.warn{color:var(--warn);border-color:#4a3a1a}
+@media(max-width:900px){.container{grid-template-columns:1fr}.sidebar{max-height:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🍎 Recipemaker v1.2</h1>
+  <span id="storageStatus" style="color:var(--muted);font-size:12px">Хранилище: загрузка…</span>
+  <span id="dbStatus" class="db-status warn">📖 Описания: не загружены</span>
+  <button onclick="newRecipe()">➕ Новый рецепт</button>
+  <button onclick="document.getElementById('importFile').click()">📂 Импорт JSON</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+  <button onclick="exportJSON()">📋 Экспорт JSON</button>
+  <button onclick="chooseFolder()">📁 Выбрать папку</button>
+  <button id="unlinkBtn" onclick="unlinkFolder()" style="display:none">✕ Отвязать папку</button>
+  <button onclick="loadDataJsonManual()">📖 Загрузить data.json</button>
+  <button class="danger" onclick="resetAll()">↺ Сбросить всё</button>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <h2>📜 Мои рецепты</h2>
+    <input type="text" class="search" id="searchInput" placeholder="🔍 Поиск" oninput="renderList()">
+    <select class="search" id="filterStyle" onchange="renderList()">
+      <option value="">Все стили</option>
+      <option value="classic">Классик</option>
+      <option value="petnat">Петнат</option>
+      <option value="still">Тихий</option>
+      <option value="solera">Коль Фандо</option>
+      <option value="ice">Ледяной</option>
+      <option value="fruit">Фруктовый</option>
+    </select>
+    <div class="recipe-list" id="recipeList"></div>
+  </div>
+
+  <div class="main" id="mainArea">
+    <div class="empty">Выберите рецепт или создайте новый</div>
+  </div>
+</div>
+
+<script>
+/* ============ БАЗА ДРОЖЖЕЙ (краткая, для подбора) ============ */
+const YEAST_DB = [
+  {name:"SafCider AC-1",emoji:"🍎",style:"classic_cider",strengths:["apple_fresh","clean","stable","classic"],weaknesses:["not_aromatic"],bestFor:["classic","still","petnat"],aroma:"apple,fresh,clean",tempMin:10,tempMax:30,tempOpt:18,abvMax:16,neutral:true},
+  {name:"SafCider AB-1",emoji:"🍷",style:"classic_cider",strengths:["apple","balanced","soft","fruity"],weaknesses:["not_complex"],bestFor:["classic","still","petnat"],aroma:"apple,pear,soft",tempMin:10,tempMax:30,tempOpt:20,abvMax:18,neutral:false},
+  {name:"Lalvin EC-1118",emoji:"🇫🇷",style:"neutral_champagne",strengths:["reliable","high_abv","cold","neutral","sparkling"],weaknesses:["neutral","kills_character"],bestFor:["classic","petnat","ice","high_abv"],aroma:"neutral,clean",tempMin:4,tempMax:35,tempOpt:18,abvMax:18,neutral:true},
+  {name:"Lalvin 71B",emoji:"🍷",style:"fruity_soft",strengths:["fruity","soft","malic_reduction","esters","young"],weaknesses:["low_abv","not_for_aging"],bestFor:["classic","still","fruit","acidic_apples"],aroma:"banana,pear,peach,tropical",tempMin:15,tempMax:30,tempOpt:20,abvMax:14,neutral:false},
+  {name:"Lalvin K1-V1116",emoji:"🇫🇷",style:"aromatic",strengths:["floral","fruity","fast","reliable","cold","high_sugar"],weaknesses:["not_neutral","less_body"],bestFor:["fruit","aromatic","classic","ice"],aroma:"acacia,citrus,pear,peach,tropical",tempMin:10,tempMax:35,tempOpt:17,abvMax:18,neutral:false},
+  {name:"Lalvin D47",emoji:"🍑",style:"full_body",strengths:["body","creamy","polysaccharides","sur_lie","premium","oak"],weaknesses:["not_sparkling","not_cold","temp_sensitive"],bestFor:["still","premium","oak","aged"],aroma:"citrus,peach,tropical,flowers,creamy",tempMin:15,tempMax:28,tempOpt:20,abvMax:15,neutral:false},
+  {name:"Lalvin QA23",emoji:"🇵🇹",style:"tropical",strengths:["tropical","thiols","citrus","aromatic","fresh"],weaknesses:["not_neutral","not_aging"],bestFor:["fruit","aromatic","hopped","craft"],aroma:"passionfruit,lime,pineapple,mango",tempMin:14,tempMax:28,tempOpt:18,abvMax:16,neutral:false},
+  {name:"Lalvin ICV VIN13",emoji:"🍇",style:"tropical",strengths:["tropical","thiols","passionfruit","grapefruit","aromatic"],weaknesses:["not_neutral","needs_nutrition"],bestFor:["fruit","hopped","aromatic","craft"],aroma:"passionfruit,guava,grapefruit,gooseberry",tempMin:12,tempMax:28,tempOpt:18,abvMax:15,neutral:false},
+  {name:"AEB X-5",emoji:"🇮🇹",style:"tropical",strengths:["tropical","thiols","passionfruit","grapefruit","fresh","aromatic"],weaknesses:["needs_nutrition","not_neutral"],bestFor:["fruit","hopped","aromatic","craft"],aroma:"passionfruit,guava,grapefruit,gooseberry",tempMin:13,tempMax:28,tempOpt:18,abvMax:16,neutral:false},
+  {name:"AEB Fermo Fruit",emoji:"🍏",style:"fruity",strengths:["fruity","fresh","apple","pear","clean"],weaknesses:["low_abv","not_sparkling"],bestFor:["fruit","still","classic"],aroma:"apple,pear,peach,flowers",tempMin:14,tempMax:25,tempOpt:18,abvMax:15,neutral:false},
+  {name:"Lallemand E88",emoji:"🍒",style:"fresh_fruit",strengths:["fresh","fruit","clean","white_fruit"],weaknesses:["not_aging","not_high_abv"],bestFor:["fruit","still","aromatic"],aroma:"apple,pear,peach,flowers",tempMin:15,tempMax:28,tempOpt:19,abvMax:15,neutral:false},
+  {name:"Lalvin BVL1",emoji:"🥂",style:"elegant_white",strengths:["elegant","fresh","white_wine","delicate"],weaknesses:["not_powerful","needs_quality"],bestFor:["premium","still","perry"],aroma:"apple,pear,flowers,honey",tempMin:15,tempMax:28,tempOpt:19,abvMax:15,neutral:false},
+  {name:"Lalvin D-254",emoji:"🍌",style:"red_full",strengths:["body","mellow","ripe_fruit","oak","structure"],weaknesses:["not_fresh","not_white"],bestFor:["oak","aged","berry_blend","red_cider"],aroma:"cherry,plum,dark_fruit,spice",tempMin:15,tempMax:28,tempOpt:25,abvMax:16,neutral:false},
+  {name:"Lalvin RC212",emoji:"🍷",style:"red_burgundy",strengths:["color","berry","structure","pinot"],weaknesses:["needs_nutrition","not_white"],bestFor:["berry_blend","red_cider","oak"],aroma:"cherry,berry,spice",tempMin:18,tempMax:30,tempOpt:24,abvMax:16,neutral:false},
+  {name:"Maurivin BRC214",emoji:"🇳🇿",style:"red_new_world",strengths:["color","dark_fruit","mellow","structure"],weaknesses:["not_white","not_fresh"],bestFor:["berry_blend","red_cider","oak","aged"],aroma:"cherry,plum,dark_fruit,chocolate",tempMin:18,tempMax:32,tempOpt:26,abvMax:16,neutral:false},
+  {name:"Lalvin KV-1255",emoji:"🍷",style:"red_mediterranean",strengths:["berry","structure","color","mellow"],weaknesses:["not_white"],bestFor:["berry_blend","red_cider","oak"],aroma:"cherry,raspberry,plum,spice",tempMin:18,tempMax:30,tempOpt:25,abvMax:16,neutral:false},
+  {name:"Lalvin FV 19",emoji:"🍷",style:"red_fruity",strengths:["red_berry","mellow","structure","fresh"],weaknesses:["not_white"],bestFor:["berry_blend","red_cider","oak"],aroma:"cherry,strawberry,plum,spice",tempMin:18,tempMax:32,tempOpt:25,abvMax:16,neutral:false},
+  {name:"Lalvin CL23",emoji:"🍷",style:"universal_fruit",strengths:["fruit","fresh","universal","clean"],weaknesses:["not_specialized"],bestFor:["fruit","still","classic","perry"],aroma:"apple,pear,flowers",tempMin:15,tempMax:28,tempOpt:20,abvMax:16,neutral:false},
+  {name:"Lalvin TD-525",emoji:"🍷",style:"aromatic_white",strengths:["aromatic","fruit","fresh","body"],weaknesses:["not_high_abv","not_sparkling"],bestFor:["aromatic","premium","still"],aroma:"apple,pear,peach,flowers,tropical",tempMin:15,tempMax:25,tempOpt:18,abvMax:15,neutral:false},
+  {name:"SafŒno BC S103",emoji:"🍷",style:"technical_reliable",strengths:["reliable","high_abv","restart","sparkling","fructose"],weaknesses:["neutral","technical"],bestFor:["high_abv","petnat","ice","restart"],aroma:"neutral,clean",tempMin:10,tempMax:35,tempOpt:20,abvMax:18,neutral:true},
+  {name:"SafŒno VR 44",emoji:"🍷",style:"technical_reliable",strengths:["reliable","high_abv","restart","sparkling","wide_temp"],weaknesses:["neutral","technical"],bestFor:["high_abv","petnat","restart"],aroma:"neutral,clean",tempMin:10,tempMax:40,tempOpt:20,abvMax:16,neutral:true},
+  {name:"CL-1006",emoji:"🍷",style:"cider_simple",strengths:["cider","simple","fast","apple"],weaknesses:["low_abv","not_premium"],bestFor:["classic","still","beginner"],aroma:"apple,pear,clean",tempMin:20,tempMax:25,tempOpt:22,abvMax:14,neutral:false},
+  {name:"DC-414",emoji:"🍷",style:"universal_fruit",strengths:["universal","fruit","fast","simple"],weaknesses:["low_abv","not_premium"],bestFor:["classic","still","fruit","beginner"],aroma:"fruit,clean",tempMin:20,tempMax:25,tempOpt:22,abvMax:14,neutral:false}
+];
+
+/* ============ ПОЛНАЯ БАЗА ОПИСАНИЙ (из data.json) ============ */
+let YEAST_FULL_DB = [];
+
+const ADDON_TYPES = {
+  juice:{name:"Сок (не яблоко)",icon:"🧃",units:"л",examples:["грушевый","вишнёвый","малиновый","смородиновый","облепиховый","клюквенный","арония","виноградный"]},
+  puree:{name:"Пюре / мезга",icon:"🍓",units:"кг",examples:["клубника","малина","черника","смородина","вишня","слива","айва"]},
+  berry:{name:"Ягоды целые",icon:"🫐",units:"кг",examples:["малина","ежевика","черника","смородина","облепиха","шиповник"]},
+  hop:{name:"Хмель",icon:"🌿",units:"г",examples:["Citra","Mosaic","Cascade","Saaz","Hallertau"]},
+  oak:{name:"Дуб",icon:"🪵",units:"г",examples:["чипсы лёгкие","чипсы средние","чипсы тяжёлые","кубик французский","кубик американский","спираль"]},
+  spice:{name:"Специи",icon:"🌶️",units:"г",examples:["корица","гвоздика","бадьян","имбирь","кардамон","ваниль","перец"]},
+  sugar:{name:"Сахар / мёд",icon:"🍯",units:"г",examples:["сахар","мёд","декстроза","фруктоза","концентрат"]},
+  acid:{name:"Кислота",icon:"🍋",units:"г",examples:["яблочная","лимонная","виннокаменная"]},
+  other:{name:"Другое",icon:"🧪",units:"г",examples:[]}
+};
+
+/* ============ СОСТОЯНИЕ ============ */
+let recipes = [];
+let currentId = null;
+let dirHandle = null;
+let fileHandle = null;
+const LS_KEY = "recipemaker_recipes_v1";
+
+/* ============ УТИЛИТЫ ============ */
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function nl2br(s){return escapeHtml(s).replace(/\n/g,'<br>')}
+function updateStorageStatus(msg,ok=true){
+  const el=document.getElementById('storageStatus');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=ok?'var(--muted)':'var(--danger)';
+}
+function updateDbStatus(msg,ok){
+  const el=document.getElementById('dbStatus');
+  if(!el)return;
+  el.textContent=msg;
+  el.className='db-status '+(ok?'ok':'warn');
+}
+
+/* ============ ЗАГРУЗКА data.json ============ */
+function findYeastFull(shortName){
+  if(!YEAST_FULL_DB.length)return null;
+  const s=shortName.toLowerCase().replace(/\s+/g,' ').trim();
+  // Точное совпадение по вхождению подстроки
+  for(const y of YEAST_FULL_DB){
+    const n=(y.name||'').toLowerCase();
+    if(n===s)return y;
+  }
+  // По ключевым словам
+  const keywords=s.replace(/lalvin|aeb|safŒno|safoeno|safcider|lallemand|maurivin|icv|zymoferm|zymaflore|fermentis|™/gi,'').trim().split(/\s+/).filter(w=>w.length>2);
+  let best=null,bestScore=0;
+  for(const y of YEAST_FULL_DB){
+    const n=(y.name||'').toLowerCase();
+    let score=0;
+    for(const k of keywords){
+      if(n.includes(k))score++;
+    }
+    if(score>bestScore){bestScore=score;best=y}
+  }
+  if(bestScore>=1)return best;
+  return null;
+}
+
+async function loadDataJsonFromHandle(handle){
+  try{
+    const file=await handle.getFile();
+    const text=await file.text();
+    const data=JSON.parse(text);
+    if(Array.isArray(data)){
+      YEAST_FULL_DB=data;
+      updateDbStatus('📖 Описания: '+data.length+' штаммов ✓',true);
+      // Если сейчас открыт рецепт — перерисуем
+      if(currentId){renderEditor()}
+      return true;
+    }
+  }catch(e){console.error('data.json load error',e)}
+  return false;
+}
+
+async function loadDataJsonManual(){
+  if(!window.showDirectoryPicker){
+    // Фолбэк — через input file
+    const inp=document.createElement('input');
+    inp.type='file';inp.accept='.json';
+    inp.onchange=async(e)=>{
+      const f=e.target.files[0];if(!f)return;
+      const r=new FileReader();
+      r.onload=ev=>{
+        try{
+          const data=JSON.parse(ev.target.result);
+          if(Array.isArray(data)){
+            YEAST_FULL_DB=data;
+            updateDbStatus('📖 Описания: '+data.length+' штаммов ✓',true);
+            if(currentId)renderEditor();
+            alert('Загружено описаний: '+data.length);
+          }
+        }catch(err){alert('Ошибка: '+err.message)}
+      };
+      r.readAsText(f);
+    };
+    inp.click();
+    return;
+  }
+  try{
+    const dirH=await window.showDirectoryPicker({mode:'read'});
+    const fileH=await dirH.getFileHandle('data.json');
+    const ok=await loadDataJsonFromHandle(fileH);
+    if(!ok)alert('Не удалось загрузить data.json');
+  }catch(e){console.log('cancelled')}
+}
+
+/* ============ ХРАНИЛИЩЕ ============ */
+function loadFromLS(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw){recipes=JSON.parse(raw)}
+  }catch(e){recipes=[];console.error('LS load error',e)}
+  updateStorageStatus('localStorage ✓ ('+recipes.length+')');
+}
+
+async function saveToLS(){
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify(recipes));
+  }catch(e){console.error('LS save error',e)}
+  if(dirHandle && fileHandle){
+    try{
+      const perm=await dirHandle.queryPermission({mode:'readwrite'});
+      if(perm==='granted'){
+        const w=await fileHandle.createWritable();
+        await w.write(JSON.stringify(recipes,null,1));
+        await w.close();
+        updateStorageStatus('📁 '+dirHandle.name+' ✓');
+      }
+    }catch(e){updateStorageStatus('Ошибка записи в файл',false);console.error(e)}
+  }
+}
+
+async function chooseFolder(){
+  if(!window.showDirectoryPicker){alert('Браузер не поддерживает File System Access');return}
+  try{
+    dirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+    fileHandle=await dirHandle.getFileHandle('recipes.json',{create:true});
+    document.getElementById('unlinkBtn').style.display='inline-block';
+    const file=await fileHandle.getFile();
+    if(file.size>0){
+      const text=await file.text();
+      try{
+        const data=JSON.parse(text);
+        if(Array.isArray(data)){
+          if(confirm('Заменить текущие рецепты ('+recipes.length+') на '+data.length+' из файла?\n\nOK = заменить\nОтмена = добавить к текущим')){
+            recipes=data;
+          }else{
+            recipes=recipes.concat(data);
+          }
+          await saveToLS();
+          renderList();
+        }
+      }catch(e){console.error('parse error',e)}
+    }
+    updateStorageStatus('📁 '+dirHandle.name+' ✓');
+
+    // Автозагрузка data.json из той же папки
+    try{
+      const dataFileH=await dirHandle.getFileHandle('data.json');
+      await loadDataJsonFromHandle(dataFileH);
+    }catch(e){
+      updateDbStatus('📖 data.json не найден в папке',false);
+    }
+  }catch(e){console.log('folder cancelled')}
+}
+
+function unlinkFolder(){
+  dirHandle=null;fileHandle=null;
+  document.getElementById('unlinkBtn').style.display='none';
+  updateStorageStatus('localStorage ✓');
+}
+
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(Array.isArray(data)){
+        if(confirm('Заменить текущие ('+recipes.length+') на импортируемые ('+data.length+')?\n\nOK = заменить\nОтмена = добавить')){
+          recipes=data;
+        }else{
+          recipes=recipes.concat(data);
+        }
+        saveToLS();renderList();
+        alert('Импортировано: '+data.length);
+      }
+    }catch(err){alert('Ошибка JSON: '+err.message)}
+  };
+  r.readAsText(f);
+  e.target.value='';
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(recipes,null,1)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='recipes.json';
+  a.click();
+}
+
+function resetAll(){
+  if(!confirm('Удалить ВСЕ рецепты?'))return;
+  recipes=[];currentId=null;saveToLS();renderList();
+  document.getElementById('mainArea').innerHTML='<div class="empty">Выберите рецепт или создайте новый</div>';
+}
+
+/* ============ РЕЦЕПТЫ ============ */
+function newRecipe(){
+  try{
+    const id='R-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+    const today=new Date().toISOString().slice(0,10);
+    const r={
+      id:id,code:'',name:'Новый рецепт',emoji:'🍎',
+      createdDate:today,status:'draft',
+      base:{varieties:'',volume:20,brix:12,ph:3.5,ta:6,region:''},
+      target:{style:'classic',sweetness:'dry',abv:6,carbonation:3,character:'balanced'},
+      addons:[],
+      tech:{maceration:false,macerationDays:0,coldSoak:false,fermTemp:18,fermDays:21,surLie:false,oakAging:false,oakMonths:0,blend:false},
+      yeast:[],
+      nutrients:'DAP 20 г/10л + Fermaid O 20 г/10л',
+      notes:'',
+      suggestions:{style:'',technology:[],yeast:[],warnings:[]}
+    };
+    recipes.push(r);
+    currentId=id;
+    saveToLS();
+    renderList();
+    recalcSuggestions();
+    renderEditor();
+  }catch(e){
+    alert('Ошибка создания: '+e.message);
+    console.error(e);
+  }
+}
+
+function deleteRecipe(){
+  if(!currentId)return;
+  if(!confirm('Удалить рецепт?'))return;
+  recipes=recipes.filter(r=>r.id!==currentId);
+  currentId=null;saveToLS();renderList();
+  document.getElementById('mainArea').innerHTML='<div class="empty">Выберите рецепт или создайте новый</div>';
+}
+
+function selectRecipe(id){
+  currentId=id;
+  renderList();
+  renderEditor();
+}
+
+function currentRecipe(){return recipes.find(r=>r.id===currentId)}
+
+/* ============ СПИСОК ============ */
+function renderList(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const f=document.getElementById('filterStyle').value;
+  const list=document.getElementById('recipeList');
+  const filtered=recipes.filter(r=>{
+    const matchQ=!q||r.name.toLowerCase().includes(q)||(r.code||'').toLowerCase().includes(q);
+    const matchF=!f||r.target.style===f;
+    return matchQ&&matchF;
+  }).sort((a,b)=>(b.createdDate||'').localeCompare(a.createdDate||''));
+  if(!filtered.length){list.innerHTML='<div class="empty">Нет рецептов</div>';return}
+  const styleNames={classic:'Классик',petnat:'Петнат',still:'Тихий',solera:'Solera',ice:'Ледяной',fruit:'Фруктовый'};
+  list.innerHTML=filtered.map(r=>{
+    const styleName=styleNames[r.target.style]||r.target.style||'?';
+    return '<div class="recipe-item '+(r.id===currentId?'active':'')+'" onclick="selectRecipe(\''+r.id+'\')">'+
+      '<div class="name">'+(r.emoji||'🍎')+' '+escapeHtml(r.name)+'</div>'+
+      '<div class="meta">'+(r.code?r.code+' · ':'')+styleName+' · '+r.base.volume+'л · '+r.base.brix+'°Bx</div>'+
+      '<div class="meta"><span class="status '+(r.status||'draft')+'">'+(r.status==='final'?'✅ финал':'📝 черновик')+'</span> '+(r.createdDate||'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ============ РЕДАКТОР ============ */
+function renderEditor(){
+  const r=currentRecipe();
+  if(!r){
+    document.getElementById('mainArea').innerHTML='<div class="empty">Выберите рецепт или создайте новый</div>';
+    return;
+  }
+  const m=document.getElementById('mainArea');
+  const statusClass=r.status==='final'?'final':'draft';
+  const statusText=r.status==='final'?'✅ финал':'📝 черновик';
+  const toggleBtnText=r.status==='final'?'↩ В черновики':'✅ Завершить';
+
+  m.innerHTML=
+    '<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">'+
+      '<button onclick="goBack()">← к списку</button>'+
+      '<button class="danger" onclick="deleteRecipe()">🗑 Удалить</button>'+
+      '<span class="status '+statusClass+'" style="margin-left:auto">'+statusText+'</span>'+
+      '<button onclick="toggleStatus()">'+toggleBtnText+'</button>'+
+    '</div>'+
+
+    '<div class="card">'+
+      '<div class="grid3">'+
+        '<div class="field"><label>Код рецепта</label><input value="'+escapeHtml(r.code||'')+'" placeholder="СИДР-REC-..." oninput="upd(\'code\',this.value)"></div>'+
+        '<div class="field"><label>Название</label><input value="'+escapeHtml(r.name)+'" oninput="upd(\'name\',this.value)"></div>'+
+        '<div class="field"><label>Дата</label><input type="date" value="'+(r.createdDate||'')+'" oninput="upd(\'createdDate\',this.value)"></div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="tabs">'+
+      '<div class="tab active" data-tab="tab-base">🍎 Сырьё</div>'+
+      '<div class="tab" data-tab="tab-target">🎯 Цель</div>'+
+      '<div class="tab" data-tab="tab-addons">🧪 Добавки ('+r.addons.length+')</div>'+
+      '<div class="tab" data-tab="tab-tech">⚙️ Технология</div>'+
+      '<div class="tab" data-tab="tab-yeast">🧬 Дрожжи</div>'+
+      '<div class="tab" data-tab="tab-result">💡 Подбор</div>'+
+    '</div>'+
+
+    '<div id="tab-base">'+renderBase(r)+'</div>'+
+    '<div id="tab-target" style="display:none">'+renderTarget(r)+'</div>'+
+    '<div id="tab-addons" style="display:none">'+renderAddons(r)+'</div>'+
+    '<div id="tab-tech" style="display:none">'+renderTech(r)+'</div>'+
+    '<div id="tab-yeast" style="display:none">'+renderYeast(r)+'</div>'+
+    '<div id="tab-result" style="display:none">'+renderResult(r)+'</div>';
+
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const tabId=this.getAttribute('data-tab');
+      ['tab-base','tab-target','tab-addons','tab-tech','tab-yeast','tab-result'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el)el.style.display=id===tabId?'block':'none';
+      });
+    });
+  });
+
+  // Навешиваем обработчики на внутренние табы дрожжей
+  bindYeastTabs();
+}
+
+function bindYeastTabs(){
+  document.querySelectorAll('.yeast-tab').forEach(t=>{
+    t.addEventListener('click',function(e){
+      e.stopPropagation();
+      const cardId=this.getAttribute('data-card');
+      const sec=this.getAttribute('data-sec');
+      this.parentElement.querySelectorAll('.yeast-tab').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      const card=document.getElementById(cardId);
+      if(!card)return;
+      card.querySelectorAll('.yeast-section').forEach(s=>{
+        s.classList.toggle('active',s.getAttribute('data-sec')===sec);
+      });
+    });
+  });
+}
+
+function goBack(){
+  currentId=null;
+  renderList();
+  document.getElementById('mainArea').innerHTML='<div class="empty">Выберите рецепт или создайте новый</div>';
+}
+
+function renderBase(r){
+  return '<div class="card">'+
+    '<h2>🍎 Базовое сырьё (яблоки)</h2>'+
+    '<div class="grid3">'+
+      '<div class="field"><label>Сорта (соотношение)</label><input value="'+escapeHtml(r.base.varieties)+'" placeholder="Антоновка 50%, Пепин 30%..." oninput="updBase(\'varieties\',this.value)"></div>'+
+      '<div class="field"><label>Регион</label><input value="'+escapeHtml(r.base.region)+'" oninput="updBase(\'region\',this.value)"></div>'+
+      '<div class="field"><label>Объём сока, л</label><input type="number" step="0.1" value="'+r.base.volume+'" oninput="updBase(\'volume\',+this.value)"></div>'+
+      '<div class="field"><label>Начальный Brix</label><input type="number" step="0.1" value="'+r.base.brix+'" oninput="updBase(\'brix\',+this.value);recalcSuggestions()"></div>'+
+      '<div class="field"><label>pH</label><input type="number" step="0.01" value="'+r.base.ph+'" oninput="updBase(\'ph\',+this.value);recalcSuggestions()"></div>'+
+      '<div class="field"><label>TA, г/л</label><input type="number" step="0.1" value="'+r.base.ta+'" oninput="updBase(\'ta\',+this.value);recalcSuggestions()"></div>'+
+    '</div>'+
+    '<div class="hint">🧮 Прогноз ABV: <b>'+((r.base.brix||0)*0.55).toFixed(1)+'%</b> (Brix × 0.55)</div>'+
+  '</div>';
+}
+
+function renderTarget(r){
+  const styles=[['classic','Классик (шампенуаз)'],['petnat','Петнат'],['still','Тихий'],['solera','Коль Фандо (Solera)'],['ice','Ледяной / Ice cider'],['fruit','Фруктовый / ягодный']];
+  const sweets=[['dry','Сухой (0-8 г/л)'],['semi','Полусухой (8-25 г/л)'],['medium','Полусладкий (25-45 г/л)'],['sweet','Сладкий (45+ г/л)']];
+  const chars=[['balanced','Сбалансированный'],['fruity','Фруктовый яркий'],['floral','Цветочный'],['mineral','Минеральный'],['tannic','Танинный / структурированный'],['creamy','Кремовый / сливочный'],['winey','Винный / гастрономический']];
+
+  let stylesHtml='',sweetsHtml='',charsHtml='';
+  styles.forEach(s=>{stylesHtml+='<option value="'+s[0]+'"'+(r.target.style===s[0]?' selected':'')+'>'+s[1]+'</option>'});
+  sweets.forEach(s=>{sweetsHtml+='<option value="'+s[0]+'"'+(r.target.sweetness===s[0]?' selected':'')+'>'+s[1]+'</option>'});
+  chars.forEach(s=>{charsHtml+='<option value="'+s[0]+'"'+(r.target.character===s[0]?' selected':'')+'>'+s[1]+'</option>'});
+
+  return '<div class="card">'+
+    '<h2>🎯 Желаемый стиль</h2>'+
+    '<div class="grid2">'+
+      '<div class="field"><label>Тип сидра</label><select onchange="updTarget(\'style\',this.value);recalcSuggestions()">'+stylesHtml+'</select></div>'+
+      '<div class="field"><label>Сладость</label><select onchange="updTarget(\'sweetness\',this.value)">'+sweetsHtml+'</select></div>'+
+      '<div class="field"><label>Целевая крепость, %</label><input type="number" step="0.1" value="'+r.target.abv+'" oninput="updTarget(\'abv\',+this.value);recalcSuggestions()"></div>'+
+      '<div class="field"><label>Карбонизация (1-5)</label><input type="number" min="1" max="5" value="'+r.target.carbonation+'" oninput="updTarget(\'carbonation\',+this.value);recalcSuggestions()"></div>'+
+      '<div class="field" style="grid-column:span 2"><label>Характер напитка</label><select onchange="updTarget(\'character\',this.value);recalcSuggestions()">'+charsHtml+'</select></div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderAddons(r){
+  const types=Object.entries(ADDON_TYPES);
+  let html='<div class="card">'+
+    '<h2>🧪 Добавки и ингредиенты</h2>'+
+    '<div class="hint">Добавки, которые вносятся ДО или ВО ВРЕМЯ брожения. Влияют на выбор дрожжей и технологию.</div>';
+  if(!r.addons.length){html+='<div class="empty">Добавки не указаны — чистое яблоко</div>'}
+  r.addons.forEach((a,i)=>{
+    const t=ADDON_TYPES[a.type]||ADDON_TYPES.other;
+    let typesHtml='';
+    types.forEach(([k,v])=>{typesHtml+='<option value="'+k+'"'+(a.type===k?' selected':'')+'>'+v.icon+' '+v.name+'</option>'});
+    let examplesHtml='';
+    (t.examples||[]).forEach(e=>{examplesHtml+='<option value="'+escapeHtml(e)+'">'});
+    html+='<div class="addon-row">'+
+      '<select onchange="updAddon('+i+',\'type\',this.value)">'+typesHtml+'</select>'+
+      '<input list="ex_'+i+'" placeholder="Название" value="'+escapeHtml(a.name)+'" oninput="updAddon('+i+',\'name\',this.value)">'+
+      '<datalist id="ex_'+i+'">'+examplesHtml+'</datalist>'+
+      '<input type="number" step="0.1" placeholder="Кол-во" value="'+a.amount+'" oninput="updAddon('+i+',\'amount\',+this.value)">'+
+      '<input placeholder="'+t.units+'" value="'+escapeHtml(a.unit||t.units)+'" oninput="updAddon('+i+',\'unit\',this.value)">'+
+      '<button class="small danger" onclick="delAddon('+i+')">✕</button>'+
+    '</div>'+
+    '<div style="margin:-4px 0 8px 0"><input style="width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:5px 9px;color:var(--text);font-size:12px" placeholder="Способ внесения: до брожения / на брожении / после / мацерация N дней..." value="'+escapeHtml(a.method||'')+'" oninput="updAddon('+i+',\'method\',this.value)"></div>';
+  });
+  html+='<button class="primary" onclick="addAddon()">➕ Добавить добавку</button></div>';
+  return html;
+}
+
+function renderTech(r){
+  const macChecked=r.tech.maceration?'checked':'';
+  const coldChecked=r.tech.coldSoak?'checked':'';
+  const surChecked=r.tech.surLie?'checked':'';
+  const oakChecked=r.tech.oakAging?'checked':'';
+  const blendChecked=r.tech.blend?'checked':'';
+  return '<div class="card">'+
+    '<h2>⚙️ Технология</h2>'+
+    '<div class="grid2">'+
+      '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" '+macChecked+' onchange="updTech(\'maceration\',this.checked);recalcSuggestions()"> Мацерация на мезге</label>'+
+      '<div class="field"><label>Дней мацерации</label><input type="number" value="'+r.tech.macerationDays+'" oninput="updTech(\'macerationDays\',+this.value)"></div>'+
+      '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" '+coldChecked+' onchange="updTech(\'coldSoak\',this.checked)"> Холодная пред-брожение (cold soak)</label>'+
+      '<div class="field"><label>Температура брожения, °C</label><input type="number" value="'+r.tech.fermTemp+'" oninput="updTech(\'fermTemp\',+this.value);recalcSuggestions()"></div>'+
+      '<div class="field"><label>Дней брожения</label><input type="number" value="'+r.tech.fermDays+'" oninput="updTech(\'fermDays\',+this.value)"></div>'+
+      '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" '+surChecked+' onchange="updTech(\'surLie\',this.checked);recalcSuggestions()"> Выдержка на осадке (Sur Lie)</label>'+
+      '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" '+oakChecked+' onchange="updTech(\'oakAging\',this.checked);recalcSuggestions()"> Выдержка на дубе</label>'+
+      '<div class="field"><label>Месяцев на дубе</label><input type="number" value="'+r.tech.oakMonths+'" oninput="updTech(\'oakMonths\',+this.value)"></div>'+
+      '<label style="display:flex;align-items:center;gap:8px"><input type="checkbox" '+blendChecked+' onchange="updTech(\'blend\',this.checked);recalcSuggestions()"> Купаж (с другими партиями)</label>'+
+    '</div>'+
+    '<div class="field" style="margin-top:10px"><label>Питание дрожжей</label><textarea oninput="upd(\'nutrients\',this.value)">'+escapeHtml(r.nutrients)+'</textarea></div>'+
+  '</div>';
+}
+
+function renderYeast(r){
+  let html='<div class="card">'+
+    '<h2>🧬 Выбранные дрожжи (ручной выбор)</h2>'+
+    '<div class="hint">Можно выбрать дрожжи вручную или принять автоподбор из вкладки «💡 Подбор»</div>';
+  r.yeast.forEach((y,i)=>{
+    let optsHtml='<option value="">— выбрать —</option>';
+    YEAST_DB.forEach(ye=>{
+      const sel=y.name===ye.name?' selected':'';
+      optsHtml+='<option value="'+escapeHtml(ye.name)+'"'+sel+'>'+ye.emoji+' '+escapeHtml(ye.name)+'</option>';
+    });
+    html+='<div class="yeast-row">'+
+      '<select onchange="updYeast('+i+',\'name\',this.value)">'+optsHtml+'</select>'+
+      '<input placeholder="Дата" type="date" value="'+(y.date||'')+'" oninput="updYeast('+i+',\'date\',this.value)">'+
+      '<input placeholder="Доза г/10л" value="'+escapeHtml(y.dose||'')+'" oninput="updYeast('+i+',\'dose\',this.value)">'+
+      '<button class="small danger" onclick="delYeast('+i+')">✕</button>'+
+    '</div>';
+  });
+  html+='<button onclick="addYeast()">➕ Добавить дрожжи</button></div>';
+  return html;
+}
+
+function renderYeastFullBlock(yeastShortName,cardIdx){
+  const full=findYeastFull(yeastShortName);
+  if(!full){
+    return '<div class="hint" style="margin-top:8px">📖 Полное описание не найдено. Загрузите data.json через кнопку «📁 Выбрать папку» или «📖 Загрузить data.json»</div>';
+  }
+  const cardId='yfull_'+cardIdx;
+  const sections=[
+    {key:'history',title:'📜 История',text:full.history},
+    {key:'spec',title:'🎯 Специализация',text:full.spec},
+    {key:'params',title:'📊 Параметры',text:full.params},
+    {key:'grapes',title:'🍇 Для винограда',text:full.grapes},
+    {key:'cider',title:'🍎 Для сидра',text:full.cider}
+  ].filter(s=>s.text && s.text.trim());
+
+  if(!sections.length)return '';
+
+  let tabsHtml='<div class="yeast-tabs">';
+  sections.forEach((s,i)=>{
+    tabsHtml+='<div class="yeast-tab'+(i===0?' active':'')+'" data-card="'+cardId+'" data-sec="'+s.key+'">'+s.title+'</div>';
+  });
+  tabsHtml+='</div>';
+
+  let sectionsHtml='';
+  sections.forEach((s,i)=>{
+    sectionsHtml+='<div class="yeast-section'+(i===0?' active':'')+'" data-sec="'+s.key+'"><div class="yeast-full"><p>'+nl2br(s.text)+'</p></div></div>';
+  });
+
+  return '<div id="'+cardId+'" class="yeast-full-block" style="margin-top:8px;border:1px solid var(--border);border-radius:6px;padding:8px;background:#12171d">'+
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">📖 Полное описание из Drozzy: <b style="color:var(--accent)">'+escapeHtml(full.name)+'</b> '+full.emoji+'</div>'+
+    tabsHtml+
+    sectionsHtml+
+  '</div>';
+}
+
+function renderResult(r){
+  const s=r.suggestions||{};
+  const topYeast=(s.yeast||[]).slice(0,8);
+  let html='<div class="card">'+
+    '<h2>💡 Автоматический подбор</h2>'+
+    '<button class="primary" onclick="recalcSuggestions();renderEditor()">🔄 Пересчитать</button>'+
+    (YEAST_FULL_DB.length?'<span style="margin-left:10px;font-size:12px;color:var(--good)">📖 Описания загружены ('+YEAST_FULL_DB.length+')</span>':'<span style="margin-left:10px;font-size:12px;color:var(--warn)">📖 Загрузите data.json для полных описаний</span>')+
+  '</div>';
+
+  if(s.style){
+    html+='<div class="suggestion"><h3>🎯 Рекомендуемый стиль</h3><div>'+escapeHtml(s.style)+'</div></div>';
+  }
+
+  if((s.technology||[]).length){
+    html+='<div class="suggestion"><h3>⚙️ Рекомендуемая технология</h3>';
+    s.technology.forEach(t=>{html+='<div class="tech-step">'+t+'</div>'});
+    html+='</div>';
+  }
+
+  html+='<div class="card"><h2>🧬 Рекомендуемые дрожжи (по соответствию)</h2>';
+  if(!topYeast.length){html+='<div class="empty">Заполните параметры для подбора</div>'}
+  topYeast.forEach((y,i)=>{
+    const cls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const fullBrief=YEAST_DB.find(ye=>ye.name===y.name);
+    const aromaTags=(fullBrief?.aroma||'').split(',').map(a=>'<span class="tag">'+a.trim()+'</span>').join('');
+    const bestTags=(fullBrief?.bestFor||[]).map(b=>'<span class="tag hot">'+b+'</span>').join('');
+    const fullBlock=renderYeastFullBlock(y.name,i);
+    html+='<div class="yeast-card '+cls+'">'+
+      '<div class="yeast-head">'+
+        '<div class="yeast-name">'+(fullBrief?.emoji||'')+' '+escapeHtml(y.name)+'</div>'+
+        '<div class="yeast-score">'+y.score+'%</div>'+
+      '</div>'+
+      '<div class="score-bar"><div class="score-fill" style="width:'+y.score+'%"></div></div>'+
+      '<div class="yeast-reason">'+escapeHtml(y.reason)+'</div>'+
+      '<div class="yeast-specs">'+
+        '<div>🌡️ '+fullBrief.tempMin+'–'+fullBrief.tempMax+'°C (опт. '+fullBrief.tempOpt+'°C) · 🍷 до '+fullBrief.abvMax+'%</div>'+
+        '<div style="margin-top:4px">Аромат: '+aromaTags+'</div>'+
+        '<div style="margin-top:4px">Лучше для: '+bestTags+'</div>'+
+      '</div>'+
+      fullBlock+
+      '<button class="small primary" style="margin-top:8px" onclick="applyYeast(\''+escapeHtml(y.name).replace(/'/g,"\\'")+'\')">✓ Применить в рецепт</button>'+
+    '</div>';
+  });
+  html+='</div>';
+
+  if((s.warnings||[]).length){
+    html+='<div class="card" style="border-color:var(--warn)"><h2 style="color:var(--warn)">⚠️ Замечания</h2>';
+    s.warnings.forEach(w=>{html+='<div class="hint" style="border-left-color:var(--warn)">'+w+'</div>'});
+    html+='</div>';
+  }
+
+  return html;
+}
+
+/* ============ ОБНОВЛЕНИЕ ПОЛЕЙ ============ */
+function upd(k,v){
+  const r=currentRecipe();if(!r)return;
+  r[k]=v;
+  if(k==='name'||k==='code')renderList();
+  saveToLS();
+}
+function updBase(k,v){const r=currentRecipe();if(!r)return;r.base[k]=v;saveToLS()}
+function updTarget(k,v){const r=currentRecipe();if(!r)return;r.target[k]=v;saveToLS()}
+function updTech(k,v){const r=currentRecipe();if(!r)return;r.tech[k]=v;saveToLS()}
+function updAddon(i,k,v){const r=currentRecipe();if(!r)return;r.addons[i][k]=v;recalcSuggestions();saveToLS()}
+function updYeast(i,k,v){const r=currentRecipe();if(!r)return;r.yeast[i][k]=v;saveToLS()}
+
+function addAddon(){
+  const r=currentRecipe();if(!r)return;
+  r.addons.push({type:'juice',name:'',amount:0,unit:'л',method:''});
+  recalcSuggestions();
+  renderEditor();
+  const tab=document.querySelector('.tab[data-tab="tab-addons"]');
+  if(tab)tab.click();
+}
+function delAddon(i){
+  const r=currentRecipe();if(!r)return;
+  r.addons.splice(i,1);
+  recalcSuggestions();
+  renderEditor();
+  const tab=document.querySelector('.tab[data-tab="tab-addons"]');
+  if(tab)tab.click();
+}
+function addYeast(){
+  const r=currentRecipe();if(!r)return;
+  r.yeast.push({name:'',date:'',dose:''});
+  renderEditor();
+  const tab=document.querySelector('.tab[data-tab="tab-yeast"]');
+  if(tab)tab.click();
+}
+function delYeast(i){
+  const r=currentRecipe();if(!r)return;
+  r.yeast.splice(i,1);
+  renderEditor();
+  const tab=document.querySelector('.tab[data-tab="tab-yeast"]');
+  if(tab)tab.click();
+}
+function applyYeast(name){
+  const r=currentRecipe();if(!r)return;
+  r.yeast.push({name:name,date:'',dose:''});
+  renderEditor();
+  const tab=document.querySelector('.tab[data-tab="tab-yeast"]');
+  if(tab)tab.click();
+}
+function toggleStatus(){
+  const r=currentRecipe();if(!r)return;
+  r.status=r.status==='final'?'draft':'final';
+  saveToLS();
+  renderList();
+  renderEditor();
+}
+
+/* ============ ЛОГИКА ПОДБОРА ============ */
+function recalcSuggestions(){
+  const r=currentRecipe();
+  if(!r)return;
+  const b=r.base,t=r.target,tc=r.tech;
+  const addons=r.addons||[];
+  const hasBerry=addons.some(a=>['berry','puree'].includes(a.type));
+  const hasHop=addons.some(a=>a.type==='hop');
+  const hasOak=addons.some(a=>a.type==='oak')||tc.oakAging;
+  const hasSpice=addons.some(a=>a.type==='spice');
+  const hasSugar=addons.some(a=>a.type==='sugar');
+  const highAcid=(b.ta>7||b.ph<3.3);
+  const targetAbv=t.abv||(b.brix*0.55);
+  const highAbv=targetAbv>12;
+  const sparkling=t.carbonation>=4;
+  const coldFerm=tc.fermTemp<16;
+  const warmFerm=tc.fermTemp>24;
+
+  const scored=YEAST_DB.map(y=>{
+    let score=50;
+    const reasons=[];
+    if(y.bestFor.includes(t.style)){score+=15;reasons.push('✓ стиль '+t.style)}
+    if(t.style==='petnat'&&y.strengths.includes('sparkling')){score+=10;reasons.push('✓ для игристого')}
+    if(t.style==='ice'&&(y.abvMax>=16||y.strengths.includes('high_abv'))){score+=10;reasons.push('✓ высокий алкоголь')}
+    if(t.style==='fruit'&&(y.style==='fruity'||y.style==='tropical'||y.style==='aromatic')){score+=12;reasons.push('✓ фруктовый профиль')}
+    if(t.style==='classic'&&y.style==='classic_cider'){score+=15;reasons.push('✓ классический сидровый')}
+    if(t.style==='still'&&y.bestFor.includes('still'))score+=5;
+
+    if(t.character==='fruity'&&(y.strengths.includes('fruity')||y.strengths.includes('aromatic'))){score+=10;reasons.push('✓ фруктовость')}
+    if(t.character==='floral'&&y.aroma.includes('flowers')){score+=10;reasons.push('✓ цветочный')}
+    if(t.character==='mineral'&&y.neutral){score+=8;reasons.push('✓ нейтральный — раскроет минерал')}
+    if(t.character==='creamy'&&y.strengths.includes('body')){score+=12;reasons.push('✓ тело / кремовость')}
+    if(t.character==='winey'&&(y.style==='full_body'||y.style==='red_full')){score+=10;reasons.push('✓ винный стиль')}
+    if(t.character==='tannic'&&hasOak&&y.strengths.includes('oak')){score+=10;reasons.push('✓ для дуба')}
+
+    if(hasBerry&&y.bestFor.includes('berry_blend')){score+=15;reasons.push('✓ под ягодные добавки')}
+    if(hasBerry&&y.style.startsWith('red')){score+=10;reasons.push('✓ красный профиль под ягоды')}
+    if(hasHop&&(y.style==='tropical'||y.aroma.includes('passionfruit')||y.aroma.includes('grapefruit'))){score+=12;reasons.push('✓ под хмель')}
+    if(hasOak&&y.strengths.includes('oak')){score+=10;reasons.push('✓ совместим с дубом')}
+    if(hasOak&&y.strengths.includes('sur_lie'))score+=5;
+    if(hasSpice&&y.neutral){score+=5;reasons.push('✓ нейтральный — не конфликтует со специями')}
+    if(hasSugar&&y.strengths.includes('high_sugar')){score+=8;reasons.push('✓ переносит высокий сахар')}
+
+    if(highAcid&&y.strengths.includes('malic_reduction')){score+=12;reasons.push('✓ снижает яблочную кислоту')}
+    if(highAcid&&y.strengths.includes('soft'))score+=5;
+    if(highAbv&&y.abvMax>=targetAbv){score+=10;reasons.push('✓ выдержит '+targetAbv.toFixed(1)+'%')}
+    if(highAbv&&y.abvMax<targetAbv){score-=20;reasons.push('✗ не хватит спиртоустойчивости')}
+    if(coldFerm&&y.tempMin<=coldFerm&&y.strengths.includes('cold')){score+=8;reasons.push('✓ холодное брожение')}
+    if(coldFerm&&y.tempMin>coldFerm){score-=10;reasons.push('✗ слишком теплолюбив')}
+    if(warmFerm&&y.tempMax>=warmFerm)score+=3;
+    if(sparkling&&y.strengths.includes('sparkling')){score+=10;reasons.push('✓ для бутылочной ферментации')}
+    if(sparkling&&y.strengths.includes('not_sparkling')){score-=15;reasons.push('✗ не для игристого')}
+    if(tc.surLie&&y.strengths.includes('sur_lie')){score+=10;reasons.push('✓ для выдержки на осадке')}
+
+    if(t.style==='classic'&&y.style.startsWith('red')){score-=20;reasons.push('✗ красный штамм для классики')}
+    if(t.style==='classic'&&y.style==='tropical'){score-=10;reasons.push('✗ тропики не для классики')}
+
+    score=Math.max(5,Math.min(99,score));
+    return {name:y.name,score:Math.round(score),reason:reasons.slice(0,4).join(' · ')||'универсальный вариант'};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+
+  let styleSuggest='';
+  if(hasBerry)styleSuggest='Ягодно-яблочный купаж — рассмотрите стиль fruit или красный сидр';
+  else if(hasHop)styleSuggest='Хмелевой сидр (hopped cider) — современный craft стиль';
+  else if(hasOak||tc.oakAging)styleSuggest='Выдержанный гастрономический сидр в винном стиле';
+  else if(t.style==='petnat')styleSuggest='Петнат — естественная карбонизация, дображивание в бутылке';
+  else if(t.style==='ice')styleSuggest='Ледяной сидр — высокая сахаристость, долгая ферментация';
+  else if(t.style==='solera')styleSuggest='Коль Фандо (Solera) — многослойная выдержка';
+  else if(t.character==='winey')styleSuggest='Сидр в стиле белого/красного вина — премиальный';
+  else styleSuggest='Классический яблочный сидр — чистый сортовой профиль';
+
+  const techSuggest=[];
+  if(tc.maceration)techSuggest.push('<b>Мацерация:</b> '+((tc.macerationDays||2))+' дней при 8–10°C для экстракции аромата');
+  if(tc.coldSoak)techSuggest.push('<b>Cold soak:</b> 24–48 часов при 4–8°C перед брожением');
+  if(coldFerm)techSuggest.push('<b>Холодная ферментация:</b> '+tc.fermTemp+'°C — медленная, для сохранения ароматики');
+  else if(warmFerm)techSuggest.push('<b>Тёплая ферментация:</b> '+tc.fermTemp+'°C — быстрая, для полноты тела');
+  else techSuggest.push('<b>Ферментация:</b> '+tc.fermTemp+'°C, '+tc.fermDays+' дней');
+  if(tc.surLie)techSuggest.push('<b>Sur Lie:</b> выдержка на осадке 3–6 месяцев с баттонажем');
+  if(tc.oakAging)techSuggest.push('<b>Дуб:</b> '+((tc.oakMonths||3))+' месяцев, лёгкие/средние чипсы 2–4 г/л');
+  if(sparkling&&t.style==='petnat')techSuggest.push('<b>Петнат:</b> розлив при 30–40 г/л остаточного сахара, кронен-пробка');
+  if(sparkling&&t.style==='classic')techSuggest.push('<b>Классический метод:</b> тиражный ликёр 24 г/л + 6 г/л дрожжей, выдержка на осадке 6+ мес');
+  if(hasBerry)techSuggest.push('<b>Ягоды:</b> внесение на 2–3 день брожения или мацерация 5–7 дней');
+  if(hasHop)techSuggest.push('<b>Хмель:</b> холодное охмеление 3–5 г/л, 3–5 дней после окончания брожения');
+  if(hasOak&&!tc.oakAging)techSuggest.push('<b>Дуб:</b> внести на этапе брожения или выдержки, 2–4 г/л');
+
+  const warnings=[];
+  if(highAbv&&targetAbv>14)warnings.push('Высокая целевая крепость — нужны спиртоустойчивые дрожжи (EC-1118, BC S103, VR 44, K1-V1116)');
+  if(highAcid)warnings.push('Высокая кислотность — рассмотрите 71B (снижает яблочную кислоту на 20–40%)');
+  if(b.brix<10)warnings.push('Низкий Brix — возможно потребуется шаптализация или ледяной метод');
+  if(hasSugar&&t.sweetness!=='dry')warnings.push('Добавлен сахар + не сухой стиль — нужна стабилизация (сорбат + холод или пастеризация)');
+  if(sparkling&&t.sweetness!=='dry')warnings.push('Игристое + не сухой стиль — нужен точный расчёт тиражного ликёра и дегоржаж');
+  if(hasBerry&&t.style==='classic')warnings.push('Ягоды + классический стиль — ягоды изменят характер, рассмотрите стиль fruit');
+  if(hasHop&&scored[0]&&scored[0].score<60)warnings.push('Хмель требует ароматических дрожжей (QA23, VIN13, X-5) для синергии');
+
+  r.suggestions={style:styleSuggest,technology:techSuggest,yeast:scored,warnings:warnings};
+  saveToLS();
+}
+
+/* ============ СТАРТ ============ */
+loadFromLS();
+renderList();
+if(recipes.length){selectRecipe(recipes[0].id)}
+
+// Попытка автозагрузить data.json через fetch (работает если открыт через сервер или file:// в некоторых браузерах)
+fetch('./data.json').then(r=>r.ok?r.json():null).then(data=>{
+  if(Array.isArray(data)){
+    YEAST_FULL_DB=data;
+    updateDbStatus('📖 Описания: '+data.length+' штаммов ✓',true);
+    if(currentId)renderEditor();
+  }
+}).catch(()=>{});
+</script>
+</body>
+</html>

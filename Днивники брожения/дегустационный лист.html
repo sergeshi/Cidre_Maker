@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дегустационный журнал — Сидролог</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f5f7; margin: 0; padding: 20px; color: #1d1d1f; }
+        .app { max-width: 1000px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        h1 {
+            font-weight: 500;
+            font-size: 2rem;
+            margin: 0;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span { color: #86868b; font-weight: 400; font-size: 1rem; }
+        .file-status {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            background: #e8e8ed;
+            color: #1d1d1f;
+        }
+        .file-status.success { background: #28cd41; color: white; }
+        .file-status.error { background: #ff3b30; color: white; }
+        button {
+            background: #0071e3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background: #0077ed; }
+        button.secondary {
+            background: #e8e8ed;
+            color: #1d1d1f;
+        }
+        button.secondary:hover { background: #d8d8e0; }
+        button.small { padding: 6px 14px; font-size: 0.85rem; }
+
+        /* Панель фильтра/выбора */
+        .selector-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .selector-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8e8ed;
+            border-radius: 20px;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #0071e3;
+        }
+
+        /* Форма дегустации */
+        .tasting-form {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .form-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #1d1d1f;
+        }
+        .rating-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .rating-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        .rating-item label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #1d1d1f;
+        }
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .star {
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #d2d2d7;
+            transition: 0.1s;
+        }
+        .star.active { color: #ffb340; }
+        .star:hover { color: #ffaa33; }
+
+        /* История дегустаций */
+        .history-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .history-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .tasting-card {
+            background: #f5f5f7;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #0071e3;
+        }
+        .tasting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .tasting-date {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        .tasting-actions button {
+            background: none;
+            padding: 5px 12px;
+            margin-left: 8px;
+            font-size: 0.8rem;
+        }
+        .tasting-ratings {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        .rating-badge {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .tasting-comment {
+            color: #5e5e66;
+            margin-top: 8px;
+        }
+        .empty-history {
+            text-align: center;
+            color: #86868b;
+            padding: 40px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #86868b;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #d2d2d7;
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28cd41;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .notification.error { background: #ff3b30; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Модальное окно для редактирования */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            max-width: 500px;
+            width: 90%;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { margin: 0; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>🍷 <span>Дегустационный журнал</span>
+            <span id="fileStatus" class="file-status">Проверка...</span>
+        </h1>
+        <div>
+            <button class="secondary" id="chooseFolderBtn">📁 Выбрать папку</button>
+            <button class="secondary" id="refreshBtn">🔄 Обновить</button>
+        </div>
+    </div>
+
+    <div class="selector-panel">
+        <div class="selector-row">
+            <div class="input-group">
+                <label>📋 Выберите партию</label>
+                <select id="batchSelect"></select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма добавления дегустации -->
+    <div class="tasting-form">
+        <div class="form-title">✨ Новая дегустация</div>
+        <div class="rating-row">
+            <div class="rating-item">
+                <label>📅 Дата</label>
+                <input type="date" id="tastingDate">
+            </div>
+        </div>
+        <div class="rating-row">
+            <div class="rating-item">
+                <label>👁️ Внешний вид</label>
+                <div class="rating-stars" data-category="appearance"></div>
+            </div>
+            <div class="rating-item">
+                <label>👃 Аромат</label>
+                <div class="rating-stars" data-category="aroma"></div>
+            </div>
+            <div class="rating-item">
+                <label>👅 Вкус</label>
+                <div class="rating-stars" data-category="taste"></div>
+            </div>
+            <div class="rating-item">
+                <label>💪 Тело</label>
+                <div class="rating-stars" data-category="body"></div>
+            </div>
+            <div class="rating-item">
+                <label>🔚 Послевкусие</label>
+                <div class="rating-stars" data-category="finish"></div>
+            </div>
+            <div class="rating-item">
+                <label>⭐ Общая оценка</label>
+                <div class="rating-stars" data-category="overall"></div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>📝 Комментарий</label>
+            <textarea id="tastingComment" rows="3" placeholder="Ваши впечатления, заметки..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="saveTastingBtn">💾 Сохранить дегустацию</button>
+            <button class="secondary" id="resetFormBtn">🔄 Сбросить форму</button>
+        </div>
+    </div>
+
+    <!-- История дегустаций -->
+    <div class="history-panel">
+        <div class="history-title">📜 История дегустаций</div>
+        <div id="historyContainer">
+            <div class="empty-history">Выберите партию, чтобы увидеть записи</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Данные сохраняются в cider_data.json · Дегустации добавляются в каждую партию
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Редактировать дегустацию</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <div id="editFormContainer"></div>
+        <div class="modal-buttons">
+            <button id="saveEditBtn" style="flex:1;">Сохранить</button>
+            <button id="cancelEditBtn" class="secondary" style="flex:1;">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // --- Состояние ---
+        let batches = [];               // массив партий
+        let directoryHandle = null;     // handle папки
+        let currentBatchId = null;      // выбранная партия
+        let currentRatings = {          // текущие оценки в форме
+            appearance: 0,
+            aroma: 0,
+            taste: 0,
+            body: 0,
+            finish: 0,
+            overall: 0
+        };
+        let editingIndex = null;         // индекс редактируемой дегустации
+
+        // DOM элементы
+        const fileStatus = document.getElementById('fileStatus');
+        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const batchSelect = document.getElementById('batchSelect');
+        const tastingDate = document.getElementById('tastingDate');
+        const tastingComment = document.getElementById('tastingComment');
+        const saveTastingBtn = document.getElementById('saveTastingBtn');
+        const resetFormBtn = document.getElementById('resetFormBtn');
+        const historyContainer = document.getElementById('historyContainer');
+        const editModal = document.getElementById('editModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const editFormContainer = document.getElementById('editFormContainer');
+
+        // --- Инициализация даты ---
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            tastingDate.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // --- Создание звёздных рейтингов ---
+        function createStars(container, category, value = 0) {
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.className = 'star' + (i <= value ? ' active' : '');
+                star.textContent = '★';
+                star.style.cursor = 'pointer';
+                star.addEventListener('click', () => {
+                    currentRatings[category] = i;
+                    updateStars(container, i);
+                });
+                container.appendChild(star);
+            }
+        }
+
+        function updateStars(container, value) {
+            const stars = container.querySelectorAll('.star');
+            stars.forEach((star, idx) => {
+                if (idx < value) star.classList.add('active');
+                else star.classList.remove('active');
+            });
+        }
+
+        function resetFormRatings() {
+            for (let cat in currentRatings) {
+                currentRatings[cat] = 0;
+                const container = document.querySelector(`.rating-stars[data-category="${cat}"]`);
+                if (container) updateStars(container, 0);
+            }
+            tastingComment.value = '';
+            setTodayDate();
+        }
+
+        // --- Сохранение в файл (через File System Access API) ---
+        async function saveData() {
+            if (!directoryHandle) {
+                showNotification('Сначала выберите папку с данными', 'error');
+                return false;
+            }
+            try {
+                const fileHandle = await directoryHandle.getFileHandle('cider_data.json', { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(JSON.stringify(batches.map(b => b.toJSON ? b.toJSON() : b), null, 2));
+                await writable.close();
+                return true;
+            } catch (err) {
+                console.error(err);
+                showNotification('Ошибка сохранения', 'error');
+                return false;
+            }
+        }
+
+        // --- Загрузка данных из файла ---
+        async function loadData() {
+            if (!directoryHandle) {
+                fileStatus.textContent = '✗ Нет папки';
+                fileStatus.className = 'file-status error';
+                return false;
+            }
+            try {
+                fileStatus.textContent = 'Загрузка...';
+                fileStatus.className = 'file-status';
+                const fileHandle = await directoryHandle.getFileHandle('cider_data.json');
+                const file = await fileHandle.getFile();
+                const contents = await file.text();
+                const data = JSON.parse(contents);
+                batches = data.map(convertToBatchObject);
+                fileStatus.textContent = `✓ Загружено (${batches.length} партий)`;
+                fileStatus.className = 'file-status success';
+                updateBatchSelect();
+                if (currentBatchId) {
+                    const exists = batches.some(b => b.id === currentBatchId);
+                    if (!exists) currentBatchId = null;
+                }
+                if (currentBatchId) {
+                    batchSelect.value = currentBatchId;
+                    renderHistory();
+                } else {
+                    renderHistory();
+                }
+                return true;
+            } catch (err) {
+                console.error(err);
+                fileStatus.textContent = '✗ Ошибка загрузки';
+                fileStatus.className = 'file-status error';
+                return false;
+            }
+        }
+
+        // Преобразование сырых данных в объект с нужными полями
+        function convertToBatchObject(raw) {
+            if (!raw.tastings) raw.tastings = [];
+            return {
+                id: raw.id,
+                name: raw.name,
+                code: raw.code,
+                type: raw.type,
+                tastings: raw.tastings,
+                toJSON: function() {
+                    return { ...raw, tastings: this.tastings };
+                }
+            };
+        }
+
+        // Обновить выпадающий список
+        function updateBatchSelect() {
+            const selectedId = batchSelect.value;
+            batchSelect.innerHTML = '';
+            batches.forEach(b => {
+                const option = document.createElement('option');
+                option.value = b.id;
+                const label = b.name || b.code || 'Без названия';
+                option.textContent = `${label} [${b.type === 'classic' ? 'Классик' : 'Петнат'}]`;
+                batchSelect.appendChild(option);
+            });
+            if (selectedId && batches.some(b => b.id === selectedId)) {
+                batchSelect.value = selectedId;
+            } else if (batches.length > 0) {
+                batchSelect.value = batches[0].id;
+                currentBatchId = batches[0].id;
+            } else {
+                currentBatchId = null;
+            }
+        }
+
+        // Получить текущую партию
+        function getCurrentBatch() {
+            if (!currentBatchId) return null;
+            return batches.find(b => b.id === currentBatchId);
+        }
+
+        // Сохранить текущую дегустацию
+        async function addTasting() {
+            const batch = getCurrentBatch();
+            if (!batch) {
+                showNotification('Выберите партию', 'error');
+                return;
+            }
+            const date = tastingDate.value;
+            if (!date) {
+                showNotification('Укажите дату', 'error');
+                return;
+            }
+            const tasting = {
+                date: date,
+                appearance: currentRatings.appearance,
+                aroma: currentRatings.aroma,
+                taste: currentRatings.taste,
+                body: currentRatings.body,
+                finish: currentRatings.finish,
+                overall: currentRatings.overall,
+                comment: tastingComment.value.trim() || ''
+            };
+            if (!batch.tastings) batch.tastings = [];
+            batch.tastings.push(tasting);
+            if (await saveData()) {
+                showNotification('Дегустация добавлена');
+                resetFormRatings();
+                renderHistory();
+            } else {
+                batch.tastings.pop(); // откат
+                showNotification('Ошибка сохранения', 'error');
+            }
+        }
+
+        // Рендер истории
+        function renderHistory() {
+            const batch = getCurrentBatch();
+            if (!batch || !batch.tastings || batch.tastings.length === 0) {
+                historyContainer.innerHTML = '<div class="empty-history">Нет дегустационных записей для этой партии</div>';
+                return;
+            }
+            const sorted = [...batch.tastings].sort((a,b) => new Date(b.date) - new Date(a.date));
+            let html = '';
+            sorted.forEach((t, idx) => {
+                const originalIdx = batch.tastings.indexOf(t); // для редактирования
+                html += `
+                    <div class="tasting-card" data-idx="${originalIdx}">
+                        <div class="tasting-header">
+                            <div class="tasting-date">${t.date}</div>
+                            <div class="tasting-actions">
+                                <button class="secondary small edit-tasting" data-idx="${originalIdx}">✎</button>
+                                <button class="secondary small delete-tasting" data-idx="${originalIdx}">🗑</button>
+                            </div>
+                        </div>
+                        <div class="tasting-ratings">
+                            ${t.appearance ? `<span class="rating-badge">👁️ ${t.appearance}/5</span>` : ''}
+                            ${t.aroma ? `<span class="rating-badge">👃 ${t.aroma}/5</span>` : ''}
+                            ${t.taste ? `<span class="rating-badge">👅 ${t.taste}/5</span>` : ''}
+                            ${t.body ? `<span class="rating-badge">💪 ${t.body}/5</span>` : ''}
+                            ${t.finish ? `<span class="rating-badge">🔚 ${t.finish}/5</span>` : ''}
+                            ${t.overall ? `<span class="rating-badge">⭐ ${t.overall}/5</span>` : ''}
+                        </div>
+                        ${t.comment ? `<div class="tasting-comment">💬 ${t.comment}</div>` : ''}
+                    </div>
+                `;
+            });
+            historyContainer.innerHTML = html;
+            // Привязываем обработчики
+            document.querySelectorAll('.edit-tasting').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.idx);
+                    openEditModal(idx);
+                });
+            });
+            document.querySelectorAll('.delete-tasting').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.idx);
+                    if (confirm('Удалить запись?')) {
+                        batch.tastings.splice(idx, 1);
+                        if (await saveData()) {
+                            showNotification('Запись удалена');
+                            renderHistory();
+                        } else {
+                            showNotification('Ошибка удаления', 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Открыть модалку редактирования
+        function openEditModal(idx) {
+            const batch = getCurrentBatch();
+            if (!batch || !batch.tastings[idx]) return;
+            const tasting = batch.tastings[idx];
+            editingIndex = idx;
+            editFormContainer.innerHTML = `
+                <div class="input-group">
+                    <label>📅 Дата</label>
+                    <input type="date" id="editDate" value="${tasting.date}">
+                </div>
+                <div class="rating-row">
+                    ${['appearance','aroma','taste','body','finish','overall'].map(cat => `
+                        <div class="rating-item">
+                            <label>${getCatLabel(cat)}</label>
+                            <div class="rating-stars-edit" data-cat="${cat}" data-value="${tasting[cat] || 0}"></div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="input-group">
+                    <label>📝 Комментарий</label>
+                    <textarea id="editComment" rows="3">${tasting.comment || ''}</textarea>
+                </div>
+            `;
+            // Инициализируем звёзды в модалке
+            const starContainers = editFormContainer.querySelectorAll('.rating-stars-edit');
+            starContainers.forEach(cont => {
+                const cat = cont.dataset.cat;
+                const val = parseInt(cont.dataset.value) || 0;
+                cont.innerHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star' + (i <= val ? ' active' : '');
+                    star.textContent = '★';
+                    star.style.cursor = 'pointer';
+                    star.addEventListener('click', () => {
+                        const newVal = i;
+                        updateStars(cont, newVal);
+                        cont.dataset.value = newVal;
+                    });
+                    cont.appendChild(star);
+                }
+            });
+            editModal.style.display = 'flex';
+        }
+
+        function getCatLabel(cat) {
+            const map = {
+                appearance: '👁️ Внешний вид',
+                aroma: '👃 Аромат',
+                taste: '👅 Вкус',
+                body: '💪 Тело',
+                finish: '🔚 Послевкусие',
+                overall: '⭐ Общая оценка'
+            };
+            return map[cat] || cat;
+        }
+
+        async function saveEditedTasting() {
+            const batch = getCurrentBatch();
+            if (!batch || editingIndex === null) return;
+            const newDate = document.getElementById('editDate').value;
+            if (!newDate) {
+                showNotification('Укажите дату', 'error');
+                return;
+            }
+            const newComment = document.getElementById('editComment').value;
+            const starContainers = editFormContainer.querySelectorAll('.rating-stars-edit');
+            const newRatings = {};
+            starContainers.forEach(cont => {
+                const cat = cont.dataset.cat;
+                newRatings[cat] = parseInt(cont.dataset.value) || 0;
+            });
+            batch.tastings[editingIndex] = {
+                date: newDate,
+                appearance: newRatings.appearance || 0,
+                aroma: newRatings.aroma || 0,
+                taste: newRatings.taste || 0,
+                body: newRatings.body || 0,
+                finish: newRatings.finish || 0,
+                overall: newRatings.overall || 0,
+                comment: newComment
+            };
+            if (await saveData()) {
+                showNotification('Запись обновлена');
+                editModal.style.display = 'none';
+                renderHistory();
+            } else {
+                showNotification('Ошибка сохранения', 'error');
+            }
+        }
+
+        // --- Уведомления ---
+        function showNotification(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `notification ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // --- Работа с папкой ---
+        async function askForFolder() {
+            try {
+                directoryHandle = await window.showDirectoryPicker();
+                localStorage.setItem('tastingFolderAccess', 'granted');
+                await loadData();
+            } catch (err) {
+                showNotification('Не удалось выбрать папку', 'error');
+            }
+        }
+
+        // --- Инициализация звёзд в форме ---
+        function initFormStars() {
+            for (let cat in currentRatings) {
+                const container = document.querySelector(`.rating-stars[data-category="${cat}"]`);
+                if (container) createStars(container, cat, 0);
+            }
+        }
+
+        // --- Обработчики событий ---
+        batchSelect.addEventListener('change', () => {
+            currentBatchId = batchSelect.value;
+            renderHistory();
+        });
+
+        saveTastingBtn.addEventListener('click', addTasting);
+        resetFormBtn.addEventListener('click', resetFormRatings);
+        chooseFolderBtn.addEventListener('click', askForFolder);
+        refreshBtn.addEventListener('click', async () => {
+            if (directoryHandle) await loadData();
+            else askForFolder();
+        });
+
+        // Модальное окно
+        closeModalBtn.addEventListener('click', () => editModal.style.display = 'none');
+        cancelEditBtn.addEventListener('click', () => editModal.style.display = 'none');
+        saveEditBtn.addEventListener('click', saveEditedTasting);
+        window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
+
+        // Старт
+        (async () => {
+            initFormStars();
+            resetFormRatings();
+            if (localStorage.getItem('tastingFolderAccess') === 'granted') {
+                try {
+                    directoryHandle = await window.showDirectoryPicker();
+                    await loadData();
+                } catch {}
+            }
+            if (!directoryHandle) {
+                fileStatus.textContent = '✗ Выберите папку';
+                fileStatus.className = 'file-status error';
+            }
+        })();
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор сладости сидра — Сидролог</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { 
+            background: #f5f5f7; 
+            margin: 0; 
+            padding: 30px; 
+            color: #1d1d1f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .app { 
+            max-width: 800px; 
+            width: 100%;
+            margin: 0 auto; 
+        }
+        
+        /* Карточка */
+        .calculator {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        h1 { 
+            font-weight: 500; 
+            font-size: 2rem; 
+            margin: 0 0 10px 0;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span { 
+            color: #86868b; 
+            font-weight: 400;
+            font-size: 1rem;
+        }
+        
+        .subtitle {
+            color: #86868b;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e8e8ed;
+        }
+        
+        /* Сетка */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        /* Группы ввода */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8e8ed;
+            border-radius: 16px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+        }
+        select:hover, input:hover {
+            border-color: #d2d2d7;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #0071e3;
+        }
+        
+        /* Стили сидра */
+        .style-info {
+            background: #f5f5f7;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .style-description {
+            color: #1d1d1f;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        .style-range {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .range-bar {
+            flex: 1;
+            height: 8px;
+            background: linear-gradient(to right, #f1c40f, #e67e22, #e74c3c);
+            border-radius: 4px;
+            position: relative;
+        }
+        .range-marker {
+            width: 16px;
+            height: 16px;
+            background: #0071e3;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        /* Результат */
+        .result {
+            background: #0071e3;
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .result-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        .result-value {
+            font-size: 3rem;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+        .result-unit {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        .result-detail {
+            font-size: 1.1rem;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Единицы измерения */
+        .units {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .unit-btn {
+            flex: 1;
+            padding: 8px;
+            background: #e8e8ed;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #1d1d1f;
+        }
+        .unit-btn.active {
+            background: #0071e3;
+            color: white;
+        }
+        
+        /* Кнопки */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: #0071e3;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0077ed;
+        }
+        .btn-secondary {
+            background: #e8e8ed;
+            color: #1d1d1f;
+        }
+        .btn-secondary:hover {
+            background: #d8d8e0;
+        }
+        
+        /* Инфо */
+        .info-box {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #86868b;
+            border: 1px solid #e8e8ed;
+        }
+        .info-box strong {
+            color: #1d1d1f;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #86868b;
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="calculator">
+        <h1>🍎 Калькулятор сладости сидра <span>остаточный сахар</span></h1>
+        <div class="subtitle">Рассчитайте, сколько сахара нужно оставить или добавить для желаемого стиля</div>
+        
+        <div class="grid">
+            <!-- Левая колонка: ввод данных -->
+            <div>
+                <div class="input-group">
+                    <label>📊 Текущая плотность (°Brix)</label>
+                    <input type="number" id="currentBrix" step="0.1" min="0" max="30" value="5.0" placeholder="например: 5.0">
+                </div>
+                
+                <div class="input-group">
+                    <label>🎯 Желаемый стиль сидра</label>
+                    <select id="styleSelect">
+                        <option value="0.5">Экстра-брют (Extra Brut) — 0-6 г/л</option>
+                        <option value="1.5">Брют (Brut) — 6-12 г/л</option>
+                        <option value="2.5">Экстра-сухой (Extra Dry) — 12-17 г/л</option>
+                        <option value="3.5" selected>Сухой (Dry) — 17-28 г/л</option>
+                        <option value="4.5">Полусухой (Demi-Sec) — 28-40 г/л</option>
+                        <option value="5.5">Полусладкий (Doux) — 40-50 г/л</option>
+                        <option value="6.5">Сладкий (Sweet) — 50-60 г/л</option>
+                        <option value="7.5">Очень сладкий (Rich) — 60+ г/л</option>
+                    </select>
+                </div>
+                
+                <div class="units">
+                    <button class="unit-btn active" id="unitBrix">°Brix</button>
+                    <button class="unit-btn" id="unitGperL">г/л</button>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="calculateBtn">Рассчитать</button>
+                    <button class="btn btn-secondary" id="resetBtn">Сброс</button>
+                </div>
+            </div>
+            
+            <!-- Правая колонка: информация о стилях -->
+            <div>
+                <div class="style-info">
+                    <h3 style="margin: 0 0 15px 0; font-weight: 500;">📋 Таблица стилей сидра</h3>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Экстра-брют</span>
+                            <span>0-6 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Брют</span>
+                            <span>6-12 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Экстра-сухой</span>
+                            <span>12-17 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 600;">Сухой</span>
+                            <span>17-28 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Полусухой</span>
+                            <span>28-40 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Полусладкий</span>
+                            <span>40-50 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Сладкий</span>
+                            <span>50-60 г/л</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Очень сладкий</span>
+                            <span>60+ г/л</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; border-radius: 12px; padding: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 1.2rem;">📌</span>
+                            <span><strong>1°Brix ≈ 10 г/л</strong> сахара (приблизительно)</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #86868b;">
+                            * Точное значение зависит от состава сока, но для сидра это хорошее приближение
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Результат -->
+        <div class="result" id="result">
+            <div class="result-title">Остаточный сахар</div>
+            <div class="result-value" id="resultValue">17-28</div>
+            <div class="result-unit" id="resultUnit">г/л</div>
+            <div class="result-detail" id="resultDetail">Сухой сидр (17-28 г/л)</div>
+        </div>
+        
+        <!-- Детальный расчёт -->
+        <div class="info-box" id="calculationDetails">
+            <strong>Текущая плотность:</strong> 5.0 °Brix ≈ 50 г/л<br>
+            <strong>Для стиля "Сухой" нужно:</strong> 17-28 г/л<br>
+            <strong>⚠️ Нужно сбродить:</strong> 22-33 г/л сахара (2.2-3.3 °Brix)<br>
+            <strong>💡 Рекомендация:</strong> Довести брожение до плотности 1.7-2.8 °Brix
+        </div>
+    </div>
+    
+    <div class="footer">
+        Сидролог · Калькулятор остаточного сахара
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Константы для пересчёта (1°Brix ≈ 10 г/л для сидра)
+        const BRIX_TO_GL = 10;
+        
+        // Стили сидра с диапазонами в г/л
+        const STYLES = {
+            '0.5': { name: 'Экстра-брют (Extra Brut)', min: 0, max: 6, description: 'Очень сухой, жёсткий' },
+            '1.5': { name: 'Брют (Brut)', min: 6, max: 12, description: 'Сухой, классический шампанский стиль' },
+            '2.5': { name: 'Экстра-сухой (Extra Dry)', min: 12, max: 17, description: 'Полусухой, чуть мягче' },
+            '3.5': { name: 'Сухой (Dry)', min: 17, max: 28, description: 'Традиционный сухой сидр' },
+            '4.5': { name: 'Полусухой (Demi-Sec)', min: 28, max: 40, description: 'Заметная сладость' },
+            '5.5': { name: 'Полусладкий (Doux)', min: 40, max: 50, description: 'Сладкий, десертный' },
+            '6.5': { name: 'Сладкий (Sweet)', min: 50, max: 60, description: 'Очень сладкий' },
+            '7.5': { name: 'Очень сладкий (Rich)', min: 60, max: 100, description: 'Насыщенно-сладкий' }
+        };
+        
+        // Элементы DOM
+        const currentBrixInput = document.getElementById('currentBrix');
+        const styleSelect = document.getElementById('styleSelect');
+        const unitBrixBtn = document.getElementById('unitBrix');
+        const unitGperLBtn = document.getElementById('unitGperL');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultValue = document.getElementById('resultValue');
+        const resultUnit = document.getElementById('resultUnit');
+        const resultDetail = document.getElementById('resultDetail');
+        const calculationDetails = document.getElementById('calculationDetails');
+        
+        // Текущие единицы отображения
+        let currentUnit = 'brix'; // 'brix' или 'gl'
+        
+        // --- Функции пересчёта ---
+        function brixToGl(brix) {
+            return brix * BRIX_TO_GL;
+        }
+        
+        function glToBrix(gl) {
+            return gl / BRIX_TO_GL;
+        }
+        
+        // --- Получение текущего стиля ---
+        function getCurrentStyle() {
+            const styleKey = styleSelect.value;
+            return STYLES[styleKey] || STYLES['3.5'];
+        }
+        
+        // --- Обновление результата ---
+        function updateResult() {
+            const currentBrix = parseFloat(currentBrixInput.value) || 0;
+            const currentGl = brixToGl(currentBrix);
+            const style = getCurrentStyle();
+            
+            // Определяем, нужно ли добавить сахар или сбродить
+            let action = '';
+            let targetRange = '';
+            
+            if (currentGl < style.min) {
+                // Нужно добавить сахар
+                const neededMin = style.min - currentGl;
+                const neededMax = style.max - currentGl;
+                action = `➕ Добавить сахар: ${neededMin.toFixed(1)}-${neededMax.toFixed(1)} г/л (${glToBrix(neededMin).toFixed(1)}-${glToBrix(neededMax).toFixed(1)} °Brix)`;
+                targetRange = `Целевая плотность: ${glToBrix(style.min).toFixed(1)}-${glToBrix(style.max).toFixed(1)} °Brix`;
+            } else if (currentGl > style.max) {
+                // Нужно сбродить лишний сахар
+                const fermentMin = currentGl - style.max;
+                const fermentMax = currentGl - style.min;
+                action = `⬇️ Сбродить: ${fermentMin.toFixed(1)}-${fermentMax.toFixed(1)} г/л (${glToBrix(fermentMin).toFixed(1)}-${glToBrix(fermentMax).toFixed(1)} °Brix)`;
+                targetRange = `Целевая плотность: ${glToBrix(style.min).toFixed(1)}-${glToBrix(style.max).toFixed(1)} °Brix`;
+            } else {
+                // Уже в диапазоне
+                action = '✅ Уже в нужном диапазоне';
+                targetRange = `Текущая плотность ${currentBrix.toFixed(1)} °Brix (${currentGl.toFixed(1)} г/л) подходит для стиля`;
+            }
+            
+            // Обновляем отображение в зависимости от выбранных единиц
+            if (currentUnit === 'brix') {
+                resultValue.textContent = `${glToBrix(style.min).toFixed(1)}-${glToBrix(style.max).toFixed(1)}`;
+                resultUnit.textContent = '°Brix';
+            } else {
+                resultValue.textContent = `${style.min}-${style.max}`;
+                resultUnit.textContent = 'г/л';
+            }
+            
+            resultDetail.textContent = `${style.name}`;
+            
+            // Обновляем детальный расчёт
+            calculationDetails.innerHTML = `
+                <strong>Текущая плотность:</strong> ${currentBrix.toFixed(1)} °Brix ≈ ${currentGl.toFixed(1)} г/л<br>
+                <strong>Для стиля "${style.name}" нужно:</strong> ${style.min}-${style.max} г/л (${glToBrix(style.min).toFixed(1)}-${glToBrix(style.max).toFixed(1)} °Brix)<br>
+                <strong>${action}</strong><br>
+                <strong>💡 ${targetRange}</strong>
+            `;
+        }
+        
+        // --- Переключение единиц ---
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            // Обновляем классы кнопок
+            if (unit === 'brix') {
+                unitBrixBtn.classList.add('active');
+                unitGperLBtn.classList.remove('active');
+            } else {
+                unitBrixBtn.classList.remove('active');
+                unitGperLBtn.classList.add('active');
+            }
+            
+            updateResult();
+        }
+        
+        // --- Сброс к значениям по умолчанию ---
+        function resetToDefault() {
+            currentBrixInput.value = '5.0';
+            styleSelect.value = '3.5';
+            setUnit('brix');
+        }
+        
+        // --- Инициализация ---
+        function init() {
+            // Устанавливаем обработчики
+            calculateBtn.addEventListener('click', updateResult);
+            resetBtn.addEventListener('click', resetToDefault);
+            
+            unitBrixBtn.addEventListener('click', () => setUnit('brix'));
+            unitGperLBtn.addEventListener('click', () => setUnit('gl'));
+            
+            // Обновляем при изменении стиля
+            styleSelect.addEventListener('change', updateResult);
+            currentBrixInput.addEventListener('input', updateResult);
+            
+            // Первоначальный расчёт
+            updateResult();
+        }
+        
+        // Запуск
+        init();
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,2155 @@
+{
+  "appVersion": "2.3.0",
+  "dataSchemaVersion": "2.3",
+  "batches": [
+    {
+      "id": "muff29bj7457ne",
+      "name": "Розе_2026",
+      "code": "СИДР-260924-КДК",
+      "type": "classic",
+      "status": "active",
+      "attention": false,
+      "createdAt": "2026-09-24T10:56:12.463Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "active",
+          "date": "2026-09-24"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-09-24",
+        "varieties": "китайка+дубовка+коричное полосатое игната+ осеннее полосатое+звездочка луга",
+        "region": "тайцы+луга+спб",
+        "volume": 80,
+        "brix": 0,
+        "predictedAbv": "0.00",
+        "actualAbv": 0,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 17,
+        "yeast": "UCLM S377",
+        "yeastDate": "2026-09-24",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [],
+        "nutrients": [
+          {
+            "date": "2026-09-24",
+            "product": "DAP",
+            "dosage": "3.5",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "15",
+        "leesAging": true,
+        "leesMonths": 0,
+        "batonnage": true,
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260924-КДК-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-09-24",
+      "generalNotes": "",
+      "updatedAt": "2026-10-12T22:46:06.977Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.011Z"
+    },
+    {
+      "id": "mu0bgxjcxkuo1f",
+      "name": "антоновка 2026",
+      "code": "СИДР-260913-NEW",
+      "type": "classic",
+      "status": "active",
+      "attention": false,
+      "createdAt": "2026-09-13T21:19:05.928Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "active",
+          "date": "2026-09-13"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-09-13",
+        "varieties": "",
+        "region": "луга-спб",
+        "volume": 30,
+        "brix": 10,
+        "predictedAbv": "5.50",
+        "actualAbv": 0,
+        "ph": 3.14,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 16,
+        "yeast": "BC S103",
+        "yeastDate": "",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [],
+        "nutrients": []
+      },
+      "stage3": {
+        "volume": 0,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "2026-10-18",
+        "autolysis": "2026-10-18",
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "9",
+        "leesAging": false,
+        "leesMonths": 0,
+        "batonnage": false,
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260913-NEW-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-09-13",
+      "generalNotes": "",
+      "updatedAt": "2026-10-20T08:57:48.464Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.011Z"
+    },
+    {
+      "id": "mtnialxv4kfads",
+      "name": "дикобраз_1_2026",
+      "code": "СИДР-260904-Д",
+      "type": "classic",
+      "status": "active",
+      "attention": false,
+      "createdAt": "2026-09-04T22:09:07.987Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "active",
+          "date": "2026-09-04"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-09-04",
+        "varieties": "дичь+АНТОНОВКА С ЛЁХИНОГО УЧАСТКА",
+        "region": "",
+        "volume": 100,
+        "brix": 13,
+        "predictedAbv": "7.15",
+        "actualAbv": 0,
+        "ph": 3.07,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "начало на диких, потом 1116",
+        "yeastDate": "2026-09-14",
+        "startDate": "2026-09-14",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "2026-09-20",
+            "density": "",
+            "temp": "",
+            "note": "ДОБАВЛЕНО В ДИЧЬ АНТОНОВКА + СОК ЛЕТНЕЕ НА МЕЗГЕ"
+          },
+          {
+            "date": "2026-09-21",
+            "density": "",
+            "temp": "",
+            "note": "АКТИВНОЕ БРОЖЕНИЕ"
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2026-09-04",
+            "product": "DAP",
+            "dosage": "5",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 100,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "totalSugar": 2000,
+        "totalYeast": 10,
+        "totalBentonite": 100,
+        "bottleCount": 133.33,
+        "totalLiqueur": 2666.67,
+        "sugarConcentration": 16,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 25
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "9",
+        "leesAging": true,
+        "leesMonths": 0,
+        "batonnage": true,
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260904-Д-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-09-04",
+      "generalNotes": "",
+      "updatedAt": "2026-10-22T07:10:19.852Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.011Z"
+    },
+    {
+      "id": "mtmgunhmrc4nep",
+      "name": "ГРУШЕВОЕ РОЗЕ 2026",
+      "code": "СИДР-260831-ГКЖ",
+      "type": "classic",
+      "status": "active",
+      "attention": false,
+      "createdAt": "2026-09-04T04:40:57.706Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "active",
+          "date": "2026-09-04"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-08-31",
+        "varieties": "ГРУША+КРИОЯБЛОКО+ЖИМОЛОСТЬ",
+        "region": "ЛУГА",
+        "volume": 10,
+        "brix": 12,
+        "predictedAbv": "6.60",
+        "actualAbv": 0,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "",
+        "yeastDate": "2026-08-31",
+        "startDate": "2026-09-02",
+        "rackingDate": "",
+        "measurements": [],
+        "nutrients": [
+          {
+            "date": "2026-08-31",
+            "product": "DAP",
+            "dosage": "5",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "15",
+        "leesAging": "false",
+        "leesMonths": 0,
+        "batonnage": "false",
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260831-ГКЖ-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-09-04",
+      "generalNotes": "",
+      "updatedAt": "2026-09-24T10:55:50.327Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.015Z"
+    },
+    {
+      "id": "mtknra1izynwtn",
+      "name": "ЛЕСНОЙ АРАМАТ 2026",
+      "code": "СИДР-260902-КЧ",
+      "type": "classic",
+      "status": "active",
+      "attention": false,
+      "createdAt": "2026-09-02T22:18:45.270Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "active",
+          "date": "2026-09-02"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-09-02",
+        "varieties": "КИСЛОЕ ЛЁХА, ЧЕРНИКА",
+        "region": "СПБ+ЛУГА",
+        "volume": 50,
+        "brix": 12,
+        "predictedAbv": "6.60",
+        "actualAbv": 0,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "ПИНО",
+        "yeastDate": "2026-09-02",
+        "startDate": "2026-09-04",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "2026-09-06",
+            "density": "11",
+            "temp": "",
+            "note": "морсовый на вкус"
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2026-09-02",
+            "product": "DAP",
+            "dosage": "5",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "15",
+        "leesAging": true,
+        "leesMonths": 0,
+        "batonnage": true,
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260902-КЧ-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-09-02",
+      "generalNotes": "",
+      "updatedAt": "2026-10-12T22:52:01.329Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.015Z"
+    },
+    {
+      "id": "mt4x7e99k9riud",
+      "name": "белый налив_2026",
+      "code": "СИДР-260822-Б",
+      "type": "petnat",
+      "status": "aging",
+      "attention": false,
+      "createdAt": "2026-08-22T21:58:54.957Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "aging",
+          "date": "2026-08-22"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-08-22",
+        "varieties": "белый налив",
+        "region": "",
+        "volume": 40,
+        "brix": 12,
+        "predictedAbv": "6.60",
+        "actualAbv": 0,
+        "ph": 3.4,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "CI 1006",
+        "yeastDate": "2026-08-22",
+        "startDate": "2026-08-22",
+        "rackingDate": "2026-08-31",
+        "measurements": [
+          {
+            "date": "2026-08-22",
+            "density": "12",
+            "temp": "18",
+            "note": ""
+          },
+          {
+            "date": "2026-08-25",
+            "density": "8",
+            "temp": "19",
+            "note": ""
+          },
+          {
+            "date": "2026-08-27",
+            "density": "6.5",
+            "temp": "19",
+            "note": ""
+          },
+          {
+            "date": "2026-08-31",
+            "density": "5",
+            "temp": "19",
+            "note": ""
+          },
+          {
+            "date": "2026-09-02",
+            "density": "4",
+            "temp": "19",
+            "note": "ФИНАЛ!"
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2026-08-22",
+            "product": "DAP",
+            "dosage": "5",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "brix": 5,
+        "date": "2026-08-31",
+        "cap": "Кронен-пробка",
+        "control": "ИТОГ 45 БУТЫЛОК НА ВЫДЕРЖКУ",
+        "desiredPressure": 5,
+        "targetBrix": 3.85,
+        "pressureUnit": "bar",
+        "temperature": 18,
+        "maxBottlePressure": 4.5,
+        "safetyMargin": 15,
+        "refractometerBrix": "",
+        "hydrometerSG": "",
+        "hydrometerOe": "",
+        "hydrometerPlato": "",
+        "measurementAlcohol": "",
+        "measurementTemp": "",
+        "estimatedResidualSugar": "",
+        "correctedBrix": "",
+        "correctedSG": "",
+        "estimatedABV": "",
+        "targetSugar": "",
+        "targetRefractometerBrix": "",
+        "calculationMode": "advanced",
+        "correctionMethod": "Terrill-compatible",
+        "petnatWarnings": []
+      },
+      "stage4": {
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": "false",
+        "rackingDatePet": "",
+        "agingMonths": "12",
+        "finalCode": "СИДР-260822-Б-К-0000",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-08-22",
+      "generalNotes": "",
+      "updatedAt": "2026-09-09T18:42:46.355Z",
+      "tastings": [],
+      "labelImage": "label_mt4x7e99k9riud.jpg",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.015Z"
+    },
+    {
+      "id": "msmezwthe0zhml",
+      "name": "изибризи 2026",
+      "code": "СИДР-260809-NEW",
+      "type": "classic",
+      "status": "aging",
+      "attention": false,
+      "createdAt": "2026-08-09T23:09:21.509Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "aging",
+          "date": "2026-08-09"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2026-08-10",
+        "varieties": "Папировка, Мельба, Коробовка, Рижский голубок, Катины у дороги",
+        "region": "Луга",
+        "volume": 80,
+        "brix": 13,
+        "predictedAbv": "7.15",
+        "actualAbv": 4.95,
+        "ph": 3.4,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 21,
+        "yeast": "71B",
+        "yeastDate": "2026-08-10",
+        "startDate": "2026-08-11",
+        "rackingDate": "2026-09-07",
+        "measurements": [
+          {
+            "date": "2026-08-11",
+            "density": "12",
+            "temp": "19",
+            "note": "начало брожения"
+          },
+          {
+            "date": "2026-08-22",
+            "density": "7",
+            "temp": "19",
+            "note": "середина брожения, все партии смешанны"
+          },
+          {
+            "date": "2026-09-02",
+            "density": "4",
+            "temp": "19",
+            "note": "КОНЕЦ"
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2026-08-10",
+            "product": "DAP",
+            "dosage": "10г на всё",
+            "note": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 80,
+        "desiredPressure": 3,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "cap": "Кронен-пробка",
+        "date": "2026-09-07",
+        "autolysis": "2027-03-07",
+        "totalSugar": 960,
+        "totalYeast": 8,
+        "totalBentonite": 80,
+        "bottleCount": 106.67,
+        "totalLiqueur": 2133.33,
+        "sugarConcentration": 45,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "15",
+        "leesAging": "false",
+        "leesMonths": 0,
+        "batonnage": "false",
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-260809-NEW-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-08-10",
+      "generalNotes": "",
+      "updatedAt": "2026-09-07T06:09:22.626Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.015Z"
+    },
+    {
+      "id": "1772190534827-8rqjed",
+      "name": "Дикобраз_2025",
+      "code": "СИДР-250911-А",
+      "type": "classic",
+      "status": "done",
+      "attention": false,
+      "createdAt": "2026-02-27T11:08:54.827Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "done",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2025-09-11",
+        "varieties": "ассорти",
+        "region": "Ладога",
+        "volume": 16,
+        "brix": 15,
+        "predictedAbv": "8.25",
+        "actualAbv": 6,
+        "ph": 3.5,
+        "ta": 6
+      },
+      "stage2": {
+        "tempStart": 16,
+        "yeast": "CWT-3",
+        "yeastDate": "2025-09-12",
+        "startDate": "2025-09-12",
+        "rackingDate": "2025-09-27",
+        "measurements": [
+          {
+            "date": "2025-09-11",
+            "density": "15",
+            "temp": "16",
+            "note": ""
+          },
+          {
+            "date": "2025-09-14",
+            "density": "11",
+            "temp": "16",
+            "note": ""
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2025-09-12",
+            "product": "DAP",
+            "dosage": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 15.5,
+        "sugar": 0,
+        "yeast": 0,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "liqueurPerBottle": 20,
+        "bottleSize": 0.75,
+        "desiredPressure": 5,
+        "totalSugar": 310,
+        "totalYeast": 1.55,
+        "totalBentonite": 15.5,
+        "bottleCount": 20.67,
+        "totalLiqueur": 413.33,
+        "sugarConcentration": 75,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "2026-04-01",
+        "liqueurSugar": 4,
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": false,
+        "rackingDatePet": "2026-04-01",
+        "finalCode": "СИДР-250911-А-C-0401",
+        "agingMonths": "custom",
+        "leesAging": "",
+        "leesMonths": "",
+        "batonnage": "",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "2026-04-12",
+        "sparkling": 2,
+        "tasteNotes": "5",
+        "packDate": "2026-04-12"
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "первый нос прелые яблоки. второй нос Цитрус, моченые яблоки. вкус цедра вяленные яблоки. приятно похоже на французов, но сухое, похоже на сухой дикий крест. на 23.05.2026 10бут.",
+      "updatedAt": "2026-09-18T22:33:21.483Z",
+      "tastings": [],
+      "labelImage": "label_1772190534827-8rqjed.jpg",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.015Z"
+    },
+    {
+      "id": "1772191094573-oxwfj0",
+      "name": "Розе_2025",
+      "code": "СИДР-250918-ШОП",
+      "type": "classic",
+      "status": "done",
+      "attention": false,
+      "createdAt": "2026-02-27T11:18:14.573Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "done",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2025-09-18",
+        "varieties": " Штрифель 50%, Осеннее полосатое 50%",
+        "region": "Ладога",
+        "volume": 18,
+        "brix": 14,
+        "predictedAbv": "7.70",
+        "actualAbv": 6,
+        "ph": 3.5,
+        "ta": 6
+      },
+      "stage2": {
+        "tempStart": 16,
+        "yeast": "Lalvin EC-1118",
+        "yeastDate": "2025-09-18",
+        "startDate": "2025-09-19",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "2025-09-19",
+            "density": "",
+            "temp": "17",
+            "note": ""
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2025-09-18",
+            "product": "DAP",
+            "dosage": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "sugar": 0,
+        "yeast": 0,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "liqueurPerBottle": 20,
+        "bottleSize": 0.75,
+        "desiredPressure": 5,
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "liqueurSugarConcentration": 600,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "2026-04-09",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": false,
+        "rackingDatePet": "2026-04-09",
+        "finalCode": "СИДР-250918-ШОП-C-0409",
+        "agingMonths": "custom",
+        "leesAging": "",
+        "leesMonths": "",
+        "batonnage": "",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "27бут. на 23.05.2026\n23бут. на 16.06.2026 ",
+      "updatedAt": "2026-07-05T22:58:58.841Z",
+      "tastings": [
+        {
+          "date": "2026-03-30",
+          "appearance": 5,
+          "aroma": 4,
+          "taste": 3,
+          "body": 4,
+          "finish": 3,
+          "overall": 4,
+          "comment": "Раньше было лучше. пропало всё кроме мощной кислоты. :( Надеемся что  отлежаться..."
+        }
+      ],
+      "labelImage": "label_1772191094573-oxwfj0.jpg",
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.016Z"
+    },
+    {
+      "id": "1772191586519-wgmg3c",
+      "name": "Изибризи_2025",
+      "code": "СИДР-250811-К",
+      "type": "petnat",
+      "status": "done",
+      "attention": false,
+      "createdAt": "2026-02-27T11:26:26.519Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "done",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2025-08-11",
+        "varieties": "100% Коробовка",
+        "region": "Ладога",
+        "volume": 0,
+        "brix": 13,
+        "predictedAbv": "7.15",
+        "actualAbv": 0,
+        "ph": 3,
+        "ta": 4
+      },
+      "stage2": {
+        "tempStart": 22,
+        "yeast": "BVG-07 (Saccharomyces bayanus)",
+        "yeastDate": "2025-08-11",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "2025-08-12",
+            "density": "13",
+            "temp": "22",
+            "note": "Мутность, бульканье 1/5 сек"
+          },
+          {
+            "date": "2025-08-13",
+            "density": "",
+            "temp": "22",
+            "note": "Пик, шапка, бульканье 1/сек, запах яблочный"
+          },
+          {
+            "date": "2025-08-14",
+            "density": "",
+            "temp": "22",
+            "note": "Замедление, 1/11 сек, рефрактометр: 4°Brix, петрольные нотки"
+          },
+          {
+            "date": "2025-08-16",
+            "density": "4",
+            "temp": "22",
+            "note": "Рефрактометр: 3–4°Brix, вкус: леденцовый, минеральный"
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "2025-08-11",
+            "product": "DAP ",
+            "dosage": "10 г на 18 л"
+          }
+        ]
+      },
+      "stage3": {
+        "brix": 0,
+        "date": "2025-08-23",
+        "cap": "Кронен-пробка",
+        "control": "",
+        "desiredPressure": 4,
+        "targetBrix": 3.08,
+        "pressureUnit": "bar",
+        "temperature": 18,
+        "maxBottlePressure": 4.5,
+        "safetyMargin": 15,
+        "refractometerBrix": "",
+        "hydrometerSG": "",
+        "hydrometerOe": "",
+        "hydrometerPlato": "",
+        "measurementAlcohol": "",
+        "measurementTemp": "",
+        "estimatedResidualSugar": "",
+        "correctedBrix": "",
+        "correctedSG": "",
+        "estimatedABV": "",
+        "targetSugar": "",
+        "targetRefractometerBrix": "",
+        "calculationMode": "advanced",
+        "correctionMethod": "Terrill-compatible",
+        "petnatWarnings": []
+      },
+      "stage4": {
+        "disgorging": "2026-03-05",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": "false",
+        "rackingDatePet": "",
+        "finalCode": "СИДР-250811-NEW-PN",
+        "agingMonths": 0,
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "2026-03-05",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "партия на 23.05.2026",
+      "updatedAt": "2026-07-05T22:58:38.241Z",
+      "labelImage": "label_1772191586519-wgmg3c.jpg",
+      "tastings": [
+        {
+          "date": "2026-03-29",
+          "appearance": 4,
+          "aroma": 5,
+          "taste": 5,
+          "body": 5,
+          "finish": 4,
+          "overall": 5,
+          "comment": "Густое, опаловое. В аромате яблоки, немного прелых яблок, чуть листвы прелой. Во вкусе яблоки, умеренная кислотность, сильная косточка."
+        }
+      ],
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.016Z"
+    },
+    {
+      "id": "1772192270864-y9fu2y",
+      "name": "Two_five_2025",
+      "code": "СИДР-250905-АПШ",
+      "type": "still",
+      "status": "aging",
+      "attention": false,
+      "createdAt": "2026-02-27T11:37:50.864Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "aging",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2025-09-05",
+        "varieties": "Антоновка 50%, Пепин шафрановый 30%, Белый налив 5%,  Симиренко 5%, осенний полосатый 10%",
+        "region": "Ладога",
+        "volume": 14,
+        "brix": 12,
+        "predictedAbv": "6.60",
+        "actualAbv": 0,
+        "ph": 3.5,
+        "ta": 7
+      },
+      "stage2": {
+        "tempStart": 0,
+        "yeast": "BVG-07 (Saccharomyces bayanus)",
+        "yeastDate": "",
+        "startDate": "2025-09-06",
+        "rackingDate": "2025-09-22",
+        "measurements": [
+          {
+            "date": "2025-09-06",
+            "density": "12",
+            "temp": "",
+            "note": "Активная фаза."
+          },
+          {
+            "date": "2025-09-09",
+            "density": "6",
+            "temp": "",
+            "note": "Пик активности (пузырь 5 сек). Запах "
+          },
+          {
+            "date": "2025-09-13",
+            "density": "4",
+            "temp": "",
+            "note": "Вкус сухой, запах дрожжевой. Тело плотное (пектин)."
+          },
+          {
+            "date": "2025-09-16",
+            "density": "2,5",
+            "temp": "",
+            "note": "Ожидается замедление."
+          },
+          {
+            "date": "2025-09-20",
+            "density": "1,5",
+            "temp": "",
+            "note": "Готовность к снятию с осадка."
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "",
+            "product": "",
+            "dosage": "нет"
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "sugar": 0,
+        "date": "2025-09-22",
+        "cap": "Кронен-пробка",
+        "stabilization": ""
+      },
+      "stage4": {
+        "agingMonths": "6",
+        "rackingDate": "2026-05-20",
+        "finalCap": "Кронен-пробка",
+        "finalCode": "СИДР-250905-АПШ-К-0000",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 3,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "на 23.05.2025 11бут",
+      "updatedAt": "2026-09-18T22:23:28.715Z",
+      "labelImage": "label_1772192270864-y9fu2y.jpg",
+      "tastings": [],
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.016Z"
+    },
+    {
+      "id": "1772194088900-se6w4z",
+      "name": "Чёрная белка_2024",
+      "code": "СИДР-240912-ОП+",
+      "type": "solera",
+      "status": "done",
+      "attention": false,
+      "createdAt": "2026-02-27T12:08:08.900Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "done",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2024-09-12",
+        "varieties": "100% осенняя полосатая + арония ",
+        "region": "оменануми",
+        "volume": 0,
+        "brix": 20,
+        "predictedAbv": "11.00",
+        "actualAbv": 0,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": " BVG-07",
+        "yeastDate": "",
+        "startDate": "2024-09-14",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "",
+            "density": "",
+            "temp": "",
+            "note": ""
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "",
+            "product": "",
+            "dosage": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "sugar": 0,
+        "yeast": 0,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "bentonite": 0,
+        "liqueurVolume": 0,
+        "dosePerL": 0,
+        "dosePerBottle": 0,
+        "soleraYear": "",
+        "fraction": "",
+        "operations": [],
+        "initialVolume": 0,
+        "averageAgeYears": 0
+      },
+      "stage4": {
+        "disgorging": "2025-04-05",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": false,
+        "rackingDatePet": "",
+        "finalCode": "СИДР-260227-NEW-C",
+        "agingMonths": 0,
+        "rackingDate": "",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": "2025-04-05"
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "",
+      "updatedAt": "2026-07-05T22:59:30.889Z",
+      "labelImage": "label_1772194088900-se6w4z.jpg",
+      "tastings": [
+        {
+          "date": "2026-03-19",
+          "appearance": 5,
+          "aroma": 4,
+          "taste": 4,
+          "body": 5,
+          "finish": 4,
+          "overall": 5,
+          "comment": "Полтора года в бутылке. мощное, терпкое, в запахе арония и яблоко. во вкусе вяленные черные ягоды."
+        }
+      ],
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.016Z"
+    },
+    {
+      "id": "1772194247156-4sqxxh",
+      "name": "Белый налив_2024",
+      "code": "СИДР-240915-БН",
+      "type": "solera",
+      "status": "done",
+      "attention": false,
+      "createdAt": "2026-02-27T12:10:47.156Z",
+      "pressDate": "",
+      "volumeInitial": "",
+      "volumeCurrent": "",
+      "apples": {
+        "mass": "",
+        "varieties": "",
+        "blend": "",
+        "description": ""
+      },
+      "juice": {
+        "date": "2026-10-06",
+        "volumeL": "",
+        "brix": "",
+        "sg": "",
+        "oe": "",
+        "ph": "",
+        "temp": "",
+        "ta": "",
+        "yan": "",
+        "so2": "",
+        "description": ""
+      },
+      "phRange": [
+        3.2,
+        3.8
+      ],
+      "measurements": [],
+      "operations": [],
+      "liqueur": {
+        "targetRS": "",
+        "currentRS": "",
+        "concGL": "",
+        "givenVolML": "",
+        "bottles": "",
+        "bottleVol": "0.75",
+        "type": "Сахарный сироп"
+      },
+      "petnat": {
+        "targetBar": "",
+        "temp": "",
+        "bottleType": "champ",
+        "bottleLimit": "",
+        "residCO2": "",
+        "fermFrac": "0.9",
+        "rb": "",
+        "sg": "",
+        "abv": "",
+        "method": "рефрактометр"
+      },
+      "soleraId": "",
+      "photos": [],
+      "tasting": [],
+      "history": [],
+      "typeChangeHistory": [],
+      "archivedTypeData": {},
+      "stageHistory": [
+        {
+          "stage": "done",
+          "date": "2026-02-27"
+        }
+      ],
+      "archived": false,
+      "notes": "",
+      "stage1": {
+        "date": "2024-09-15",
+        "varieties": "Белый налив 100%",
+        "region": "",
+        "volume": 0,
+        "brix": 20,
+        "predictedAbv": "11.00",
+        "actualAbv": 0,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "1118",
+        "yeastDate": "",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [
+          {
+            "date": "",
+            "density": "",
+            "temp": "",
+            "note": ""
+          }
+        ],
+        "nutrients": [
+          {
+            "date": "",
+            "product": "",
+            "dosage": ""
+          }
+        ]
+      },
+      "stage3": {
+        "volume": 0,
+        "sugar": 0,
+        "yeast": 0,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "bentonite": 0,
+        "liqueurVolume": 0,
+        "dosePerL": 0,
+        "dosePerBottle": 0,
+        "soleraYear": 0,
+        "fraction": 0,
+        "operations": [],
+        "initialVolume": 0,
+        "averageAgeYears": 0
+      },
+      "stage4": {
+        "disgorging": "2025-04-05",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "petnatRacked": false,
+        "rackingDatePet": "",
+        "finalCode": "СИДР-260227-NEW-C",
+        "agingMonths": 0,
+        "rackingDate": "",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "2025-04-05",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": "2025-12-06"
+      },
+      "createdDate": "2026-02-27",
+      "generalNotes": "",
+      "updatedAt": "2026-10-06T07:56:01.583Z",
+      "labelImage": "",
+      "tastings": [],
+      "typeHistory": [],
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-06T07:54:35.016Z"
+    },
+    {
+      "id": "mv5ucwl2xwb8a4",
+      "type": "still",
+      "status": "active",
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-12T22:48:28.035Z",
+      "stage1": {
+        "date": "2026-10-12",
+        "varieties": "ПЕРСИАНКА",
+        "region": "СПБ",
+        "volume": 50,
+        "brix": 11,
+        "predictedAbv": "6.05",
+        "actualAbv": 0,
+        "ph": 3.4,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 18,
+        "yeast": "",
+        "yeastDate": "",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [],
+        "nutrients": []
+      },
+      "stage3": {
+        "volume": 0,
+        "sugar": 0,
+        "date": "",
+        "cap": "Кронен-пробка",
+        "stabilization": ""
+      },
+      "stage4": {
+        "agingMonths": 6,
+        "rackingDate": "",
+        "finalCap": "Кронен-пробка",
+        "finalCode": "СИДР-261012-NEW-К-0000",
+        "batonnageSchedule": []
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "code": "СИДР-261012-NEW",
+      "name": "Two_five_2026",
+      "createdDate": "2026-10-12",
+      "generalNotes": "",
+      "createdAt": "2026-10-12T22:46:23.990Z",
+      "updatedAt": "2026-10-20T08:56:38.209Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": []
+    },
+    {
+      "id": "mvj6pdd6g5cblj",
+      "type": "classic",
+      "status": "planned",
+      "statusReason": "",
+      "statusUpdatedAt": "2026-10-22T06:53:01.290Z",
+      "stage1": {
+        "date": "2026-10-21",
+        "varieties": "антоновка+антоновка золотая",
+        "region": "луга+Ира",
+        "volume": 30,
+        "brix": 13.5,
+        "predictedAbv": "7.43",
+        "actualAbv": 7.43,
+        "ph": 0,
+        "ta": 0
+      },
+      "stage2": {
+        "tempStart": 16,
+        "yeast": "",
+        "yeastDate": "",
+        "startDate": "",
+        "rackingDate": "",
+        "measurements": [],
+        "nutrients": []
+      },
+      "stage3": {
+        "volume": 0,
+        "desiredPressure": 5,
+        "bottleSize": 0.75,
+        "liqueurPerBottle": 20,
+        "liqueurSugarConcentration": 600,
+        "cap": "Кронен-пробка",
+        "date": "",
+        "autolysis": "",
+        "totalSugar": 0,
+        "totalYeast": 0,
+        "totalBentonite": 0,
+        "bottleCount": 0,
+        "totalLiqueur": 0,
+        "sugarConcentration": 0,
+        "requiredLiqueurPerBottle": 0
+      },
+      "stage4": {
+        "disgorging": "",
+        "liqueurSugar": 0,
+        "finalCap": "Кронен-пробка",
+        "agingMonths": "15",
+        "leesAging": false,
+        "leesMonths": 0,
+        "batonnage": false,
+        "batonnageSchedule": [],
+        "finalCode": "СИДР-261022-NEW-К-0000"
+      },
+      "stage5": {
+        "tastingDate": "",
+        "sparkling": 0,
+        "tasteNotes": "",
+        "packDate": ""
+      },
+      "code": "СИДР-261022-NEW",
+      "name": "Антоновка2_2026",
+      "createdDate": "2026-10-21",
+      "generalNotes": "",
+      "createdAt": "2026-10-22T06:53:01.290Z",
+      "updatedAt": "2026-10-24T20:20:52.471Z",
+      "tastings": [],
+      "labelImage": "",
+      "typeHistory": []
+    }
+  ]
+}

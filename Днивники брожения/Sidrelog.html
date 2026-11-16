@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сидролог — учёт партий сидра</title>
+    <!-- Подключаем библиотеки для экспорта и графиков -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f3f2ee; margin: 0; padding: 20px; color: #1e2b2e; }
+        .app { max-width: 1200px; margin: 0 auto; }
+        h1 { font-weight: 400; font-size: 2rem; letter-spacing: 1px; border-bottom: 1px solid #a7b5b3; padding-bottom: 10px; }
+        button { background: #2f4f4f; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: 0.2s; margin-right: 8px; margin-bottom: 8px; border: 1px solid #1e3a3a; }
+        button:hover { background: #1e3a3a; }
+        button.secondary { background: #e7e4de; color: #1e2b2e; border: 1px solid #b3b9b5; }
+        button.secondary:hover { background: #d6d2c9; }
+        .panel { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #d6d9d4; }
+        .flex { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: #fafaf8; border-radius: 20px; padding: 20px; border: 1px solid #d0d7d2; transition: 0.1s; cursor: pointer; }
+        .card:hover { border-color: #2f4f4f; background: #f5f8f5; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .batch-code { font-weight: 600; font-size: 1.2rem; color: #1e4d4d; }
+        .batch-meta { color: #4f675f; font-size: 0.9rem; margin: 8px 0; }
+        .badge { background: #d4e2da; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem; font-weight: 500; }
+        .photo-indicator { color: #0071e3; font-size: 0.9rem; margin: 5px 0; }
+        input, textarea, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5d0; border-radius: 40px; font-size: 1rem; background: #ffffff; margin-bottom: 12px; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #2f4f4f; box-shadow: 0 0 0 2px rgba(47,79,79,0.2); }
+        label { font-weight: 500; font-size: 0.9rem; display: block; margin-bottom: 4px; color: #2c4a3e; }
+        .stage { margin-bottom: 32px; border-left: 3px solid #2f4f4f; padding-left: 20px; }
+        .stage h3 { margin: 0 0 16px 0; font-weight: 500; color: #1e3a3a; }
+        .row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .col { flex: 1 1 200px; }
+        hr { border: none; border-top: 1px dashed #cbd5d0; margin: 24px 0; }
+        .calc-row { background: #eaf1ed; border-radius: 20px; padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+        .calc-row .col { min-width: 150px; }
+        .table-rows { margin-top: 10px; }
+        .measure-row, .nutrient-row { display: flex; gap: 8px; align-items: center; background: #f4f7f5; padding: 8px; border-radius: 40px; margin-bottom: 6px; }
+        .measure-row input, .nutrient-row input { margin-bottom: 0; }
+        .remove-btn { background: #b03a3a; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; border: none; }
+        .radio-group { display: flex; gap: 20px; align-items: center; margin-bottom: 15px; }
+        .radio-group label { display: flex; align-items: center; gap: 6px; font-weight: normal; }
+        .hidden { display: none; }
+        .main-screen, .edit-screen { transition: 0.2s; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; }
+        .sort-options { display: flex; gap: 10px; }
+        .empty-state { padding: 40px; text-align: center; background: #f1f5f2; border-radius: 48px; color: #527a6e; }
+        .footer { text-align: right; color: #6b8980; font-size: 0.8rem; margin-top: 20px; }
+        .notes-field { width: 100%; margin-top: 10px; }
+        .chart-container { margin-top: 20px; height: 300px; width: 100%; }
+        .folder-warning { background: #ffecb3; padding: 15px; border-radius: 40px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .preview-container { margin-top: 20px; text-align: center; border: 2px dashed #cbd5d0; border-radius: 20px; padding: 20px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        .preview-image { max-width: 100%; max-height: 300px; border-radius: 10px; object-fit: contain; }
+        .photo-actions { margin-top: 10px; display: flex; gap: 10px; justify-content: center; }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <!-- главный экран -->
+    <div id="mainScreen" class="main-screen">
+        <div class="header-bar">
+            <h1>🍎 СИДРОЛОГ</h1>
+            <div>
+                <button class="secondary" id="newBatchBtn">+ Новая партия</button>
+                <button id="importBtn" class="secondary">Загрузить JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Уведомление о папке -->
+        <div id="folderWarning" class="folder-warning" style="display: none;">
+            <span>⚠️ Для работы нужно выбрать папку для хранения данных и фото.</span>
+            <button id="chooseFolderBtn" class="secondary">Выбрать папку</button>
+        </div>
+
+        <div class="sort-options">
+            <span style="font-weight:500;">Сортировка:</span>
+            <button class="secondary" data-sort="year">по годам</button>
+            <button class="secondary" data-sort="date">по дате создания</button>
+        </div>
+
+        <div id="batchesContainer" class="grid-2" style="margin-top:24px;">
+            <!-- карточки будут генерироваться js -->
+        </div>
+    </div>
+
+    <!-- экран редактирования (изначально скрыт) -->
+    <div id="editScreen" class="edit-screen" style="display:none;">
+        <div class="header-bar">
+            <h2 id="editTitle">Новая партия</h2>
+            <div>
+                <button class="secondary" id="backToMainBtn">← к списку</button>
+                <button class="secondary" id="saveToFileBtn">💾 экспорт JSON</button>
+                <button class="secondary" id="exportPdfBtn">📄 PDF</button>
+                <button class="secondary" id="exportExcelBtn">📊 Excel</button>
+                <button id="saveBatchBtn">✔ сохранить в список</button>
+            </div>
+        </div>
+
+        <!-- форма редактирования -->
+        <div class="panel">
+            <div class="flex" style="justify-content:space-between;">
+                <div style="width:250px;"><label>Код партии (авто)</label><input type="text" id="batchCode" placeholder="СИДР-..." readonly></div>
+                <div style="width:300px;"><label>Название партии</label><input type="text" id="batchName" placeholder="Например: Осенний бленд 2025"></div>
+                <div style="width:200px;"><label>Дата создания</label><input type="date" id="createdDate" readonly></div>
+            </div>
+            <hr>
+
+            <!-- Вкладки -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="tab1">Этап 1</button>
+                    <button class="tab-btn" data-tab="tab2">Этап 2</button>
+                    <button class="tab-btn" data-tab="tab3">Этап 3</button>
+                    <button class="tab-btn" data-tab="tab4">Этап 4</button>
+                    <button class="tab-btn" data-tab="tab5">Этап 5</button>
+                    <button class="tab-btn" data-tab="tab6">📸 Этикетка</button>
+                </div>
+                
+                <!-- Этап 1 -->
+                <div id="tab1" class="tab-content active">
+                    <div class="stage">
+                        <h3>Этап 1. Сырьё и отжим</h3>
+                        <div class="row">
+                            <div class="col"><label>Дата отжима</label><input type="date" id="stage1_date"></div>
+                            <div class="col"><label>Сорта яблок (соотношение)</label><input type="text" id="stage1_varieties" placeholder="70% Антоновка, 30% Семиренко"></div>
+                            <div class="col"><label>Регион сбора</label><input type="text" id="stage1_region" placeholder="Московская обл."></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Объём сока (л)</label><input type="number" step="0.1" id="stage1_volume"></div>
+                            <div class="col"><label>Начальная сахаристость (°Brix)</label><input type="number" step="0.1" id="stage1_brix"></div>
+                            <div class="col"><label>Прогнозируемый ABV</label><input type="text" id="stage1_predictedAbv" readonly></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Фактический ABV (заполнить позже)</label><input type="number" step="0.1" id="stage1_actualAbv"></div>
+                            <div class="col"><label>pH сока</label><input type="number" step="0.01" id="stage1_ph"></div>
+                            <div class="col"><label>Кислотность TA (г/л)</label><input type="number" step="0.1" id="stage1_ta"></div>
+                        </div>
+                        <div class="radio-group">
+                            <span style="margin-right:20px;">Тип сидра:</span>
+                            <label><input type="radio" name="ciderType" value="classic" checked> Классик (шампенуаз)</label>
+                            <label><input type="radio" name="ciderType" value="petnat"> Петнат</label>
+                        </div>
+
+                        <!-- Калькулятор крепости -->
+                        <div class="calc-row">
+                            <span style="font-weight:500; width:100%;">🧮 Калькулятор крепости (приблизительно: (нач. Brix - кон. Brix) * 0.55)</span>
+                            <div class="col"><label>Начальный Brix</label><input type="number" id="calcAbv_start" step="0.1" placeholder="нач. Brix"></div>
+                            <div class="col"><label>Конечный Brix</label><input type="number" id="calcAbv_end" step="0.1" placeholder="кон. Brix"></div>
+                            <div class="col"><label>ABV (прим.)</label><input type="text" id="calcAbv_result" readonly></div>
+                            <div><button class="secondary" id="applyAbvBtn">→ в фактический</button></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Этап 2 -->
+                <div id="tab2" class="tab-content">
+                    <div class="stage">
+                        <h3>Этап 2. Брожение</h3>
+                        <div class="row">
+                            <div class="col"><label>Температура начала (°C)</label><input type="number" step="0.1" id="stage2_tempStart"></div>
+                            <div class="col"><label>Дрожжи (штамм)</label><input type="text" id="stage2_yeast" placeholder="EC-1118"></div>
+                            <div class="col"><label>Дата внесения дрожжей</label><input type="date" id="stage2_yeastDate"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Дата начала брожения</label><input type="date" id="stage2_startDate"></div>
+                            <div class="col"><label>Дата снятия с осадка</label><input type="date" id="stage2_rackingDate"></div>
+                        </div>
+
+                        <!-- Питание дрожжей (подкормки) -->
+                        <h4 style="margin-top:20px;">Питание дрожжей (подкормки)</h4>
+                        <div id="nutrientsContainer"></div>
+                        <button class="secondary" id="addNutrientBtn">+ Добавить подкормку</button>
+
+                        <!-- Ежедневные замеры -->
+                        <h4 style="margin-top:20px;">Ежедневные замеры</h4>
+                        <div id="measurementsContainer"></div>
+                        <button class="secondary" id="addMeasureBtn">+ Добавить замер</button>
+
+                        <!-- График брожения -->
+                        <div class="chart-container">
+                            <canvas id="fermentationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Этап 3 -->
+                <div id="tab3" class="tab-content">
+                    <div class="stage">
+                        <h3>Этап 3. Розлив</h3>
+                        <!-- Блок для классик -->
+                        <div id="classicFields">
+                            <h4 style="font-weight:400;">Классик (шампенуаз)</h4>
+                            <div class="row">
+                                <div class="col"><label>Объём тиража (л)</label><input type="number" step="0.1" id="classic_volume"></div>
+                                <div class="col"><label>Сахар (г/л)</label><input type="number" step="0.1" id="classic_sugar"></div>
+                                <div class="col"><label>Дрожжи (г/л)</label><input type="number" step="0.01" id="classic_yeast"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><label>Тип укупорки</label>
+                                    <select id="classic_cap">
+                                        <option value="Кронен-пробка">Кронен-пробка</option>
+                                        <option value="Корковая + мюзле">Корковая + мюзле</option>
+                                        <option value="Пластиковая (ПЭТ)">Пластиковая (ПЭТ)</option>
+                                        <option value="Другое">Другое</option>
+                                    </select>
+                                </div>
+                                <div class="col"><label>Дата укупорки</label><input type="date" id="classic_date"></div>
+                                <div class="col"><label>Начало автотизиса (дата)</label><input type="date" id="classic_autolysis"></div>
+                            </div>
+                            <!-- Калькулятор давления классик -->
+                            <div class="calc-row">
+                                <span style="font-weight:500;">🧮 Давление (Классик): 4 г/л = 1 атм</span>
+                                <div class="col"><label>Желаемое давление (атм)</label><input type="number" step="0.1" id="classic_pressureTarget"></div>
+                                <div class="col"><label>Нужно сахара (г/л)</label><input type="text" id="classic_sugarCalc" readonly></div>
+                                <div><button class="secondary" id="applyClassicSugar">Применить</button></div>
+                            </div>
+                        </div>
+
+                        <!-- Блок для петнат -->
+                        <div id="petnatFields" style="display:none;">
+                            <h4 style="font-weight:400;">Петнат (Pet-Nat)</h4>
+                            <div class="row">
+                                <div class="col"><label>Плотность при розливе (°Brix)</label><input type="number" step="0.1" id="petnat_brix"></div>
+                                <div class="col"><label>Дата розлива</label><input type="date" id="petnat_date"></div>
+                                <div class="col"><label>Тип укупорки</label>
+                                    <select id="petnat_cap">
+                                        <option value="Кронен-пробка">Кронен-пробка</option>
+                                        <option value="Корковая + мюзле">Корковая + мюзле</option>
+                                        <option value="Пластиковая (ПЭТ)">Пластиковая (ПЭТ)</option>
+                                        <option value="Другое">Другое</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><label>Контрольная бутылка (наблюдения)</label><input type="text" id="petnat_control" placeholder="жёсткость ПЭТ"></div>
+                            </div>
+                            <!-- Калькулятор давления петнат -->
+                            <div class="calc-row">
+                                <span style="font-weight:500;">🧮 Давление (Петнат): 1°Brix ≈ 1.3 атм (приближ.)</span>
+                                <div class="col"><label>Желаемое давление (атм)</label><input type="number" step="0.1" id="petnat_pressureTarget"></div>
+                                <div class="col"><label>Нужно ост. Brix</label><input type="text" id="petnat_brixCalc" readonly></div>
+                                <div><button class="secondary" id="applyPetnatBrix">Применить</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Этап 4 -->
+                <div id="tab4" class="tab-content">
+                    <div class="stage">
+                        <h3>Этап 4. Выдержка / финиш</h3>
+                        <div class="row">
+                            <div class="col"><label>Дегоржаж (дата, только классик)</label><input type="date" id="stage4_disgorging"></div>
+                            <div class="col"><label>Экспед. ликёр (сахар г/л)</label><input type="number" step="0.1" id="stage4_liqueurSugar"></div>
+                            <div class="col"><label>Финальная укупорка</label>
+                                <select id="stage4_finalCap">
+                                    <option value="Кронен-пробка">Кронен-пробка</option>
+                                    <option value="Корковая + мюзле">Корковая + мюзле</option>
+                                    <option value="Пластиковая (ПЭТ)">Пластиковая (ПЭТ)</option>
+                                    <option value="Другое">Другое</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Для петнат: снято с осадка?</label><input type="checkbox" id="stage4_petnatRacked" style="width:auto; margin-top:10px;"></div>
+                            <div class="col"><label>Дата снятия (если да)</label><input type="date" id="stage4_rackingDatePet"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Финальный код партии (авто)</label><input type="text" id="stage4_finalCode" readonly></div>
+                            <div class="col"><button class="secondary" id="regenerateFinalCode">⟳ сгенерировать</button></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Этап 5 -->
+                <div id="tab5" class="tab-content">
+                    <div class="stage">
+                        <h3>Этап 5. Контроль качества</h3>
+                        <div class="row">
+                            <div class="col"><label>Дата дегустации</label><input type="date" id="stage5_tastingDate"></div>
+                            <div class="col"><label>Игристость (1-5)</label><input type="number" min="1" max="5" step="1" id="stage5_sparkling"></div>
+                            <div class="col"><label>Оценка вкуса</label><input type="text" id="stage5_tasteNotes"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><label>Дата финальной упаковки</label><input type="date" id="stage5_packDate"></div>
+                        </div>
+                        <div class="notes-field">
+                            <label>Общие заметки (промежуточные и финальные комментарии)</label>
+                            <textarea id="generalNotes" rows="3" placeholder="Любые важные замечания..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Этикетка -->
+                <div id="tab6" class="tab-content">
+                    <div class="stage">
+                        <h3>📸 Фото этикетки</h3>
+                        <div class="row">
+                            <div class="col">
+                                <button class="secondary" id="uploadLabelBtn">Выбрать фото</button>
+                                <input type="file" id="labelFileInput" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="col">
+                                <span id="labelFileName"></span>
+                            </div>
+                        </div>
+                        <div id="labelPreview" class="preview-container">
+                            <img id="labelImage" class="preview-image" style="display: none;">
+                            <span id="noLabelText">Фото не выбрано</span>
+                        </div>
+                        <div class="photo-actions">
+                            <button class="secondary" id="removeLabelBtn" style="display: none;">Удалить фото</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div style="text-align:right;">
+                <button class="secondary" id="resetDraftBtn">Сбросить черновик</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">🍏 Сидролог · данные хранятся в файле cider_data.json, фото в папке labels</div>
+</div>
+
+<script>
+    (function() {
+        // --- Состояние приложения ---
+        let batches = [];                // массив всех партий
+        let currentBatchId = null;       // id редактируемой партии (null = новая)
+        let isEditMode = false;          // показываем список или форму
+        let chartInstance = null;        // для графика
+        let directoryHandle = null;       // handle выбранной папки
+        let fileHandle = null;            // handle файла cider_data.json
+        let labelsDirHandle = null;       // handle папки labels
+        let currentLabelFile = null;      // текущий файл этикетки
+
+        // --- Константы ---
+        const LABELS_DIR = 'labels';
+
+        // --- Элементы DOM ---
+        const mainScreen = document.getElementById('mainScreen');
+        const editScreen = document.getElementById('editScreen');
+        const batchesContainer = document.getElementById('batchesContainer');
+        const newBatchBtn = document.getElementById('newBatchBtn');
+        const backToMainBtn = document.getElementById('backToMainBtn');
+        const saveBatchBtn = document.getElementById('saveBatchBtn');
+        const saveToFileBtn = document.getElementById('saveToFileBtn');
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFile = document.getElementById('importFile');
+        const editTitle = document.getElementById('editTitle');
+        const batchCode = document.getElementById('batchCode');
+        const batchName = document.getElementById('batchName');
+        const createdDate = document.getElementById('createdDate');
+        const resetDraftBtn = document.getElementById('resetDraftBtn');
+        const addMeasureBtn = document.getElementById('addMeasureBtn');
+        const addNutrientBtn = document.getElementById('addNutrientBtn');
+        const measurementsContainer = document.getElementById('measurementsContainer');
+        const nutrientsContainer = document.getElementById('nutrientsContainer');
+        const classicFields = document.getElementById('classicFields');
+        const petnatFields = document.getElementById('petnatFields');
+        const typeRadios = document.getElementsByName('ciderType');
+        const applyAbvBtn = document.getElementById('applyAbvBtn');
+        const calcAbvStart = document.getElementById('calcAbv_start');
+        const calcAbvEnd = document.getElementById('calcAbv_end');
+        const calcAbvResult = document.getElementById('calcAbv_result');
+        const applyClassicSugar = document.getElementById('applyClassicSugar');
+        const classicPressureTarget = document.getElementById('classic_pressureTarget');
+        const classicSugarCalc = document.getElementById('classic_sugarCalc');
+        const classicSugar = document.getElementById('classic_sugar');
+        const applyPetnatBrix = document.getElementById('applyPetnatBrix');
+        const petnatPressureTarget = document.getElementById('petnat_pressureTarget');
+        const petnatBrixCalc = document.getElementById('petnat_brixCalc');
+        const petnatBrix = document.getElementById('petnat_brix');
+        const regenerateFinalCode = document.getElementById('regenerateFinalCode');
+        const stage4FinalCode = document.getElementById('stage4_finalCode');
+        const generalNotes = document.getElementById('generalNotes');
+        const chartCanvas = document.getElementById('fermentationChart');
+        const folderWarning = document.getElementById('folderWarning');
+        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
+        
+        // Элементы для этикетки
+        const uploadLabelBtn = document.getElementById('uploadLabelBtn');
+        const labelFileInput = document.getElementById('labelFileInput');
+        const labelFileName = document.getElementById('labelFileName');
+        const labelImage = document.getElementById('labelImage');
+        const noLabelText = document.getElementById('noLabelText');
+        const removeLabelBtn = document.getElementById('removeLabelBtn');
+
+        // --- Переключение вкладок ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                // Деактивируем все кнопки и содержимое
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Активируем выбранное
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // --- Функции для работы с файловой системой ---
+        async function ensureLabelsDir() {
+            if (!directoryHandle) return null;
+            try {
+                labelsDirHandle = await directoryHandle.getDirectoryHandle(LABELS_DIR, { create: true });
+                return labelsDirHandle;
+            } catch (err) {
+                console.error('Ошибка создания папки labels:', err);
+                return null;
+            }
+        }
+
+        async function saveLabelImage(file) {
+            if (!directoryHandle || !currentBatchId) return null;
+            
+            try {
+                await ensureLabelsDir();
+                if (!labelsDirHandle) return null;
+
+                // Создаем имя файла: batchId_originalName
+                const ext = file.name.split('.').pop();
+                const filename = `label_${currentBatchId}.${ext}`;
+                
+                // Создаем файл в папке labels
+                const fileHandle = await labelsDirHandle.getFileHandle(filename, { create: true });
+                const writable = await fileHandle.createWritable();
+                
+                // Читаем файл как ArrayBuffer и записываем
+                const buffer = await file.arrayBuffer();
+                await writable.write(buffer);
+                await writable.close();
+                
+                return filename;
+            } catch (err) {
+                console.error('Ошибка сохранения фото:', err);
+                alert('Не удалось сохранить фото');
+                return null;
+            }
+        }
+
+        async function loadLabelImage(filename) {
+            if (!directoryHandle || !filename) return;
+            
+            try {
+                await ensureLabelsDir();
+                if (!labelsDirHandle) return;
+                
+                const fileHandle = await labelsDirHandle.getFileHandle(filename);
+                const file = await fileHandle.getFile();
+                const url = URL.createObjectURL(file);
+                
+                labelImage.src = url;
+                labelImage.style.display = 'block';
+                noLabelText.style.display = 'none';
+                removeLabelBtn.style.display = 'inline-block';
+                labelFileName.textContent = filename;
+                
+                currentLabelFile = filename;
+            } catch (err) {
+                console.error('Ошибка загрузки фото:', err);
+            }
+        }
+
+        async function deleteLabelImage(filename) {
+            if (!directoryHandle || !filename) return;
+            
+            try {
+                await ensureLabelsDir();
+                if (!labelsDirHandle) return;
+                
+                await labelsDirHandle.removeEntry(filename);
+                currentLabelFile = null;
+            } catch (err) {
+                console.error('Ошибка удаления фото:', err);
+            }
+        }
+
+        // --- Функции для работы с файловой системой (остальные) ---
+        async function askForFolder() {
+            try {
+                directoryHandle = await window.showDirectoryPicker();
+                localStorage.setItem('folderAccess', 'granted');
+                folderWarning.style.display = 'none';
+                await ensureLabelsDir();
+                await loadDataFromFile();
+                return directoryHandle;
+            } catch (err) {
+                alert('Не удалось получить доступ к папке. Разрешение необходимо для работы.');
+                return null;
+            }
+        }
+
+        async function getFileHandle() {
+            if (!directoryHandle) return null;
+            try {
+                fileHandle = await directoryHandle.getFileHandle('cider_data.json', { create: true });
+                return fileHandle;
+            } catch (err) {
+                console.error(err);
+                return null;
+            }
+        }
+
+        async function readDataFile() {
+            if (!directoryHandle) {
+                folderWarning.style.display = 'flex';
+                return [];
+            }
+            try {
+                const handle = await getFileHandle();
+                if (!handle) return [];
+                const file = await handle.getFile();
+                const contents = await file.text();
+                if (contents.trim()) {
+                    return JSON.parse(contents);
+                } else {
+                    return [];
+                }
+            } catch (err) {
+                return [];
+            }
+        }
+
+        async function writeDataFile() {
+            if (!directoryHandle) {
+                folderWarning.style.display = 'flex';
+                return false;
+            }
+            try {
+                const handle = await getFileHandle();
+                if (!handle) return false;
+                const writable = await handle.createWritable();
+                await writable.write(JSON.stringify(batches, null, 2));
+                await writable.close();
+                return true;
+            } catch (err) {
+                console.error('Ошибка записи файла:', err);
+                alert('Не удалось сохранить данные в файл. Проверьте разрешения для папки.');
+                return false;
+            }
+        }
+
+        async function loadDataFromFile() {
+            const data = await readDataFile();
+            if (data) {
+                batches = data;
+            } else {
+                batches = [];
+            }
+            renderBatches();
+        }
+
+        // --- Инициализация ---
+        async function init() {
+            if (localStorage.getItem('folderAccess') === 'granted') {
+                try {
+                    directoryHandle = await window.showDirectoryPicker();
+                } catch {
+                    directoryHandle = null;
+                }
+            }
+            if (directoryHandle) {
+                folderWarning.style.display = 'none';
+                await ensureLabelsDir();
+                await loadDataFromFile();
+            } else {
+                folderWarning.style.display = 'flex';
+                batches = [];
+                renderBatches();
+            }
+        }
+
+        // --- Сбор данных из формы ---
+        function collectFormData() {
+            const type = document.querySelector('input[name="ciderType"]:checked')?.value || 'classic';
+            
+            const stage1 = {
+                date: document.getElementById('stage1_date').value,
+                varieties: document.getElementById('stage1_varieties').value,
+                region: document.getElementById('stage1_region').value,
+                volume: parseFloat(document.getElementById('stage1_volume').value) || 0,
+                brix: parseFloat(document.getElementById('stage1_brix').value) || 0,
+                predictedAbv: document.getElementById('stage1_predictedAbv').value,
+                actualAbv: parseFloat(document.getElementById('stage1_actualAbv').value) || 0,
+                ph: parseFloat(document.getElementById('stage1_ph').value) || 0,
+                ta: parseFloat(document.getElementById('stage1_ta').value) || 0,
+            };
+            
+            const measurements = [];
+            document.querySelectorAll('.measure-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 4) {
+                    measurements.push({
+                        date: inputs[0].value,
+                        density: inputs[1].value,
+                        temp: inputs[2].value,
+                        note: inputs[3].value
+                    });
+                }
+            });
+            
+            const nutrients = [];
+            document.querySelectorAll('.nutrient-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 3) {
+                    nutrients.push({
+                        date: inputs[0].value,
+                        product: inputs[1].value,
+                        dosage: inputs[2].value
+                    });
+                }
+            });
+            
+            const stage2 = {
+                tempStart: parseFloat(document.getElementById('stage2_tempStart').value) || 0,
+                yeast: document.getElementById('stage2_yeast').value,
+                yeastDate: document.getElementById('stage2_yeastDate').value,
+                startDate: document.getElementById('stage2_startDate').value,
+                rackingDate: document.getElementById('stage2_rackingDate').value,
+                measurements: measurements,
+                nutrients: nutrients
+            };
+            
+            let stage3 = {};
+            if (type === 'classic') {
+                stage3 = {
+                    volume: parseFloat(document.getElementById('classic_volume').value) || 0,
+                    sugar: parseFloat(document.getElementById('classic_sugar').value) || 0,
+                    yeast: parseFloat(document.getElementById('classic_yeast').value) || 0,
+                    cap: document.getElementById('classic_cap').value,
+                    date: document.getElementById('classic_date').value,
+                    autolysis: document.getElementById('classic_autolysis').value
+                };
+            } else {
+                stage3 = {
+                    brix: parseFloat(document.getElementById('petnat_brix').value) || 0,
+                    date: document.getElementById('petnat_date').value,
+                    cap: document.getElementById('petnat_cap').value,
+                    control: document.getElementById('petnat_control').value
+                };
+            }
+            
+            const stage4 = {
+                disgorging: document.getElementById('stage4_disgorging').value,
+                liqueurSugar: parseFloat(document.getElementById('stage4_liqueurSugar').value) || 0,
+                finalCap: document.getElementById('stage4_finalCap').value,
+                petnatRacked: document.getElementById('stage4_petnatRacked').checked,
+                rackingDatePet: document.getElementById('stage4_rackingDatePet').value,
+                finalCode: document.getElementById('stage4_finalCode').value
+            };
+            
+            const stage5 = {
+                tastingDate: document.getElementById('stage5_tastingDate').value,
+                sparkling: parseInt(document.getElementById('stage5_sparkling').value) || 0,
+                tasteNotes: document.getElementById('stage5_tasteNotes').value,
+                packDate: document.getElementById('stage5_packDate').value
+            };
+
+            return {
+                type,
+                stage1, stage2, stage3, stage4, stage5,
+                code: batchCode.value,
+                name: batchName.value,
+                createdDate: createdDate.value || new Date().toISOString().slice(0,10),
+                generalNotes: generalNotes.value,
+                labelImage: currentLabelFile || ''
+            };
+        }
+
+        // --- Заполнение формы ---
+        function populateForm(batch) {
+            const radio = document.querySelector(`input[name="ciderType"][value="${batch.type}"]`);
+            if (radio) radio.checked = true;
+            toggleTypeFields(batch.type);
+
+            // Этап1
+            document.getElementById('stage1_date').value = batch.stage1.date || '';
+            document.getElementById('stage1_varieties').value = batch.stage1.varieties || '';
+            document.getElementById('stage1_region').value = batch.stage1.region || '';
+            document.getElementById('stage1_volume').value = batch.stage1.volume || 0;
+            document.getElementById('stage1_brix').value = batch.stage1.brix || 0;
+            document.getElementById('stage1_predictedAbv').value = batch.stage1.predictedAbv || '';
+            document.getElementById('stage1_actualAbv').value = batch.stage1.actualAbv || 0;
+            document.getElementById('stage1_ph').value = batch.stage1.ph || 0;
+            document.getElementById('stage1_ta').value = batch.stage1.ta || 0;
+
+            // Этап2
+            document.getElementById('stage2_tempStart').value = batch.stage2.tempStart || 0;
+            document.getElementById('stage2_yeast').value = batch.stage2.yeast || '';
+            document.getElementById('stage2_yeastDate').value = batch.stage2.yeastDate || '';
+            document.getElementById('stage2_startDate').value = batch.stage2.startDate || '';
+            document.getElementById('stage2_rackingDate').value = batch.stage2.rackingDate || '';
+            
+            measurementsContainer.innerHTML = '';
+            if (batch.stage2.measurements && batch.stage2.measurements.length) {
+                batch.stage2.measurements.forEach(m => addMeasureRow(m.date, m.density, m.temp, m.note));
+            } else {
+                addMeasureRow();
+            }
+            
+            nutrientsContainer.innerHTML = '';
+            if (batch.stage2.nutrients && batch.stage2.nutrients.length) {
+                batch.stage2.nutrients.forEach(n => addNutrientRow(n.date, n.product, n.dosage));
+            } else {
+                addNutrientRow();
+            }
+
+            // Этап3
+            if (batch.type === 'classic') {
+                document.getElementById('classic_volume').value = batch.stage3.volume || 0;
+                document.getElementById('classic_sugar').value = batch.stage3.sugar || 0;
+                document.getElementById('classic_yeast').value = batch.stage3.yeast || 0;
+                document.getElementById('classic_cap').value = batch.stage3.cap || 'Кронен-пробка';
+                document.getElementById('classic_date').value = batch.stage3.date || '';
+                document.getElementById('classic_autolysis').value = batch.stage3.autolysis || '';
+            } else {
+                document.getElementById('petnat_brix').value = batch.stage3.brix || 0;
+                document.getElementById('petnat_date').value = batch.stage3.date || '';
+                document.getElementById('petnat_cap').value = batch.stage3.cap || 'Кронен-пробка';
+                document.getElementById('petnat_control').value = batch.stage3.control || '';
+            }
+
+            // Этап4
+            document.getElementById('stage4_disgorging').value = batch.stage4.disgorging || '';
+            document.getElementById('stage4_liqueurSugar').value = batch.stage4.liqueurSugar || 0;
+            document.getElementById('stage4_finalCap').value = batch.stage4.finalCap || 'Кронен-пробка';
+            document.getElementById('stage4_petnatRacked').checked = batch.stage4.petnatRacked || false;
+            document.getElementById('stage4_rackingDatePet').value = batch.stage4.rackingDatePet || '';
+            document.getElementById('stage4_finalCode').value = batch.stage4.finalCode || '';
+
+            // Этап5
+            document.getElementById('stage5_tastingDate').value = batch.stage5.tastingDate || '';
+            document.getElementById('stage5_sparkling').value = batch.stage5.sparkling || 0;
+            document.getElementById('stage5_tasteNotes').value = batch.stage5.tasteNotes || '';
+            document.getElementById('stage5_packDate').value = batch.stage5.packDate || '';
+
+            // Название и код
+            batchCode.value = batch.code || '';
+            batchName.value = batch.name || '';
+            createdDate.value = batch.createdDate || new Date().toISOString().slice(0,10);
+            generalNotes.value = batch.generalNotes || '';
+
+            // Фото этикетки
+            if (batch.labelImage) {
+                loadLabelImage(batch.labelImage);
+            } else {
+                // Сбрасываем превью
+                labelImage.style.display = 'none';
+                noLabelText.style.display = 'block';
+                removeLabelBtn.style.display = 'none';
+                labelFileName.textContent = '';
+                currentLabelFile = null;
+            }
+
+            updateChart();
+        }
+
+        // --- Остальные функции (addMeasureRow, addNutrientRow, updateChart, и т.д.) ---
+        function addMeasureRow(date='', dens='', temp='', note='') {
+            const div = document.createElement('div');
+            div.className = 'measure-row';
+            div.innerHTML = `
+                <input type="date" value="${date}" placeholder="Дата" style="flex:1.5;">
+                <input type="text" value="${dens}" placeholder="Плотность °Brix" style="flex:1;">
+                <input type="text" value="${temp}" placeholder="Темп. °C" style="flex:0.8;">
+                <input type="text" value="${note}" placeholder="Комментарий" style="flex:1.5;">
+                <span class="remove-btn" onclick="this.parentElement.remove(); window.dispatchEvent(new Event('measurementChanged'));">✕</span>
+            `;
+            measurementsContainer.appendChild(div);
+            div.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => updateChart()));
+        }
+
+        function addNutrientRow(date='', product='', dosage='') {
+            const div = document.createElement('div');
+            div.className = 'nutrient-row';
+            div.innerHTML = `
+                <input type="date" value="${date}" placeholder="Дата" style="flex:1.5;">
+                <input type="text" value="${product}" placeholder="Препарат" style="flex:2;">
+                <input type="text" value="${dosage}" placeholder="Дозировка" style="flex:1;">
+                <span class="remove-btn" onclick="this.parentElement.remove()">✕</span>
+            `;
+            nutrientsContainer.appendChild(div);
+        }
+
+        function updateChart() {
+            if (!chartCanvas) return;
+            const rows = document.querySelectorAll('.measure-row');
+            const dates = [];
+            const densities = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 4) {
+                    const date = inputs[0].value;
+                    const dens = parseFloat(inputs[1].value);
+                    if (date && !isNaN(dens)) {
+                        dates.push(date);
+                        densities.push(dens);
+                    }
+                }
+            });
+            if (chartInstance) chartInstance.destroy();
+            if (dates.length === 0) return;
+            chartInstance = new Chart(chartCanvas, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Плотность (°Brix)',
+                        data: densities,
+                        borderColor: '#2f4f4f',
+                        backgroundColor: 'rgba(47,79,79,0.1)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, title: { display: true, text: '°Brix' } },
+                        x: { title: { display: true, text: 'Дата' } }
+                    }
+                }
+            });
+        }
+
+        function renderBatches() {
+            if (batches.length === 0) {
+                batchesContainer.innerHTML = '<div class="empty-state">🍏 Нет сохранённых партий. Создайте новую или загрузите JSON.</div>';
+                return;
+            }
+            
+            const sorted = [...batches].sort((a,b) => {
+                const yearA = a.stage1.date ? a.stage1.date.slice(0,4) : '0';
+                const yearB = b.stage1.date ? b.stage1.date.slice(0,4) : '0';
+                return yearB.localeCompare(yearA);
+            });
+            
+            let html = '';
+            sorted.forEach(b => {
+                const date = b.stage1.date || 'нет даты';
+                const year = date.slice(0,4) || '?';
+                const type = b.type === 'classic' ? 'Классик' : 'Петнат';
+                const displayName = b.name || b.code || 'Без названия';
+                const hasPhoto = b.labelImage ? '📸' : '';
+                
+                html += `
+                    <div class="card" data-id="${b.id}">
+                        <div class="card-header">
+                            <span class="batch-code">${displayName} ${hasPhoto}</span>
+                            <span class="badge">${year}</span>
+                        </div>
+                        <div class="batch-meta">${date} · ${type}</div>
+                        ${b.labelImage ? '<div class="photo-indicator">📸 Есть фото</div>' : ''}
+                        <div style="display:flex; gap:8px; margin-top:16px;">
+                            <button class="secondary edit-btn" data-id="${b.id}">✎ открыть</button>
+                            <button class="secondary export-one" data-id="${b.id}">↓ JSON</button>
+                            <button class="secondary export-pdf-one" data-id="${b.id}">📄 PDF</button>
+                            <button class="secondary export-excel-one" data-id="${b.id}">📊 Excel</button>
+                            <button class="secondary delete-btn" data-id="${b.id}" style="background:#d95b5b;">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+            batchesContainer.innerHTML = html;
+        }
+
+        function toggleTypeFields(type) {
+            if (type === 'classic') {
+                classicFields.style.display = 'block';
+                petnatFields.style.display = 'none';
+            } else {
+                classicFields.style.display = 'none';
+                petnatFields.style.display = 'block';
+            }
+        }
+
+        function generateBatchCode() {
+            const date = document.getElementById('stage1_date').value;
+            const varieties = document.getElementById('stage1_varieties').value;
+            let dateStr = date ? date.replace(/-/g, '').slice(2) : new Date().toISOString().slice(2,10).replace(/-/g,'');
+            let code = 'СИДР-' + dateStr;
+            if (varieties) {
+                const words = varieties.split(/[,\s]+/);
+                let abbr = '';
+                for (let w of words) {
+                    if (w.length > 0 && isNaN(w[0])) { abbr += w[0].toUpperCase(); if(abbr.length>=3) break; }
+                }
+                if (abbr.length<1) abbr = 'ЯБ';
+                code += '-' + abbr.slice(0,3);
+            } else {
+                code += '-NEW';
+            }
+            batchCode.value = code;
+        }
+
+        function generateFinalCode() {
+            const base = batchCode.value || 'СИДР-XXXX';
+            const type = document.querySelector('input[name="ciderType"]:checked')?.value || 'classic';
+            const suffix = type === 'classic' ? '-C' : '-PN';
+            const disgDate = document.getElementById('stage4_disgorging').value || document.getElementById('classic_date').value || document.getElementById('petnat_date').value || '';
+            let datePart = '';
+            if (disgDate) datePart = '-' + disgDate.slice(5,7) + disgDate.slice(8,10);
+            stage4FinalCode.value = base + suffix + datePart;
+        }
+
+        // --- Обработчики для фото ---
+        uploadLabelBtn.addEventListener('click', () => {
+            labelFileInput.click();
+        });
+
+        labelFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Показываем превью
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                labelImage.src = e.target.result;
+                labelImage.style.display = 'block';
+                noLabelText.style.display = 'none';
+                removeLabelBtn.style.display = 'inline-block';
+                labelFileName.textContent = file.name;
+            };
+            reader.readAsDataURL(file);
+
+            // Сохраняем файл для последующей записи
+            currentLabelFile = file;
+        });
+
+        removeLabelBtn.addEventListener('click', async () => {
+            if (currentLabelFile && currentBatchId) {
+                if (typeof currentLabelFile === 'string') {
+                    // Это имя файла, удаляем из папки
+                    await deleteLabelImage(currentLabelFile);
+                }
+            }
+            
+            labelImage.style.display = 'none';
+            noLabelText.style.display = 'block';
+            removeLabelBtn.style.display = 'none';
+            labelFileName.textContent = '';
+            currentLabelFile = null;
+            labelFileInput.value = '';
+        });
+
+        function startNewBatch() {
+            currentBatchId = null;
+            editTitle.innerText = 'Новая партия';
+            
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.type !== 'radio' && el.type !== 'checkbox') el.value = '';
+                else if (el.type === 'radio' && el.value === 'classic') el.checked = true;
+                else if (el.type === 'checkbox') el.checked = false;
+            });
+            
+            measurementsContainer.innerHTML = '';
+            nutrientsContainer.innerHTML = '';
+            addMeasureRow();
+            addNutrientRow();
+            toggleTypeFields('classic');
+            
+            const today = new Date().toISOString().slice(0,10);
+            createdDate.value = today;
+            batchName.value = '';
+            generalNotes.value = '';
+            
+            generateBatchCode();
+            generateFinalCode();
+            
+            // Сброс фото
+            labelImage.style.display = 'none';
+            noLabelText.style.display = 'block';
+            removeLabelBtn.style.display = 'none';
+            labelFileName.textContent = '';
+            currentLabelFile = null;
+            labelFileInput.value = '';
+            
+            mainScreen.style.display = 'none';
+            editScreen.style.display = 'block';
+            isEditMode = true;
+            updateChart();
+        }
+
+        function openBatch(id) {
+            const batch = batches.find(b => b.id == id);
+            if (!batch) return;
+            currentBatchId = id;
+            editTitle.innerText = 'Редактирование партии';
+            populateForm(batch);
+            mainScreen.style.display = 'none';
+            editScreen.style.display = 'block';
+            isEditMode = true;
+            updateChart();
+        }
+
+        async function saveCurrentBatch() {
+            if (!directoryHandle) {
+                alert('Сначала выберите папку для хранения данных.');
+                return;
+            }
+
+            // Если есть новое фото, сохраняем его
+            if (currentLabelFile && typeof currentLabelFile !== 'string') {
+                const filename = await saveLabelImage(currentLabelFile);
+                if (filename) {
+                    currentLabelFile = filename;
+                }
+            }
+
+            const data = collectFormData();
+            if (!data) return;
+            
+            const now = new Date().toISOString();
+            
+            if (currentBatchId) {
+                const index = batches.findIndex(b => b.id == currentBatchId);
+                if (index !== -1) {
+                    batches[index] = { ...batches[index], ...data, id: currentBatchId, updatedAt: now };
+                }
+            } else {
+                const newId = Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+                const newBatch = { id: newId, ...data, createdAt: now, updatedAt: now };
+                batches.push(newBatch);
+                currentBatchId = newId;
+            }
+            
+            const success = await writeDataFile();
+            if (success) {
+                alert('Партия сохранена в файл');
+            } else {
+                alert('Ошибка сохранения в файл');
+            }
+            renderBatches();
+        }
+
+        async function deleteBatch(id) {
+            if (!directoryHandle) return;
+            
+            const batch = batches.find(b => b.id == id);
+            if (batch && batch.labelImage) {
+                await deleteLabelImage(batch.labelImage);
+            }
+            
+            if (confirm('Удалить партию?')) {
+                batches = batches.filter(b => b.id != id);
+                await writeDataFile();
+                renderBatches();
+            }
+        }
+
+        // --- Обработчики событий ---
+        window.addEventListener('load', init);
+        chooseFolderBtn.addEventListener('click', askForFolder);
+        newBatchBtn.addEventListener('click', startNewBatch);
+
+        backToMainBtn.addEventListener('click', () => {
+            if (confirm('Вернуться к списку? Несохранённые изменения будут утеряны.')) {
+                mainScreen.style.display = 'block';
+                editScreen.style.display = 'none';
+                isEditMode = false;
+            }
+        });
+
+        saveBatchBtn.addEventListener('click', saveCurrentBatch);
+
+        saveToFileBtn.addEventListener('click', () => {
+            const data = collectFormData();
+            if (!data) return;
+            const finalData = currentBatchId ? { id: currentBatchId, ...data } : data;
+            const blob = new Blob([JSON.stringify(finalData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (batchCode.value || 'batch') + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        exportPdfBtn.addEventListener('click', () => {
+            const data = collectFormData();
+            if (!data) return;
+            const fullData = currentBatchId ? { id: currentBatchId, ...data } : data;
+            exportToPdf(fullData);
+        });
+
+        exportExcelBtn.addEventListener('click', () => {
+            const data = collectFormData();
+            if (!data) return;
+            const fullData = currentBatchId ? { id: currentBatchId, ...data } : data;
+            exportToExcel(fullData);
+        });
+
+        importBtn.addEventListener('click', () => importFile.click());
+        importFile.addEventListener('change', (e) => {
+            if (e.target.files[0]) importFromFile(e.target.files[0]);
+            importFile.value = '';
+        });
+
+        batchesContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const card = btn.closest('.card');
+            if (!card) return;
+            const id = card.dataset.id;
+            if (btn.classList.contains('edit-btn')) openBatch(id);
+            if (btn.classList.contains('delete-btn')) deleteBatch(id);
+            if (btn.classList.contains('export-one')) exportBatch(id);
+            if (btn.classList.contains('export-pdf-one')) {
+                const batch = batches.find(b => b.id == id);
+                if (batch) exportToPdf(batch);
+            }
+            if (btn.classList.contains('export-excel-one')) {
+                const batch = batches.find(b => b.id == id);
+                if (batch) exportToExcel(batch);
+            }
+        });
+
+        typeRadios.forEach(r => r.addEventListener('change', (e) => {
+            toggleTypeFields(e.target.value);
+            generateFinalCode();
+        }));
+
+        function updateAbvCalc() {
+            const start = parseFloat(calcAbvStart.value) || 0;
+            const end = parseFloat(calcAbvEnd.value) || 0;
+            const abv = ((start - end) * 0.55).toFixed(2);
+            calcAbvResult.value = abv;
+        }
+        calcAbvStart.addEventListener('input', updateAbvCalc);
+        calcAbvEnd.addEventListener('input', updateAbvCalc);
+        applyAbvBtn.addEventListener('click', () => {
+            document.getElementById('stage1_actualAbv').value = calcAbvResult.value;
+        });
+
+        function updateClassicSugar() {
+            const atm = parseFloat(classicPressureTarget.value) || 0;
+            classicSugarCalc.value = (atm * 4).toFixed(1);
+        }
+        classicPressureTarget.addEventListener('input', updateClassicSugar);
+        applyClassicSugar.addEventListener('click', () => {
+            classicSugar.value = classicSugarCalc.value;
+        });
+
+        function updatePetnatBrix() {
+            const atm = parseFloat(petnatPressureTarget.value) || 0;
+            petnatBrixCalc.value = (atm / 1.3).toFixed(1);
+        }
+        petnatPressureTarget.addEventListener('input', updatePetnatBrix);
+        applyPetnatBrix.addEventListener('click', () => {
+            petnatBrix.value = petnatBrixCalc.value;
+        });
+
+        regenerateFinalCode.addEventListener('click', generateFinalCode);
+
+        document.querySelectorAll('#editScreen input, #editScreen textarea, #editScreen select').forEach(el => {
+            el.addEventListener('input', () => {
+                const brix = parseFloat(document.getElementById('stage1_brix').value) || 0;
+                document.getElementById('stage1_predictedAbv').value = (brix * 0.55).toFixed(2);
+                if (el.id === 'stage1_date' || el.id === 'stage1_varieties') {
+                    generateBatchCode();
+                }
+            });
+        });
+
+        addMeasureBtn.addEventListener('click', () => {
+            addMeasureRow();
+            updateChart();
+        });
+
+        addNutrientBtn.addEventListener('click', () => addNutrientRow());
+
+        window.addEventListener('measurementChanged', updateChart);
+
+        resetDraftBtn.addEventListener('click', () => {
+            if (confirm('Сбросить все несохранённые изменения?')) {
+                if (currentBatchId) {
+                    const original = batches.find(b => b.id == currentBatchId);
+                    if (original) populateForm(original);
+                } else {
+                    startNewBatch();
+                }
+            }
+        });
+
+        // Экспорт функций
+        function exportBatch(id) {
+            const batch = batches.find(b => b.id == id);
+            if (!batch) return;
+            const blob = new Blob([JSON.stringify(batch, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (batch.code || 'batch') + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportToPdf(batch) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const title = batch.name || batch.code || 'Партия сидра';
+            doc.setFontSize(18);
+            doc.text(title, 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Код: ${batch.code} | Тип: ${batch.type === 'classic' ? 'Классик' : 'Петнат'}`, 14, 32);
+            doc.text(`Дата отжима: ${batch.stage1.date || 'не указана'} | Объём: ${batch.stage1.volume} л`, 14, 40);
+            doc.text(`Сорта: ${batch.stage1.varieties}`, 14, 48);
+            doc.text(`Нач. Brix: ${batch.stage1.brix}, pH: ${batch.stage1.ph}, TA: ${batch.stage1.ta}`, 14, 56);
+            doc.text(`Прогн. ABV: ${batch.stage1.predictedAbv}, Факт. ABV: ${batch.stage1.actualAbv}`, 14, 64);
+
+            let y = 72;
+            doc.text('Этап 2. Брожение', 14, y);
+            y += 6;
+            doc.text(`Дрожжи: ${batch.stage2.yeast}, темп. начала: ${batch.stage2.tempStart}°C`, 14, y);
+            y += 6;
+            doc.text(`Дата внесения: ${batch.stage2.yeastDate}, начало: ${batch.stage2.startDate}`, 14, y);
+            y += 6;
+            if (batch.stage2.nutrients && batch.stage2.nutrients.length) {
+                doc.text('Подкормки:', 14, y);
+                y += 6;
+                batch.stage2.nutrients.forEach(n => {
+                    doc.text(`${n.date || ''} — ${n.product || ''} (${n.dosage || ''})`, 18, y);
+                    y += 5;
+                });
+                y += 2;
+            }
+            if (batch.stage2.measurements && batch.stage2.measurements.length) {
+                doc.text('Ежедневные замеры:', 14, y);
+                y += 6;
+                const headers = [['Дата', 'Плотность', 'Темп.', 'Комментарий']];
+                const data = batch.stage2.measurements.map(m => [m.date, m.density, m.temp, m.note]);
+                doc.autoTable({
+                    startY: y,
+                    head: headers,
+                    body: data,
+                    theme: 'plain',
+                    styles: { fontSize: 9 }
+                });
+                y = doc.lastAutoTable.finalY + 6;
+            } else {
+                doc.text('Нет замеров', 14, y);
+                y += 6;
+            }
+
+            doc.text('Этап 3. Розлив', 14, y);
+            y += 6;
+            if (batch.type === 'classic') {
+                doc.text(`Классик: объём тиража ${batch.stage3.volume} л, сахар ${batch.stage3.sugar} г/л, дрожжи ${batch.stage3.yeast} г/л`, 14, y);
+                y += 6;
+                doc.text(`Укупорка: ${batch.stage3.cap}, дата: ${batch.stage3.date}`, 14, y);
+            } else {
+                doc.text(`Петнат: плотность при розливе ${batch.stage3.brix} °Brix, дата: ${batch.stage3.date}`, 14, y);
+                y += 6;
+                doc.text(`Укупорка: ${batch.stage3.cap}, контроль: ${batch.stage3.control}`, 14, y);
+            }
+            y += 8;
+
+            doc.text('Этап 4. Выдержка/финиш', 14, y);
+            y += 6;
+            doc.text(`Дегоржаж: ${batch.stage4.disgorging || 'не указан'} | Ликёр: ${batch.stage4.liqueurSugar} г/л`, 14, y);
+            y += 6;
+            doc.text(`Фин. укупорка: ${batch.stage4.finalCap}, фин. код: ${batch.stage4.finalCode}`, 14, y);
+            y += 8;
+
+            doc.text('Этап 5. Контроль качества', 14, y);
+            y += 6;
+            doc.text(`Дегустация: ${batch.stage5.tastingDate}, игристость: ${batch.stage5.sparkling}/5`, 14, y);
+            y += 6;
+            doc.text(`Вкус: ${batch.stage5.tasteNotes}`, 14, y);
+            y += 6;
+            doc.text(`Упаковка: ${batch.stage5.packDate}`, 14, y);
+            y += 8;
+            doc.text(`Общие заметки: ${batch.generalNotes || ''}`, 14, y);
+            if (batch.labelImage) {
+                y += 6;
+                doc.text(`📸 Есть фото этикетки: ${batch.labelImage}`, 14, y);
+            }
+
+            doc.save(`${batch.code || 'batch'}.pdf`);
+        }
+
+        function exportToExcel(batch) {
+            const wb = XLSX.utils.book_new();
+            const mainData = [
+                ['Параметр', 'Значение'],
+                ['Код партии', batch.code],
+                ['Название', batch.name || ''],
+                ['Тип', batch.type === 'classic' ? 'Классик' : 'Петнат'],
+                ['Дата создания', batch.createdDate],
+                ['Дата отжима', batch.stage1.date],
+                ['Сорта', batch.stage1.varieties],
+                ['Регион', batch.stage1.region],
+                ['Объём (л)', batch.stage1.volume],
+                ['Начальный Brix', batch.stage1.brix],
+                ['Прогн. ABV', batch.stage1.predictedAbv],
+                ['Факт. ABV', batch.stage1.actualAbv],
+                ['pH', batch.stage1.ph],
+                ['TA (г/л)', batch.stage1.ta],
+                ['Фото этикетки', batch.labelImage || 'нет']
+            ];
+            const wsMain = XLSX.utils.aoa_to_sheet(mainData);
+            XLSX.utils.book_append_sheet(wb, wsMain, 'Сводка');
+
+            if (batch.stage2.nutrients && batch.stage2.nutrients.length) {
+                const nutData = [['Дата', 'Препарат', 'Дозировка']];
+                batch.stage2.nutrients.forEach(n => nutData.push([n.date, n.product, n.dosage]));
+                const wsNut = XLSX.utils.aoa_to_sheet(nutData);
+                XLSX.utils.book_append_sheet(wb, wsNut, 'Подкормки');
+            }
+
+            if (batch.stage2.measurements && batch.stage2.measurements.length) {
+                const measData = [['Дата', 'Плотность', 'Температура', 'Комментарий']];
+                batch.stage2.measurements.forEach(m => measData.push([m.date, m.density, m.temp, m.note]));
+                const wsMeas = XLSX.utils.aoa_to_sheet(measData);
+                XLSX.utils.book_append_sheet(wb, wsMeas, 'Замеры');
+            }
+
+            const stage3Data = [['Параметр', 'Значение']];
+            if (batch.type === 'classic') {
+                stage3Data.push(['Объём тиража (л)', batch.stage3.volume]);
+                stage3Data.push(['Сахар (г/л)', batch.stage3.sugar]);
+                stage3Data.push(['Дрожжи (г/л)', batch.stage3.yeast]);
+                stage3Data.push(['Тип укупорки', batch.stage3.cap]);
+                stage3Data.push(['Дата укупорки', batch.stage3.date]);
+                stage3Data.push(['Начало автотизиса', batch.stage3.autolysis]);
+            } else {
+                stage3Data.push(['Плотность при розливе (°Brix)', batch.stage3.brix]);
+                stage3Data.push(['Дата розлива', batch.stage3.date]);
+                stage3Data.push(['Тип укупорки', batch.stage3.cap]);
+                stage3Data.push(['Контрольная бутылка', batch.stage3.control]);
+            }
+            const wsStage3 = XLSX.utils.aoa_to_sheet(stage3Data);
+            XLSX.utils.book_append_sheet(wb, wsStage3, 'Розлив');
+
+            const finishData = [
+                ['Параметр', 'Значение'],
+                ['Дегоржаж', batch.stage4.disgorging],
+                ['Экспед. ликёр (г/л)', batch.stage4.liqueurSugar],
+                ['Финальная укупорка', batch.stage4.finalCap],
+                ['Петнат снят с осадка', batch.stage4.petnatRacked ? 'Да' : 'Нет'],
+                ['Дата снятия', batch.stage4.rackingDatePet],
+                ['Финальный код', batch.stage4.finalCode],
+                ['Дата дегустации', batch.stage5.tastingDate],
+                ['Игристость (1-5)', batch.stage5.sparkling],
+                ['Оценка вкуса', batch.stage5.tasteNotes],
+                ['Дата упаковки', batch.stage5.packDate],
+                ['Общие заметки', batch.generalNotes || '']
+            ];
+            const wsFinish = XLSX.utils.aoa_to_sheet(finishData);
+            XLSX.utils.book_append_sheet(wb, wsFinish, 'Финиш');
+
+            XLSX.writeFile(wb, `${batch.code || 'batch'}.xlsx`);
+        }
+
+        async function importFromFile(file) {
+            if (!directoryHandle) {
+                alert('Сначала выберите папку для хранения данных.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.stage1) throw new Error('Не похоже на файл партии');
+                    if (!data.id) data.id = Date.now() + '-' + Math.random().toString(36).substr(2,6);
+                    batches.push(data);
+                    await writeDataFile();
+                    renderBatches();
+                    alert('Партия добавлена в список');
+                } catch (err) {
+                    alert('Ошибка при загрузке файла: ' + err);
+                }
+            };
+            reader.readAsText(file);
+        }
+    })();
+</script>
+</body>
+</html>

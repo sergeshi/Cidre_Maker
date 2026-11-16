@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор алкоголя и коррекции сусла</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #e9f0e6 0%, #d9e2d4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 16px;
+        }
+        .card {
+            background: rgba(250, 245, 235, 0.95);
+            backdrop-filter: blur(8px);
+            max-width: 550px;
+            width: 100%;
+            border-radius: 40px;
+            box-shadow: 0 20px 30px rgba(60, 50, 40, 0.2);
+            padding: 32px 28px;
+            border: 1px solid #c6bcab;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #2b4f2b;
+            margin: 0 0 10px;
+            text-align: center;
+            border-bottom: 2px solid #aac0a5;
+            padding-bottom: 15px;
+        }
+        .sub {
+            text-align: center;
+            color: #5a6b55;
+            margin-bottom: 28px;
+            font-style: italic;
+        }
+        .input-group {
+            background: #f5f3eb;
+            border-radius: 30px;
+            padding: 24px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .input-row label {
+            font-weight: 600;
+            color: #2e4a2e;
+            margin-bottom: 6px;
+            font-size: 1.1rem;
+        }
+        .input-row input {
+            background: white;
+            border: 1px solid #b8b09e;
+            border-radius: 40px;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            outline: none;
+            transition: 0.2s;
+            font-weight: 500;
+            color: #1e2e1e;
+        }
+        .input-row input:focus {
+            border-color: #7fa07f;
+            box-shadow: 0 0 0 3px rgba(100, 130, 100, 0.2);
+        }
+        .input-row input[readonly] {
+            background: #eae7de;
+            color: #3f4d3f;
+            border-color: #bcb29e;
+            cursor: default;
+        }
+        .result-block {
+            background: #dde8d5;
+            border-radius: 28px;
+            padding: 20px 24px;
+            border: 1px solid #b1bfa6;
+            margin-top: 20px;
+        }
+        .result-title {
+            font-weight: 700;
+            color: #1f3b1f;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-value {
+            background: #fefef9;
+            border-radius: 24px;
+            padding: 18px 22px;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1e4a1e;
+            text-align: center;
+            border: 1px solid #9faf92;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .correction-box {
+            background: #e2efdb;
+            border-radius: 28px;
+            padding: 22px;
+            margin-top: 24px;
+            border-left: 6px solid #4f7a4f;
+        }
+        .correction-detail {
+            background: #fcfaf2;
+            border-radius: 20px;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #2b412b;
+            border: 1px solid #b5c2a8;
+            margin: 12px 0 8px;
+        }
+        .small-note {
+            font-size: 0.9rem;
+            color: #4f6248;
+            background: #f5f9ef;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-top: 16px;
+            border-left: 4px solid #8fb78f;
+        }
+        .button-calc {
+            background: #5f7e5f;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 26px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 8px 0 0;
+            border-bottom: 4px solid #3e5a3e;
+            letter-spacing: 0.5px;
+        }
+        .button-calc:hover {
+            background: #6f946f;
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        hr {
+            border: 1px dashed #b5c2a8;
+            margin: 30px 0 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 28px;
+            color: #6d7a64;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🍷 Алкоголь и коррекция</h1>
+        <div class="sub">Рассчитайте крепость и скорректируйте сусло</div>
+
+        <!-- Основной блок: ввод Brix, расчётный алкоголь -->
+        <div class="input-group">
+            <div class="input-row">
+                <label>🌡️ Начальный Brix (измеренный)</label>
+                <input type="number" id="brixInput" value="12.0" step="0.1" min="0" max="30">
+            </div>
+            <div class="input-row">
+                <label>🍾 Расчётный алкоголь при сбраживании насухо (% об.)</label>
+                <input type="text" id="alcReadOnly" readonly value="7.1">
+            </div>
+        </div>
+
+        <!-- Блок целевого алкоголя и коррекции -->
+        <div class="correction-box">
+            <div class="result-title">🎯 Целевая крепость</div>
+            <div class="input-row">
+                <label>Желаемый алкоголь (% об.)</label>
+                <input type="number" id="targetAlcInput" value="7.0" step="0.1" min="0" max="25">
+            </div>
+
+            <div class="correction-detail" id="requiredBrixDisplay">
+                Требуемый начальный Brix: —
+            </div>
+
+            <div id="correctionMessage" class="correction-detail" style="background: #f0f7ea;">
+                Введите желаемую крепость
+            </div>
+
+            <button class="button-calc" id="calcBtn">⟳ Рассчитать коррекцию</button>
+        </div>
+
+        <div class="small-note">
+            ⚖️ Формула: 1% алкоголя ≈ 17 г/л сахара, Brix × 10 ≈ г/л. <br>
+            При добавлении сахара объём увеличивается (1 кг сахара ≈ +0,6 л). Результат приблизительный.
+        </div>
+
+        <footer>
+            ✣ Для разбавления используется сухое сусло или вода (0 г/л сахара).
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // Коэффициенты
+            const SUGAR_PER_PERCENT = 17;      // г/л на 1% алкоголя
+            const BRIX_TO_SUGAR = 10;           // г/л = Brix * 10 (грубо)
+
+            // Элементы
+            const brixInput = document.getElementById('brixInput');
+            const alcReadOnly = document.getElementById('alcReadOnly');
+            const targetAlcInput = document.getElementById('targetAlcInput');
+            const requiredBrixDisplay = document.getElementById('requiredBrixDisplay');
+            const correctionMessage = document.getElementById('correctionMessage');
+            const calcBtn = document.getElementById('calcBtn');
+
+            // Функция пересчёта алкоголя по Brix
+            function updateAlcoholFromBrix() {
+                let brix = parseFloat(brixInput.value);
+                if (isNaN(brix) || brix < 0) brix = 0;
+                // алкоголь = (brix * 10) / 17
+                let alcohol = (brix * BRIX_TO_SUGAR) / SUGAR_PER_PERCENT;
+                alcReadOnly.value = alcohol.toFixed(2);
+            }
+
+            // Функция расчёта требуемого Brix по целевому алкоголю
+            function brixFromTargetAlcohol(targetAlc) {
+                if (isNaN(targetAlc) || targetAlc < 0) return 0;
+                return (targetAlc * SUGAR_PER_PERCENT) / BRIX_TO_SUGAR;
+            }
+
+            // Основная функция коррекции
+            function calculateCorrection() {
+                // Получаем фактический Brix
+                let actualBrix = parseFloat(brixInput.value);
+                if (isNaN(actualBrix) || actualBrix < 0) actualBrix = 0;
+
+                // Получаем целевой алкоголь
+                let targetAlc = parseFloat(targetAlcInput.value);
+                if (isNaN(targetAlc) || targetAlc < 0) targetAlc = 0;
+
+                // Рассчитываем требуемый Brix для целевого алкоголя
+                let requiredBrix = brixFromTargetAlcohol(targetAlc);
+                requiredBrixDisplay.innerText = `Требуемый начальный Brix: ${requiredBrix.toFixed(2)} °Bx`;
+
+                // Сравниваем
+                if (targetAlc === 0) {
+                    correctionMessage.innerText = 'Укажите желаемый алкоголь больше 0';
+                    return;
+                }
+
+                if (Math.abs(actualBrix - requiredBrix) < 0.01) {
+                    correctionMessage.innerText = '✅ Текущий Brix идеален для целевой крепости. Коррекция не требуется.';
+                    return;
+                }
+
+                if (actualBrix < requiredBrix) {
+                    // Нужно добавить сахара
+                    let deficitBrix = requiredBrix - actualBrix;
+                    let sugarGramsPerLiter = deficitBrix * BRIX_TO_SUGAR; // г/л
+                    correctionMessage.innerText = `➕ Добавить ${sugarGramsPerLiter.toFixed(1)} г сахара на литр сусла.`;
+                } else {
+                    // actualBrix > requiredBrix — нужно разбавить
+                    // Формула: V_add = (actualBrix / requiredBrix) - 1  (литров сухого сусла/воды на 1 литр исходного)
+                    let dilutionRatio = (actualBrix / requiredBrix) - 1;
+                    let addLitersPerLiter = dilutionRatio.toFixed(3);
+                    correctionMessage.innerText = `💧 Добавить ${addLitersPerLiter} л сухого сусла (или воды) на 1 л исходного.`;
+                }
+            }
+
+            // События: при изменении Brix обновляем алкоголь
+            brixInput.addEventListener('input', () => {
+                updateAlcoholFromBrix();
+                // также можно автоматически обновлять коррекцию, но лучше по кнопке, чтобы не сбивать
+            });
+
+            // При изменении целевого алкоголя можно тоже автоматически? Оставим на кнопку
+            targetAlcInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') calculateCorrection();
+            });
+
+            // Кнопка расчёта
+            calcBtn.addEventListener('click', calculateCorrection);
+
+            // Инициализация
+            updateAlcoholFromBrix();
+            calculateCorrection(); // показать начальную рекомендацию
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,630 @@
+
+
+
+<meta charset="UTF-8">
+<title>Винные дрожжи — Каталог</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-2: #171a21;
+    --card: #1c2029;
+    --card-hover: #222732;
+    --border: #2a2f3a;
+    --text: #e6e8ec;
+    --muted: #8b93a3;
+    --accent: #c9a96a;
+    --accent-2: #e0c48a;
+    --danger: #d96b6b;
+    --ok: #7bc47b;
+    --warn: #e0a94a;
+    --radius: 14px;
+    --shadow: 0 4px 20px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { min-height: 100vh; padding: 24px 16px 80px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  header.top {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 14px;
+  }
+  header.top h1 {
+    font-size: 22px; margin: 0 12px 0 0; font-weight: 600;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header.top .sub { color: var(--muted); font-size: 13px; flex: 1; }
+  .btn {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 13px;
+    transition: all .2s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--card-hover); border-color: var(--accent); color: var(--accent-2); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), #a8894c); color: #1a1408; border-color: transparent; font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.1); color: #1a1408; }
+
+  .storage-bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px; margin-bottom: 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    font-size: 13px;
+  }
+  .storage-bar .dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .storage-bar .dot.ok { background: var(--ok); color: var(--ok); }
+  .storage-bar .dot.warn { background: var(--warn); color: var(--warn); }
+  .storage-bar .dot.off { background: var(--muted); color: var(--muted); }
+  .storage-bar .label { color: var(--muted); }
+  .storage-bar .val { color: var(--text); }
+  .storage-bar .spacer { flex: 1; }
+  .storage-bar .btn { padding: 5px 10px; font-size: 12px; }
+
+  .cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .card:hover { border-color: #3a4150; }
+  .card.open { border-color: var(--accent); background: var(--card-hover); }
+
+  .card-head {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; cursor: pointer; user-select: none;
+  }
+  .card-head:hover .card-name { color: var(--accent-2); }
+
+  .card-emoji {
+    width: 42px; height: 42px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #2a2f3a, #1c2029);
+    border-radius: 10px; font-size: 22px;
+  }
+  .card-title { flex: 1; min-width: 0; }
+  .card-name {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    transition: color .2s ease;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-stamp {
+    display: block; font-size: 12px; color: var(--muted); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: rgba(201, 169, 106, .12); color: var(--accent-2);
+    border: 1px solid rgba(201, 169, 106, .25);
+  }
+  .badge.ok { background: rgba(123, 196, 123, .12); color: var(--ok); border-color: rgba(123, 196, 123, .25); }
+
+  .chev {
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); transition: transform .3s ease; flex-shrink: 0;
+  }
+  .card.open .chev { transform: rotate(180deg); color: var(--accent); }
+
+  .card-body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .35s cubic-bezier(.4,0,.2,1);
+  }
+  .card.open .card-body-wrap { grid-template-rows: 1fr; }
+  .card-body { overflow: hidden; }
+  .card-body-inner {
+    padding: 0 18px 18px;
+    opacity: 0; transform: translateY(-6px);
+    transition: opacity .3s ease .05s, transform .3s ease .05s;
+  }
+  .card.open .card-body-inner { opacity: 1; transform: translateY(0); }
+
+  .divider { height: 1px; background: var(--border); margin: 4px 0 16px; }
+
+  .fields { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 720px) {
+    .fields { grid-template-columns: 1fr 1fr; }
+    .fields .full { grid-column: 1 / -1; }
+  }
+  .field label {
+    display: block; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--accent); margin-bottom: 6px; font-weight: 600;
+  }
+  .field .val {
+    background: rgba(0,0,0,.25); border: 1px solid var(--border);
+    padding: 10px 12px; border-radius: 10px; font-size: 14px;
+    line-height: 1.5; color: var(--text); white-space: pre-wrap; word-wrap: break-word;
+  }
+  .field input, .field textarea {
+    width: 100%; background: rgba(0,0,0,.35); border: 1px solid var(--accent);
+    padding: 10px 12px; border-radius: 10px; font-size: 14px; color: var(--text);
+    font-family: inherit; resize: vertical; min-height: 40px;
+  }
+  .field textarea { min-height: 70px; line-height: 1.5; }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-2); }
+
+  .card-foot {
+    display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all .2s ease; font-size: 15px;
+  }
+  .icon-btn:hover { color: var(--accent-2); border-color: var(--accent); }
+  .icon-btn.del:hover { color: var(--danger); border-color: var(--danger); }
+
+  .empty {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--card); border: 1px solid var(--accent); color: var(--accent-2);
+    padding: 10px 18px; border-radius: 10px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: all .3s ease; z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 30px; }
+</style>
+
+
+<div class="wrap">
+  <header class="top">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAABHmlDQ1BBcHBsZSBSR0IAACjPY2Bg0nB0cXJlEmBgyM0rKQpyd1KIiIxSYD/PwMbAzAAGicnFBY4BAT4gdl5+XioDBvh2jYERRF/WBZnFQBrgSi4oKgHSf4DYKCW1OJmBgdEAyE4pLykAijNOAbJFkrLB7BUgdlFIkDOQvQfI5kuHsM+A2EkQ9h0QuwjoCSD7DUh9OpjNxAA2B8IWAbFLUitA9jI45xdUFmWmZ5QoGFpaWio4puQnpSoEVxaXpOYWK3jmJecXFeQXJZakpoAcBXYfxN2OBQU5qQrAEGOgLgCFP4T1ORAcroxiZxBiCJBcWlQGZTIyniXMR5hRuZeBwTGIgYFlJ0Is7AcDwxp9BgZZZoSYmhIDg1A9A8PGAgDxwFA9TVL8KgAAAAlwSFlzAAALEwAACxMBAJqcGAAABelpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDYuMC1jMDA2IDc5LjE2NDc1MywgMjAyMS8wMi8xNS0xMTo1MjoxMyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDIyLjMgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyNi0wNi0yNlQxNzoyMTowNCswMzowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNi0yNlQxNzoyMTowNCswMzowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjYtMDYtMjZUMTc6MjE6MDQrMDM6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NTI2ZTFhNzYtMmMxMi1iODQ2LTlmN2QtNWZkNGUyZTJjNTMyIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZDJmNWE1NjAtN2JhYy1hYTQ2LTg0ZjgtMGJmMGIzNjE0NWQ0IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NjhjNzg0NzMtYjIwZS03YTQyLWI4YjEtOGZjNDc2YjVmOTZhIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9IkFwcGxlIFJHQiI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjhjNzg0NzMtYjIwZS03YTQyLWI4YjEtOGZjNDc2YjVmOTZhIiBzdEV2dDp3aGVuPSIyMDI2LTA2LTI2VDE3OjIxOjA0KzAzOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjIuMyAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjUyNmUxYTc2LTJjMTItYjg0Ni05ZjdkLTVmZDRlMmUyYzUzMiIgc3RFdnQ6d2hlbj0iMjAyNi0wNi0yNlQxNzoyMTowNCswMzowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIyLjMgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBN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" alt="" style="float:left; margin:0 10px 10px 0;"><h1>&nbsp;КАТОЛОГ ДРОЖЖЕЙ</h1>
+    <span class="sub">Интерактивный каталог · автосохранение</span>
+    <button class="btn" id="exportBtn">📋 Экспорт JSON</button>
+    <button class="btn" id="importBtn">📂 Импорт JSON</button>
+    <input type="file" id="importFile" accept=".json" hidden="">
+    <button class="btn" id="resetBtn">↺ Сбросить к базе</button>
+    <button class="btn primary" id="addBtn">➕ Добавить</button>
+  </header>
+
+  <div class="storage-bar" id="storageBar">
+    <span class="dot off" id="dot"></span>
+    <span class="label">Хранилище:</span>
+    <span class="val" id="storageStatus">загрузка…</span>
+    <span class="spacer"></span>
+    <button class="btn" id="pickFolderBtn">📁 Выбрать папку</button>
+    <button class="btn" id="detachBtn" style="display:none">✕ Отвязать папку</button>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <footer>v3 · данные в JSON · автосохранение в localStorage + файл data.json</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ БАЗОВЫЕ ДАННЫЕ (на случай первого запуска) ============ */
+const BASE = [
+  { emoji:"🇫🇷", name:"INRA K2 — Универсал", stamp:"Lalvin EC-1118", history:"Франция, 1972. Институт INRA. Очень выносливый, конкурентный фактор K2.", spec:"Универсал, белые, красные, розе, ледяные вина, медовуха.", params:"Спирт 18% · темп. 10-35°C · низкие потребности в азоте · киллер · не совместим с ЯМБ", grapes:"Совиньон Блан, Шенен, лёгкие красные, розе.", cider:"Отлично для сидра (сухой, чистый). Хорош для яблочных и грушевых вин, подавляет дичку." },
+  { emoji:"🇫🇷", name:"Шардоне-Мастер", stamp:"Lalvin D-47", history:"Франция, отобран для Шардоне. Даёт маслянистость, сложные эфиры.", spec:"Белые благородные, Шардоне, Рислинг, медовуха, сидр.", params:"Спирт 14% · темп. 15-20°C · низкий азот · нейтральный (не киллер) · совместим с ЯМБ", grapes:"Шардоне, Совиньон, Вионье, Рислинг, Мускат.", cider:"Идеален для сидра и медовухи — даёт полнотелость, грушево-яблочные ноты. Чувствителен к теплу." },
+  { emoji:"🇫🇷", name:"Атомный реактор", stamp:"Lalvin K1V1116", history:"Из Шампани. \"Атомный реактор\", создан для надёжности.", spec:"Все типы вин, игристые, сидр, медовуха, рестарт.", params:"Спирт 18% · темп. 4-35°C · низкий азот · киллер · не совместим с ЯМБ", grapes:"Любые сорта, особенно для игристых и фруктовых.", cider:"Отличный выбор для сидра — сухой, чистый, стабильный. Подавляет дикую микрофлору." },
+  { emoji:"🍏", name:"Яблочный итальянец", stamp:"AEB Fermo Fruit", history:"Специалист для яблочных и грушевых вин. Итальянская селекция.", spec:"Сидр, грушевое вино, яблочные вина.", params:"Спирт 14% · темп. 20-25°C · не требует регидратации · нейтральный", grapes:"—", cider:"Лучший выбор для сидра и грушевого вина. Полностью отсутствует дрожжевой привкус, чистый яблочный профиль." },
+  { emoji:"🍑", name:"Фруктовый итальянец", stamp:"Lallemano Vitilevure", history:"Итальянский штамм для фруктовых и ягодных вин.", spec:"Виноград, сливы, абрикосы, фруктовые вина.", params:"Спирт 14% · темп. 20-25°C · не требует регидратации · нейтральный", grapes:"Столовые сорта, фруктовые смеси.", cider:"Хорош для фруктовых сидров (с добавлением слив, абрикосов), даёт чистый аромат." },
+  { emoji:"🍷", name:"Бургундский премиум", stamp:"Lalvin RC212 (BDX)", history:"Бургундия, BIVB. Для премиальных красных, Пино Нуар.", spec:"Красные вина — Пино Нуар, Каберне, Мерло, Сира.", params:"Спирт 16% · темп. 20-30°C · высокий азот · нейтральный · совместим с ЯМБ", grapes:"Пино Нуар, Каберне Совиньон, Мерло, Сира, Зинфандель.", cider:"Не рекомендуется для сидра (ориентирован на красные вина, танины)." },
+  { emoji:"🇮🇹", name:"Итальянский тяжеловес", stamp:"AEB X-5", history:"Итальянский \"тяжеловес\" для креплёных вин. Высокая спиртуозность.", spec:"Креплёные вина, ликёрные, фруктовые дистилляты.", params:"Спирт до 21% · темп. 20-25°C · не требует регидратации · нейтральный", grapes:"Технические сорта для креплёных вин.", cider:"Для сидра подходит, но даёт очень сухой и крепкий продукт (до 18-20%). Не для тонкого сидра." },
+  { emoji:"🍒", name:"Красный итальянец", stamp:"Lallemano E88", history:"Итальянский штамм для красных вин, стабильный и чистый.", spec:"Красные вина из винограда и ягод.", params:"Спирт 16% · темп. 20-25°C · не требует регидратации · нейтральный", grapes:"Красные сорта, ягодные вина.", cider:"Может использоваться для ягодных сидров (с малиной, вишней), но не основной выбор." },
+  { emoji:"🇵🇹", name:"Португальский аромат", stamp:"Lalvin QA23", history:"Португальский штамм, выделен для ярких белых вин.", spec:"Белые ароматные: Совиньон, Мускат, Рислинг, Вионье.", params:"Спирт 16% · темп. 14-28°C · низкий азот · нейтральный · совместим с ЯМБ", grapes:"Совиньон Блан, Шардоне, Рислинг, Мускат, Вионье.", cider:"Хорош для белых сидров из ароматных яблок, даёт цитрусовые ноты." },
+  { emoji:"🍎", name:"Fermentis Cider", stamp:"SafCider AC-1", history:"Fermentis, специально для сидра. Очень надёжный.", spec:"Сидр, медовуха, фруктовые вина.", params:"Спирт ~17.6% · темп. 10-30°C · низкий азот · нейтральный · эффективный выход", grapes:"—", cider:"Специалист для всех типов сидра — сухой, полусладкий. Для яблочного и грушевого. Деликатный яблочный профиль." },
+  { emoji:"🌐", name:"Fermentis E2U", stamp:"SafWine E2U™", history:"Универсал от Fermentis для сложных условий. E2U™.", spec:"Все типы вин, сидр, медовуха, рестарт.", params:"Спирт 18% · темп. 10-35°C · низкий азот · нейтральный · совместим с ЯМБ", grapes:"Все сорта (белые, красные, розе).", cider:"Надёжный для сидра, даёт чистый вкус, хорошо работает даже при низких температурах." },
+  { emoji:"🥂", name:"Король пузырьков", stamp:"Lalvin BVL1", history:"Французский штамм для игристых и премиальных вин.", spec:"Игристые, красные, белые. \"Король пузырьков\".", params:"Спирт 16% · темп. 10-40°C · низкий азот · киллер · совместим с ЯМБ", grapes:"Шардоне, Пино Гриджио, Каберне, Мерло, Санджовезе.", cider:"Даёт тонкую перляж, подходит для игристых сидров." },
+  { emoji:"🍌", name:"Narbonne", stamp:"Lalvin ICV D-254", history:"Франция, Narbonne. Снижает яблочную кислоту.", spec:"Молодые вина, медовуха, фруктовые, Божоле, Гевюрцтраминер.", params:"Спирт 14% · темп. 15-30°C · низкий азот · нейтральный · совместим с ЯМБ", grapes:"Рислинг, Гевюрцтраминер, Божоле, фруктовые сорта.", cider:"Отличный выбор для сидра с высокой кислотностью — смягчает вкус, даёт фруктовые ноты (банан, ягоды)." },
+  { emoji:"🇳🇿", name:"Новозеландский биореактор", stamp:"Maurivin BRC214", history:"Новозеландский штамм для сухих вин, \"биореактор\".", spec:"Белые, розовые, игристые, сухие вина.", params:"Спирт 18% · темп. 8-32°C · очень низкий азот · нейтральный · сухой финиш", grapes:"Белые сорта, для жёстких структур.", cider:"Даёт очень сухой, чистый сидр без дрожжевых нот. Идеален для брют-сидра." },
+  { emoji:"🍇", name:"Фруктовый красный", stamp:"Lallemano Vin13", history:"Для фруктовых красных вин, быстрое созревание.", spec:"Красные вина: Мерло, Каберне, Сира, Темпранильо.", params:"Спирт 16% · темп. 17-28°C · средний азот · нейтральный · совместим с ЯМБ", grapes:"Мерло, Каберне Совиньон, Сира, Гренаш, Неббиоло.", cider:"Не специалист для сидра, но может дать ягодные ноты в фруктовом сидре." }
+];
+
+const DATA_FILE = 'data.json';
+const LS_KEY = 'yeast_catalog_v3';
+const IDB_NAME = 'yeast_catalog_db';
+const IDB_STORE = 'handles';
+const IDB_KEY = 'dirHandle';
+
+let data = [];
+let dirHandle = null;
+let dataFileHandle = null;
+let editing = new Set();
+let saveTimer = null;
+
+/* ============ INDEXEDDB для хранения handle папки ============ */
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet(key) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const r = tx.objectStore(IDB_STORE).get(key);
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function idbSet(key, val) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(val, key);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbDel(key) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(key);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+/* ============ РАБОТА С ФАЙЛОМ data.json ============ */
+async function ensurePermission(handle, mode = 'readwrite') {
+  if (!handle) return false;
+  if (handle.queryPermission) {
+    const p = await handle.queryPermission({ mode });
+    if (p === 'granted') return true;
+    const r = await handle.requestPermission({ mode });
+    return r === 'granted';
+  }
+  return true;
+}
+
+async function loadDataFromFile() {
+  if (!dirHandle) return null;
+  try {
+    if (!(await ensurePermission(dirHandle, 'read'))) return null;
+    const fh = await dirHandle.getFileHandle(DATA_FILE);
+    const file = await fh.getFile();
+    const text = await file.text();
+    return JSON.parse(text);
+  } catch (e) {
+    console.warn('Не удалось прочитать data.json:', e);
+    return null;
+  }
+}
+
+async function saveDataToFile() {
+  if (!dirHandle) return false;
+  try {
+    if (!(await ensurePermission(dirHandle, 'readwrite'))) return false;
+    const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
+    const writable = await fh.createWritable();
+    await writable.write(JSON.stringify(data, null, 2));
+    await writable.close();
+    dataFileHandle = fh;
+    return true;
+  } catch (e) {
+    console.warn('Не удалось записать data.json:', e);
+    return false;
+  }
+}
+
+/* ============ LOCALSTORAGE ============ */
+function saveToLS() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); return true; }
+  catch(e) { console.warn('localStorage save failed', e); return false; }
+}
+function loadFromLS() {
+  try {
+    const s = localStorage.getItem(LS_KEY);
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+
+/* ============ ОБЩЕЕ СОХРАНЕНИЕ (автосейв) ============ */
+function scheduleSave(immediate = false) {
+  clearTimeout(saveTimer);
+  const delay = immediate ? 0 : 400;
+  saveTimer = setTimeout(async () => {
+    saveToLS();
+    if (dirHandle) {
+      const ok = await saveDataToFile();
+      updateStorageStatus(ok ? 'file' : 'ls');
+    } else {
+      updateStorageStatus('ls');
+    }
+  }, delay);
+}
+
+/* ============ СТАТУС ХРАНИЛИЩА ============ */
+function updateStorageStatus(mode) {
+  const dot = document.getElementById('dot');
+  const status = document.getElementById('storageStatus');
+  const detachBtn = document.getElementById('detachBtn');
+  if (mode === 'file') {
+    dot.className = 'dot ok';
+    status.textContent = '✓ файл data.json (автосохранение)';
+    detachBtn.style.display = '';
+  } else if (mode === 'ls') {
+    if (dirHandle) {
+      dot.className = 'dot warn';
+      status.textContent = '⚠ только localStorage (ошибка записи файла)';
+    } else {
+      dot.className = 'dot warn';
+      status.textContent = 'localStorage (выберите папку для файла data.json)';
+    }
+    detachBtn.style.display = dirHandle ? '' : 'none';
+  } else {
+    dot.className = 'dot off';
+    status.textContent = 'не привязано';
+    detachBtn.style.display = 'none';
+  }
+}
+
+/* ============ ВЫБОР ПАПКИ ============ */
+document.getElementById('pickFolderBtn').addEventListener('click', async () => {
+  if (!('showDirectoryPicker' in window)) {
+    toast('⚠ Ваш браузер не поддерживает выбор папки. Используйте Chrome/Edge. Данные сохраняются в localStorage.');
+    return;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    dirHandle = handle;
+    await idbSet(IDB_KEY, handle);
+    // пробуем прочитать существующий data.json
+    const fromFile = await loadDataFromFile();
+    if (fromFile && Array.isArray(fromFile)) {
+      if (confirm('В папке найден data.json. Загрузить данные из него?\n(Иначе останутся текущие)')) {
+        data = fromFile;
+        saveToLS();
+      }
+    } else {
+      // создаём файл с текущими данными
+      await saveDataToFile();
+    }
+    editing.clear();
+    render();
+    updateStorageStatus('file');
+    toast('✓ Папка привязана, data.json создан/обновлён');
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('Ошибка: ' + e.message);
+  }
+});
+
+document.getElementById('detachBtn').addEventListener('click', async () => {
+  if (!confirm('Отвязать папку? Данные останутся в localStorage.')) return;
+  dirHandle = null;
+  dataFileHandle = null;
+  await idbDel(IDB_KEY);
+  updateStorageStatus('ls');
+  toast('Папка отвязана');
+});
+
+/* ============ РЕНДЕР ============ */
+const cardsEl = document.getElementById('cards');
+
+function render() {
+  cardsEl.innerHTML = '';
+  if (data.length === 0) {
+    cardsEl.innerHTML = '<div class="empty">Каталог пуст. Нажмите «➕ Добавить».</div>';
+    return;
+  }
+  data.forEach((item, idx) => cardsEl.appendChild(renderCard(item, idx)));
+}
+
+function renderCard(item, idx) {
+  const isEdit = editing.has(idx);
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.dataset.idx = idx;
+
+  const isCiderOk = item.cider && !item.cider.startsWith('Не') && !item.cider.startsWith('Не ');
+  const badges = [];
+  if (item.params) {
+    const m = item.params.match(/Спирт\s*([\d.]+%)/i);
+    if (m) badges.push({ text: m[1], cls: '' });
+    const t = item.params.match(/тем[еп]\.?\s*([\d\-–°C\s]+?)(?:·|$)/i);
+    if (t) badges.push({ text: t[1].trim(), cls: '' });
+  }
+  if (isCiderOk) badges.push({ text: '✓ сидр', cls: 'ok' });
+
+  card.innerHTML = `
+    <div class="card-head">
+      <div class="card-emoji">${item.emoji || '🍷'}</div>
+      <div class="card-title">
+        <div class="card-name">${escapeHtml(item.name || 'Без названия')}</div>
+        <div class="card-stamp">${escapeHtml(item.stamp || '—')}</div>
+      </div>
+      <div class="card-badges">${badges.map(b => `<span class="badge ${b.cls}">${escapeHtml(b.text)}</span>`).join('')}</div>
+      <div class="chev">▼</div>
+    </div>
+    <div class="card-body-wrap">
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="divider"></div>
+          <div class="fields">
+            ${field('Название', 'name', item.name, isEdit)}
+            ${field('Штамм', 'stamp', item.stamp, isEdit)}
+            <div class="field full"><label>История / происхождение</label>${isEdit ? `<textarea data-k="history">${escapeHtml(item.history||'')}</textarea>` : `<div class="val">${escapeHtml(item.history||'—')}</div>`}</div>
+            <div class="field full"><label>Специализация</label>${isEdit ? `<textarea data-k="spec">${escapeHtml(item.spec||'')}</textarea>` : `<div class="val">${escapeHtml(item.spec||'—')}</div>`}</div>
+            <div class="field full"><label>Технические параметры</label>${isEdit ? `<textarea data-k="params">${escapeHtml(item.params||'')}</textarea>` : `<div class="val">${escapeHtml(item.params||'—')}</div>`}</div>
+            <div class="field full"><label>Для сортов винограда</label>${isEdit ? `<textarea data-k="grapes">${escapeHtml(item.grapes||'')}</textarea>` : `<div class="val">${escapeHtml(item.grapes||'—')}</div>`}</div>
+            <div class="field full"><label>🍎 Сидр / медовуха</label>${isEdit ? `<textarea data-k="cider">${escapeHtml(item.cider||'')}</textarea>` : `<div class="val">${escapeHtml(item.cider||'—')}</div>`}</div>
+          </div>
+          <div class="card-foot">
+            ${isEdit
+              ? `<button class="btn primary" data-act="save-edit">✓ Сохранить</button>
+                 <button class="btn" data-act="cancel-edit">Отмена</button>`
+              : `<button class="icon-btn" data-act="edit" title="Редактировать">✎</button>
+                 <button class="icon-btn" data-act="dup" title="Дублировать">⎘</button>
+                 <button class="icon-btn del" data-act="del" title="Удалить">✕</button>`
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  card.querySelector('.card-head').addEventListener('click', () => {
+    card.classList.toggle('open');
+  });
+
+  card.querySelectorAll('[data-act]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const act = btn.dataset.act;
+      if (act === 'edit') { editing.add(idx); render(); }
+      else if (act === 'cancel-edit') { editing.delete(idx); render(); }
+      else if (act === 'save-edit') {
+        const inputs = card.querySelectorAll('[data-k]');
+        inputs.forEach(inp => { item[inp.dataset.k] = inp.value; });
+        editing.delete(idx);
+        toast('✓ Изменения сохранены');
+        render();
+        scheduleSave(true);
+      }
+      else if (act === 'dup') {
+        data.splice(idx+1, 0, JSON.parse(JSON.stringify(item)));
+        toast('Строка продублирована');
+        render();
+        scheduleSave(true);
+      }
+      else if (act === 'del') {
+        if (confirm(`Удалить «${item.name || 'запись'}»?`)) {
+          data.splice(idx, 1);
+          editing.delete(idx);
+          render();
+          scheduleSave(true);
+        }
+      }
+    });
+  });
+
+  return card;
+}
+
+function field(label, key, value, isEdit) {
+  if (isEdit) {
+    return `<div class="field"><label>${label}</label><input data-k="${key}" value="${escapeAttr(value||'')}"></div>`;
+  }
+  return `<div class="field"><label>${label}</label><div class="val">${escapeHtml(value||'—')}</div></div>`;
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s) { return escapeHtml(s); }
+
+/* ============ ДЕЙСТВИЯ ============ */
+document.getElementById('addBtn').addEventListener('click', () => {
+  data.push({ emoji:"🍷", name:"Новый штамм", stamp:"", history:"", spec:"", params:"", grapes:"", cider:"" });
+  editing.add(data.length-1);
+  render();
+  setTimeout(() => {
+    const last = cardsEl.lastElementChild;
+    if (last) last.classList.add('open');
+  }, 50);
+  scheduleSave(true);
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Сбросить каталог к исходному состоянию? Текущие данные будут потеряны.')) {
+    data = JSON.parse(JSON.stringify(BASE));
+    editing.clear();
+    render();
+    scheduleSave(true);
+    toast('Каталог сброшен');
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'каталог_дрожжей.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Экспортировано');
+});
+
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const parsed = JSON.parse(r.result);
+      if (!Array.isArray(parsed)) throw new Error('не массив');
+      data = parsed;
+      editing.clear();
+      render();
+      scheduleSave(true);
+      toast('✓ Импортировано: ' + data.length + ' записей');
+    } catch(err) { toast('Ошибка импорта: ' + err.message); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+});
+
+/* ============ TOAST ============ */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ============ СТАРТ ============ */
+(async function init() {
+  // 1. Пытаемся восстановить handle папки из IndexedDB
+  if ('showDirectoryPicker' in window) {
+    try {
+      const saved = await idbGet(IDB_KEY);
+      if (saved) {
+        // проверяем что permission ещё валиден
+        if (await ensurePermission(saved, 'read')) {
+          dirHandle = saved;
+        } else {
+          await idbDel(IDB_KEY);
+        }
+      }
+    } catch(e) { console.warn('IDB restore failed', e); }
+  }
+
+  // 2. Загружаем данные: приоритет — файл, потом localStorage, потом база
+  let loaded = false;
+  if (dirHandle) {
+    const fromFile = await loadDataFromFile();
+    if (fromFile && Array.isArray(fromFile)) {
+      data = fromFile;
+      saveToLS(); // синхронизируем localStorage
+      loaded = true;
+    }
+  }
+  if (!loaded) {
+    const fromLS = loadFromLS();
+    if (fromLS && Array.isArray(fromLS)) {
+      data = fromLS;
+      loaded = true;
+    } else {
+      data = JSON.parse(JSON.stringify(BASE));
+      saveToLS();
+    }
+  }
+
+  render();
+  updateStorageStatus(dirHandle ? 'file' : 'ls');
+
+  // автосохранение при закрытии вкладки (на всякий случай)
+  window.addEventListener('beforeunload', () => {
+    saveToLS();
+  });
+})();
+</script>
+

@@ -1,0 +1,689 @@
+[
+ {
+  "id": "R-1783548062974-d743x",
+  "code": "",
+  "name": "розе",
+  "emoji": "🍎",
+  "createdDate": "2026-07-08",
+  "status": "final",
+  "base": {
+   "varieties": "персианка",
+   "volume": 50,
+   "brix": 12,
+   "ph": 3.5,
+   "ta": 6,
+   "region": "ингрия"
+  },
+  "target": {
+   "style": "classic",
+   "sweetness": "dry",
+   "abv": 6,
+   "carbonation": 4,
+   "character": "fruity"
+  },
+  "addons": [
+   {
+    "type": "juice",
+    "name": "арония",
+    "amount": 2,
+    "unit": "л",
+    "method": ""
+   }
+  ],
+  "tech": {
+   "maceration": false,
+   "macerationDays": 0,
+   "coldSoak": false,
+   "fermTemp": 18,
+   "fermDays": 21,
+   "surLie": false,
+   "oakAging": false,
+   "oakMonths": 0,
+   "blend": false
+  },
+  "yeast": [
+   {
+    "name": "Lalvin K1-V1116",
+    "date": "",
+    "dose": ""
+   }
+  ],
+  "nutrients": "DAP 20 г/10л + Fermaid O 20 г/10л",
+  "notes": "",
+  "suggestions": {
+   "style": "Классический яблочный сидр — чистый сортовой профиль",
+   "technology": [
+    "<b>Ферментация:</b> 18°C, 21 дней",
+    "<b>Классический метод:</b> тиражный ликёр 24 г/л + 6 г/л дрожжей, выдержка на осадке 6+ мес"
+   ],
+   "yeast": [
+    {
+     "name": "SafCider AB-1",
+     "score": 90,
+     "reason": "✓ стиль classic · ✓ классический сидровый · ✓ фруктовость"
+    },
+    {
+     "name": "SafCider AC-1",
+     "score": 80,
+     "reason": "✓ стиль classic · ✓ классический сидровый"
+    },
+    {
+     "name": "Lalvin EC-1118",
+     "score": 75,
+     "reason": "✓ стиль classic · ✓ для бутылочной ферментации"
+    },
+    {
+     "name": "Lalvin 71B",
+     "score": 75,
+     "reason": "✓ стиль classic · ✓ фруктовость"
+    },
+    {
+     "name": "Lalvin K1-V1116",
+     "score": 75,
+     "reason": "✓ стиль classic · ✓ фруктовость"
+    },
+    {
+     "name": "AEB Fermo Fruit",
+     "score": 75,
+     "reason": "✓ стиль classic · ✓ фруктовость"
+    },
+    {
+     "name": "Lalvin CL23",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "CL-1006",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "DC-414",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "Lalvin TD-525",
+     "score": 60,
+     "reason": "✓ фруктовость"
+    },
+    {
+     "name": "SafŒno BC S103",
+     "score": 60,
+     "reason": "✓ для бутылочной ферментации"
+    },
+    {
+     "name": "SafŒno VR 44",
+     "score": 60,
+     "reason": "✓ для бутылочной ферментации"
+    },
+    {
+     "name": "Lalvin D47",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin QA23",
+     "score": 50,
+     "reason": "✓ фруктовость · ✗ тропики не для классики"
+    },
+    {
+     "name": "Lalvin ICV VIN13",
+     "score": 50,
+     "reason": "✓ фруктовость · ✗ тропики не для классики"
+    },
+    {
+     "name": "AEB X-5",
+     "score": 50,
+     "reason": "✓ фруктовость · ✗ тропики не для классики"
+    },
+    {
+     "name": "Lallemand E88",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin BVL1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin D-254",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin RC212",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Maurivin BRC214",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin KV-1255",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin FV 19",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    }
+   ],
+   "warnings": []
+  }
+ },
+ {
+  "id": "R-1783551312336-xz9z4",
+  "code": "",
+  "name": "dikobraz",
+  "emoji": "🍎",
+  "createdDate": "2026-07-08",
+  "status": "final",
+  "base": {
+   "varieties": "антоновка, пепин, осеннее полосатое, дикое",
+   "volume": 50,
+   "brix": 12,
+   "ph": 3.5,
+   "ta": 6,
+   "region": "ингрия"
+  },
+  "target": {
+   "style": "solera",
+   "sweetness": "dry",
+   "abv": 6,
+   "carbonation": 4,
+   "character": "tannic"
+  },
+  "addons": [
+   {
+    "type": "other",
+    "name": "первичное бражение на диких дрожжах вторичное на шампане",
+    "amount": 0,
+    "unit": "л",
+    "method": ""
+   }
+  ],
+  "tech": {
+   "maceration": true,
+   "macerationDays": 0,
+   "coldSoak": false,
+   "fermTemp": 18,
+   "fermDays": 21,
+   "surLie": true,
+   "oakAging": false,
+   "oakMonths": 0,
+   "blend": false
+  },
+  "yeast": [
+   {
+    "name": "Lalvin EC-1118",
+    "date": "",
+    "dose": ""
+   }
+  ],
+  "nutrients": "DAP 20 г/10л + Fermaid O 20 г/10л ",
+  "notes": "",
+  "suggestions": {
+   "style": "Коль Фандо (Solera) — многослойная выдержка",
+   "technology": [
+    "<b>Мацерация:</b> 2 дней при 8–10°C для экстракции аромата",
+    "<b>Ферментация:</b> 18°C, 21 дней",
+    "<b>Sur Lie:</b> выдержка на осадке 3–6 месяцев с баттонажем"
+   ],
+   "yeast": [
+    {
+     "name": "Lalvin EC-1118",
+     "score": 60,
+     "reason": "✓ для бутылочной ферментации"
+    },
+    {
+     "name": "Lalvin D47",
+     "score": 60,
+     "reason": "✓ для выдержки на осадке"
+    },
+    {
+     "name": "SafŒno BC S103",
+     "score": 60,
+     "reason": "✓ для бутылочной ферментации"
+    },
+    {
+     "name": "SafŒno VR 44",
+     "score": 60,
+     "reason": "✓ для бутылочной ферментации"
+    },
+    {
+     "name": "SafCider AC-1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "SafCider AB-1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin 71B",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin K1-V1116",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin QA23",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin ICV VIN13",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "AEB X-5",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "AEB Fermo Fruit",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lallemand E88",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin BVL1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin D-254",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin RC212",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Maurivin BRC214",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin KV-1255",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin FV 19",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin CL23",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin TD-525",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "CL-1006",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "DC-414",
+     "score": 50,
+     "reason": "универсальный вариант"
+    }
+   ],
+   "warnings": []
+  }
+ },
+ {
+  "id": "R-1783551614321-f0pme",
+  "code": "",
+  "name": "белый налив",
+  "emoji": "🍎",
+  "createdDate": "2026-07-08",
+  "status": "final",
+  "base": {
+   "varieties": "белый налив",
+   "volume": 50,
+   "brix": 12,
+   "ph": 3.5,
+   "ta": 6,
+   "region": "ингрия"
+  },
+  "target": {
+   "style": "classic",
+   "sweetness": "dry",
+   "abv": 6,
+   "carbonation": 5,
+   "character": "mineral"
+  },
+  "addons": [],
+  "tech": {
+   "maceration": true,
+   "macerationDays": 0,
+   "coldSoak": false,
+   "fermTemp": 18,
+   "fermDays": 21,
+   "surLie": false,
+   "oakAging": false,
+   "oakMonths": 0,
+   "blend": false
+  },
+  "yeast": [
+   {
+    "name": "SafCider AC-1",
+    "date": "",
+    "dose": ""
+   }
+  ],
+  "nutrients": "DAP 20 г/10л + Fermaid O 20 г/10л",
+  "notes": "",
+  "suggestions": {
+   "style": "Классический яблочный сидр — чистый сортовой профиль",
+   "technology": [
+    "<b>Мацерация:</b> 2 дней при 8–10°C для экстракции аромата",
+    "<b>Ферментация:</b> 18°C, 21 дней",
+    "<b>Классический метод:</b> тиражный ликёр 24 г/л + 6 г/л дрожжей, выдержка на осадке 6+ мес"
+   ],
+   "yeast": [
+    {
+     "name": "SafCider AC-1",
+     "score": 88,
+     "reason": "✓ стиль classic · ✓ классический сидровый · ✓ нейтральный — раскроет минерал"
+    },
+    {
+     "name": "Lalvin EC-1118",
+     "score": 83,
+     "reason": "✓ стиль classic · ✓ нейтральный — раскроет минерал · ✓ для бутылочной ферментации"
+    },
+    {
+     "name": "SafCider AB-1",
+     "score": 80,
+     "reason": "✓ стиль classic · ✓ классический сидровый"
+    },
+    {
+     "name": "SafŒno BC S103",
+     "score": 68,
+     "reason": "✓ нейтральный — раскроет минерал · ✓ для бутылочной ферментации"
+    },
+    {
+     "name": "SafŒno VR 44",
+     "score": 68,
+     "reason": "✓ нейтральный — раскроет минерал · ✓ для бутылочной ферментации"
+    },
+    {
+     "name": "Lalvin 71B",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "Lalvin K1-V1116",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "AEB Fermo Fruit",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "Lalvin CL23",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "CL-1006",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "DC-414",
+     "score": 65,
+     "reason": "✓ стиль classic"
+    },
+    {
+     "name": "Lalvin D47",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lallemand E88",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin BVL1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin TD-525",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin QA23",
+     "score": 40,
+     "reason": "✗ тропики не для классики"
+    },
+    {
+     "name": "Lalvin ICV VIN13",
+     "score": 40,
+     "reason": "✗ тропики не для классики"
+    },
+    {
+     "name": "AEB X-5",
+     "score": 40,
+     "reason": "✗ тропики не для классики"
+    },
+    {
+     "name": "Lalvin D-254",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin RC212",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Maurivin BRC214",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin KV-1255",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    },
+    {
+     "name": "Lalvin FV 19",
+     "score": 30,
+     "reason": "✗ красный штамм для классики"
+    }
+   ],
+   "warnings": []
+  }
+ },
+ {
+  "id": "R-1783551776520-1bs7c",
+  "code": "",
+  "name": "петнат",
+  "emoji": "🍎",
+  "createdDate": "2026-07-08",
+  "status": "draft",
+  "base": {
+   "varieties": "разсортица",
+   "volume": 20,
+   "brix": 12,
+   "ph": 3.5,
+   "ta": 6,
+   "region": "ингрия"
+  },
+  "target": {
+   "style": "petnat",
+   "sweetness": "dry",
+   "abv": 6,
+   "carbonation": 3,
+   "character": "creamy"
+  },
+  "addons": [],
+  "tech": {
+   "maceration": false,
+   "macerationDays": 0,
+   "coldSoak": false,
+   "fermTemp": 18,
+   "fermDays": 21,
+   "surLie": false,
+   "oakAging": false,
+   "oakMonths": 0,
+   "blend": false
+  },
+  "yeast": [],
+  "nutrients": "DAP 20 г/10л + Fermaid O 20 г/10л",
+  "notes": "",
+  "suggestions": {
+   "style": "Петнат — естественная карбонизация, дображивание в бутылке",
+   "technology": [
+    "<b>Ферментация:</b> 18°C, 21 дней"
+   ],
+   "yeast": [
+    {
+     "name": "Lalvin EC-1118",
+     "score": 75,
+     "reason": "✓ стиль petnat · ✓ для игристого"
+    },
+    {
+     "name": "SafŒno BC S103",
+     "score": 75,
+     "reason": "✓ стиль petnat · ✓ для игристого"
+    },
+    {
+     "name": "SafŒno VR 44",
+     "score": 75,
+     "reason": "✓ стиль petnat · ✓ для игристого"
+    },
+    {
+     "name": "SafCider AC-1",
+     "score": 65,
+     "reason": "✓ стиль petnat"
+    },
+    {
+     "name": "SafCider AB-1",
+     "score": 65,
+     "reason": "✓ стиль petnat"
+    },
+    {
+     "name": "Lalvin D47",
+     "score": 62,
+     "reason": "✓ тело / кремовость"
+    },
+    {
+     "name": "Lalvin D-254",
+     "score": 62,
+     "reason": "✓ тело / кремовость"
+    },
+    {
+     "name": "Lalvin TD-525",
+     "score": 62,
+     "reason": "✓ тело / кремовость"
+    },
+    {
+     "name": "Lalvin 71B",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin K1-V1116",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin QA23",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin ICV VIN13",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "AEB X-5",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "AEB Fermo Fruit",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lallemand E88",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin BVL1",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin RC212",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Maurivin BRC214",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin KV-1255",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin FV 19",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "Lalvin CL23",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "CL-1006",
+     "score": 50,
+     "reason": "универсальный вариант"
+    },
+    {
+     "name": "DC-414",
+     "score": 50,
+     "reason": "универсальный вариант"
+    }
+   ],
+   "warnings": []
+  }
+ }
+]

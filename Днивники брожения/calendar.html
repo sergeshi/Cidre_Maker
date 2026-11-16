@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь брожения — Сидролог</title>
+    <!-- Подключаем библиотеки -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f5f7; margin: 0; padding: 20px; color: #1d1d1f; }
+        .app { max-width: 1400px; margin: 0 auto; }
+        
+        /* Шапка */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        h1 { 
+            font-weight: 500; 
+            font-size: 2rem; 
+            margin: 0;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span { color: #86868b; font-weight: 400; }
+        
+        /* Статус файла */
+        .file-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            background: #e8e8ed;
+            color: #1d1d1f;
+        }
+        .file-status.success {
+            background: #28cd41;
+            color: white;
+        }
+        .file-status.error {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        /* Кнопки */
+        button { 
+            background: #0071e3; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            margin: 0 5px;
+        }
+        button:hover { background: #0077ed; }
+        button.secondary { 
+            background: #e8e8ed; 
+            color: #1d1d1f;
+        }
+        button.secondary:hover { background: #d8d8e0; }
+        
+        /* Панель фильтров */
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        select, input {
+            padding: 8px 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            background: white;
+        }
+        
+        /* Статистика */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0071e3;
+        }
+        .stat-label {
+            color: #86868b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Таймлайн */
+        .timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        .timeline-header {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+            height: 40px;
+        }
+        .timeline-months {
+            display: flex;
+            flex: 1;
+            position: relative;
+        }
+        .month-marker {
+            flex: 1;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #86868b;
+            border-left: 1px solid #e8e8ed;
+            height: 100%;
+            position: relative;
+        }
+        .month-marker:first-child { border-left: none; }
+        .month-marker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 8px;
+            background: #d2d2d7;
+        }
+        
+        .timeline-body {
+            position: relative;
+            min-height: 500px;
+        }
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f5;
+            position: relative;
+            min-height: 70px;
+        }
+        .batch-info {
+            width: 250px;
+            padding-right: 20px;
+            flex-shrink: 0;
+        }
+        .batch-name {
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        .batch-type {
+            font-size: 0.85rem;
+            color: #86868b;
+        }
+        .batch-type.classic { color: #0071e3; }
+        .batch-type.petnat { color: #af52de; }
+        
+        .timeline-bar-container {
+            flex: 1;
+            position: relative;
+            height: 60px;
+            background: #f5f5f7;
+            border-radius: 30px;
+            overflow: visible;
+        }
+        .timeline-bar {
+            position: absolute;
+            height: 100%;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .timeline-bar:hover {
+            filter: brightness(1.1);
+            transform: scaleY(1.05);
+            z-index: 10;
+        }
+        .timeline-bar.active { background: #30b0c0; }
+        .timeline-bar.aging { background: #0071e3; }
+        .timeline-bar.finished { background: #5856d6; } /* Фиолетовый для готовых */
+        
+        .timeline-marker {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(0,0,0,0.1);
+            top: 0;
+        }
+        .marker-label {
+            position: absolute;
+            top: -25px;
+            font-size: 0.75rem;
+            color: #86868b;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+        
+        /* Детали партии */
+        .batch-details {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e8e8ed;
+        }
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .details-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+        .details-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #86868b;
+            padding: 5px 10px;
+        }
+        .details-close:hover { color: #1d1d1f; }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .detail-section {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .detail-section h4 {
+            margin: 0 0 10px 0;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .detail-label {
+            color: #86868b;
+        }
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .measurements-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .measurement-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e8e8ed;
+            font-size: 0.9rem;
+        }
+        
+        /* Индикаторы */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-active { background: #30b0c0; color: white; }
+        .status-aging { background: #0071e3; color: white; }
+        .status-finished { background: #5856d6; color: white; }
+        
+        .footer {
+            text-align: center;
+            color: #86868b;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #d2d2d7;
+        }
+        
+        /* Анимация загрузки */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #86868b;
+        }
+        .error {
+            background: #ffebeb;
+            color: #ff3b30;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        /* Уведомление о папке */
+        .folder-warning {
+            background: #ffecb3;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="header">
+        <h1>
+            📅 <span>Календарь брожения</span>
+            <span id="fileStatus" class="file-status">Проверка...</span>
+        </h1>
+        <div>
+            <button class="secondary" id="chooseFolderBtn">📁 Выбрать папку</button>
+            <button class="secondary" id="refreshBtn">🔄 Обновить</button>
+            <button class="secondary" id="exportBtn">📊 Экспорт в Excel</button>
+        </div>
+    </div>
+
+    <!-- Уведомление о папке (показывается если файл не найден) -->
+    <div id="folderWarning" class="folder-warning" style="display: none;">
+        <span>⚠️ Файл cider_data.json не найден. Выберите папку с данными вручную.</span>
+        <button id="manualFolderBtn" class="secondary">Выбрать папку</button>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters">
+        <div class="filter-group">
+            <label>Год:</label>
+            <select id="yearFilter">
+                <option value="all">Все годы</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Статус:</label>
+            <select id="statusFilter">
+                <option value="all">Все статусы</option>
+                <option value="active">Активное брожение</option>
+                <option value="aging">Выдержка</option>
+                <option value="finished">Готово</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Тип:</label>
+            <select id="typeFilter">
+                <option value="all">Все типы</option>
+                <option value="classic">Классик</option>
+                <option value="petnat">Петнат</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stats" id="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="totalBatches">0</div>
+            <div class="stat-label">Всего партий</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="activeBatches">0</div>
+            <div class="stat-label">Активных</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="agingBatches">0</div>
+            <div class="stat-label">На выдержке</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="finishedBatches">0</div>
+            <div class="stat-label">Готово</div>
+        </div>
+    </div>
+
+    <!-- Таймлайн -->
+    <div class="timeline" id="timeline">
+        <div class="timeline-header" id="timelineHeader"></div>
+        <div class="timeline-body" id="timelineBody">
+            <div class="loading">Загрузка данных...</div>
+        </div>
+    </div>
+
+    <!-- Детали партии (скрыты по умолчанию) -->
+    <div id="batchDetails" class="batch-details" style="display: none;">
+        <div class="details-header">
+            <span class="details-title" id="detailTitle"></span>
+            <button class="details-close" id="closeDetailsBtn">✕</button>
+        </div>
+        <div class="details-grid" id="detailsGrid"></div>
+    </div>
+
+    <div class="footer">
+        Данные из файла: <span id="dataFile">cider_data.json</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // --- Состояние приложения ---
+        let batches = [];
+        let selectedBatchId = null;
+        let directoryHandle = null;
+        let currentFilePath = 'cider_data.json';
+        
+        // Константы для статусов
+        const STATUS = {
+            ACTIVE: 'active',
+            AGING: 'aging',
+            FINISHED: 'finished'
+        };
+        
+        // --- Элементы DOM ---
+        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
+        const manualFolderBtn = document.getElementById('manualFolderBtn');
+        const folderWarning = document.getElementById('folderWarning');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const fileStatus = document.getElementById('fileStatus');
+        const yearFilter = document.getElementById('yearFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const timelineBody = document.getElementById('timelineBody');
+        const timelineHeader = document.getElementById('timelineHeader');
+        const batchDetails = document.getElementById('batchDetails');
+        const closeDetailsBtn = document.getElementById('closeDetailsBtn');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailsGrid = document.getElementById('detailsGrid');
+        
+        // Элементы статистики
+        const totalBatchesEl = document.getElementById('totalBatches');
+        const activeBatchesEl = document.getElementById('activeBatches');
+        const agingBatchesEl = document.getElementById('agingBatches');
+        const finishedBatchesEl = document.getElementById('finishedBatches');
+        const dataFileEl = document.getElementById('dataFile');
+
+        // --- Функции для работы с файловой системой ---
+        async function askForFolder() {
+            try {
+                directoryHandle = await window.showDirectoryPicker();
+                localStorage.setItem('calendarFolderAccess', 'granted');
+                folderWarning.style.display = 'none';
+                await loadDataFromHandle();
+                return directoryHandle;
+            } catch (err) {
+                console.error('Ошибка выбора папки:', err);
+                return null;
+            }
+        }
+
+        async function loadDataFromHandle() {
+            if (!directoryHandle) return;
+            
+            try {
+                fileStatus.textContent = 'Загрузка...';
+                fileStatus.className = 'file-status';
+                
+                const fileHandle = await directoryHandle.getFileHandle('cider_data.json');
+                const file = await fileHandle.getFile();
+                const contents = await file.text();
+                const data = JSON.parse(contents);
+                
+                batches = data || [];
+                currentFilePath = `${directoryHandle.name}/cider_data.json`;
+                dataFileEl.textContent = currentFilePath;
+                
+                fileStatus.textContent = `✓ Загружено (${batches.length} партий)`;
+                fileStatus.className = 'file-status success';
+                folderWarning.style.display = 'none';
+                
+                updateYears();
+                applyFilters();
+                updateStats();
+                
+            } catch (err) {
+                console.error('Ошибка чтения файла:', err);
+                fileStatus.textContent = '✗ Ошибка загрузки';
+                fileStatus.className = 'file-status error';
+                folderWarning.style.display = 'flex';
+            }
+        }
+
+        // --- Загрузка данных из локального файла (автоматический поиск) ---
+        async function loadLocalData() {
+            try {
+                fileStatus.textContent = 'Загрузка...';
+                fileStatus.className = 'file-status';
+                
+                const response = await fetch('cider_data.json');
+                
+                if (!response.ok) {
+                    throw new Error('Файл не найден локально');
+                }
+                
+                const data = await response.json();
+                batches = data || [];
+                
+                currentFilePath = 'cider_data.json (локальный)';
+                dataFileEl.textContent = currentFilePath;
+                
+                fileStatus.textContent = `✓ Загружено (${batches.length} партий)`;
+                fileStatus.className = 'file-status success';
+                folderWarning.style.display = 'none';
+                
+                updateYears();
+                applyFilters();
+                updateStats();
+                
+            } catch (err) {
+                console.log('Локальный файл не найден, ожидаем выбора папки');
+                fileStatus.textContent = '✗ Файл не найден';
+                fileStatus.className = 'file-status error';
+                folderWarning.style.display = 'flex';
+                batches = [];
+                renderEmptyState();
+            }
+        }
+
+        function renderEmptyState() {
+            timelineBody.innerHTML = '<div class="error">Файл cider_data.json не найден. Выберите папку с данными вручную.</div>';
+            totalBatchesEl.textContent = '0';
+            activeBatchesEl.textContent = '0';
+            agingBatchesEl.textContent = '0';
+            finishedBatchesEl.textContent = '0';
+        }
+
+        // --- Определение статуса партии ---
+        function getBatchStatus(batch) {
+            const today = new Date();
+            
+            // Для классик - проверяем дату дегоржажа
+            if (batch.type === 'classic') {
+                const disgorgingDate = batch.stage4?.disgorging ? new Date(batch.stage4.disgorging) : null;
+                if (disgorgingDate && disgorgingDate <= today) {
+                    return STATUS.FINISHED;
+                }
+            } 
+            // Для петнат - проверяем дату контроля качества (дегустация или упаковка)
+            else {
+                const tastingDate = batch.stage5?.tastingDate ? new Date(batch.stage5.tastingDate) : null;
+                const packDate = batch.stage5?.packDate ? new Date(batch.stage5.packDate) : null;
+                
+                if ((tastingDate && tastingDate <= today) || (packDate && packDate <= today)) {
+                    return STATUS.FINISHED;
+                }
+            }
+            
+            // Если есть дата снятия с осадка и нет финала - выдержка
+            const rackingDate = batch.stage2?.rackingDate ? new Date(batch.stage2.rackingDate) : null;
+            if (rackingDate && rackingDate <= today) {
+                return STATUS.AGING;
+            }
+            
+            // Если есть дата начала брожения - активное
+            const startDate = batch.stage2?.startDate ? new Date(batch.stage2.startDate) : null;
+            if (startDate && startDate <= today) {
+                return STATUS.ACTIVE;
+            }
+            
+            // Если есть дата отжима - считаем активным
+            const pressDate = batch.stage1?.date ? new Date(batch.stage1.date) : null;
+            if (pressDate && pressDate <= today) {
+                return STATUS.ACTIVE;
+            }
+            
+            return STATUS.ACTIVE; // По умолчанию
+        }
+
+        // --- Получение финальной даты партии ---
+        function getFinalDate(batch) {
+            if (batch.type === 'classic') {
+                return batch.stage4?.disgorging ? new Date(batch.stage4.disgorging) : null;
+            } else {
+                // Для петнат используем дату контроля качества
+                return batch.stage5?.packDate ? new Date(batch.stage5.packDate) : 
+                       (batch.stage5?.tastingDate ? new Date(batch.stage5.tastingDate) : null);
+            }
+        }
+
+        // --- Получение начальной даты партии ---
+        function getStartDate(batch) {
+            return batch.stage2?.startDate ? new Date(batch.stage2.startDate) : 
+                   (batch.stage1?.date ? new Date(batch.stage1.date) : new Date());
+        }
+
+        // --- Получение диапазона дат для таймлайна ---
+        function getTimelineRange() {
+            if (batches.length === 0) {
+                const now = new Date();
+                return {
+                    start: new Date(now.getFullYear(), now.getMonth() - 6, 1),
+                    end: new Date(now.getFullYear(), now.getMonth() + 6, 1)
+                };
+            }
+            
+            let minDate = new Date();
+            let maxDate = new Date(0);
+            
+            batches.forEach(batch => {
+                const dates = [];
+                
+                // Добавляем все значимые даты
+                if (batch.stage1?.date) dates.push(new Date(batch.stage1.date));
+                if (batch.stage2?.startDate) dates.push(new Date(batch.stage2.startDate));
+                if (batch.stage2?.rackingDate) dates.push(new Date(batch.stage2.rackingDate));
+                if (batch.stage3?.date) dates.push(new Date(batch.stage3.date));
+                
+                // Для классик добавляем дегоржаж
+                if (batch.type === 'classic' && batch.stage4?.disgorging) {
+                    dates.push(new Date(batch.stage4.disgorging));
+                }
+                
+                // Для петнат добавляем контроль качества
+                if (batch.type === 'petnat') {
+                    if (batch.stage5?.tastingDate) dates.push(new Date(batch.stage5.tastingDate));
+                    if (batch.stage5?.packDate) dates.push(new Date(batch.stage5.packDate));
+                }
+                
+                dates.forEach(date => {
+                    if (date < minDate) minDate = date;
+                    if (date > maxDate) maxDate = date;
+                });
+            });
+            
+            // Добавляем отступы по 3 месяца
+            minDate = new Date(minDate.getFullYear(), minDate.getMonth() - 3, 1);
+            maxDate = new Date(maxDate.getFullYear(), maxDate.getMonth() + 3, 1);
+            
+            return { start: minDate, end: maxDate };
+        }
+
+        // --- Форматирование даты ---
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('ru-RU');
+        }
+
+        // --- Обновление списка годов в фильтре ---
+        function updateYears() {
+            const years = new Set();
+            batches.forEach(batch => {
+                if (batch.stage1?.date) {
+                    const year = new Date(batch.stage1.date).getFullYear();
+                    years.add(year);
+                }
+            });
+            
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+            yearFilter.innerHTML = '<option value="all">Все годы</option>';
+            sortedYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+        }
+
+        // --- Обновление статистики ---
+        function updateStats() {
+            const total = batches.length;
+            let active = 0, aging = 0, finished = 0;
+            
+            batches.forEach(batch => {
+                const status = getBatchStatus(batch);
+                if (status === STATUS.ACTIVE) active++;
+                else if (status === STATUS.AGING) aging++;
+                else if (status === STATUS.FINISHED) finished++;
+            });
+            
+            totalBatchesEl.textContent = total;
+            activeBatchesEl.textContent = active;
+            agingBatchesEl.textContent = aging;
+            finishedBatchesEl.textContent = finished;
+        }
+
+        // --- Применение фильтров ---
+        function applyFilters() {
+            const year = yearFilter.value;
+            const status = statusFilter.value;
+            const type = typeFilter.value;
+            
+            const filtered = batches.filter(batch => {
+                // Фильтр по году
+                if (year !== 'all') {
+                    const batchYear = batch.stage1?.date ? new Date(batch.stage1.date).getFullYear() : null;
+                    if (batchYear !== parseInt(year)) return false;
+                }
+                
+                // Фильтр по статусу
+                if (status !== 'all') {
+                    const batchStatus = getBatchStatus(batch);
+                    if (batchStatus !== status) return false;
+                }
+                
+                // Фильтр по типу
+                if (type !== 'all') {
+                    if (batch.type !== type) return false;
+                }
+                
+                return true;
+            });
+            
+            renderTimeline(filtered);
+        }
+
+        // --- Рендер заголовка таймлайна ---
+        function renderTimelineHeader(startDate, endDate) {
+            const months = [];
+            const current = new Date(startDate);
+            
+            while (current <= endDate) {
+                months.push(new Date(current));
+                current.setMonth(current.getMonth() + 1);
+            }
+            
+            let html = '<div class="timeline-months">';
+            months.forEach((date, i) => {
+                const monthName = date.toLocaleDateString('ru-RU', { month: 'short' });
+                const year = date.getFullYear();
+                html += `<div class="month-marker">${monthName} ${year}</div>`;
+            });
+            html += '</div>';
+            
+            timelineHeader.innerHTML = html;
+        }
+
+        // --- Рендер таймлайна ---
+        function renderTimeline(filteredBatches) {
+            if (filteredBatches.length === 0) {
+                timelineBody.innerHTML = '<div class="loading">Нет партий для отображения</div>';
+                return;
+            }
+            
+            const range = getTimelineRange();
+            const startTime = range.start.getTime();
+            const endTime = range.end.getTime();
+            const totalDuration = endTime - startTime;
+            
+            renderTimelineHeader(range.start, range.end);
+            
+            let html = '';
+            
+            filteredBatches.forEach(batch => {
+                const status = getBatchStatus(batch);
+                const startDate = getStartDate(batch);
+                const finalDate = getFinalDate(batch);
+                const endDate = finalDate || new Date(); // Если нет финала, используем текущую дату
+                
+                // Вычисляем позицию полосы
+                const startPos = Math.max(0, (startDate.getTime() - startTime) / totalDuration * 100);
+                const endPos = Math.min(100, (endDate.getTime() - startTime) / totalDuration * 100);
+                const width = endPos - startPos;
+                
+                if (width <= 0) return;
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                if (status === STATUS.ACTIVE) {
+                    statusClass = 'active';
+                    statusText = 'Активное';
+                } else if (status === STATUS.AGING) {
+                    statusClass = 'aging';
+                    statusText = 'Выдержка';
+                } else {
+                    statusClass = 'finished';
+                    statusText = 'Готово';
+                }
+                
+                const typeText = batch.type === 'classic' ? 'Классик' : 'Петнат';
+                const typeClass = batch.type === 'classic' ? 'classic' : 'petnat';
+                
+                html += `
+                    <div class="timeline-row" data-batch-id="${batch.id}">
+                        <div class="batch-info">
+                            <div class="batch-name">${batch.name || batch.code || 'Без названия'}</div>
+                            <div class="batch-type ${typeClass}">${typeText}</div>
+                            <div class="status-badge status-${statusClass}">${statusText}</div>
+                        </div>
+                        <div class="timeline-bar-container">
+                            <div class="timeline-bar ${statusClass}" 
+                                 style="left: ${startPos}%; width: ${width}%;"
+                                 onclick="window.showBatchDetails('${batch.id}')"
+                                 title="${batch.name || batch.code}">
+                            </div>
+                            <div class="timeline-marker" style="left: ${startPos}%">
+                                <span class="marker-label">${formatDate(batch.stage2?.startDate || batch.stage1?.date)}</span>
+                            </div>
+                            ${batch.stage2?.rackingDate ? `
+                                <div class="timeline-marker" style="left: ${((new Date(batch.stage2.rackingDate).getTime() - startTime) / totalDuration * 100)}%">
+                                    <span class="marker-label">Снятие</span>
+                                </div>
+                            ` : ''}
+                            ${finalDate ? `
+                                <div class="timeline-marker" style="left: ${((finalDate.getTime() - startTime) / totalDuration * 100)}%">
+                                    <span class="marker-label">${batch.type === 'classic' ? 'Дегоржаж' : 'Готово'}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            timelineBody.innerHTML = html;
+        }
+
+        // --- Показ деталей партии ---
+        window.showBatchDetails = function(batchId) {
+            const batch = batches.find(b => b.id == batchId);
+            if (!batch) return;
+            
+            selectedBatchId = batchId;
+            detailTitle.textContent = batch.name || batch.code || 'Партия сидра';
+            
+            const status = getBatchStatus(batch);
+            const statusText = status === STATUS.ACTIVE ? 'Активное' : 
+                              status === STATUS.AGING ? 'Выдержка' : 'Готово';
+            const finalDate = getFinalDate(batch);
+            
+            let html = `
+                <div class="detail-section">
+                    <h4>📋 Основная информация</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Код:</span>
+                        <span class="detail-value">${batch.code || '—'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Тип:</span>
+                        <span class="detail-value">${batch.type === 'classic' ? 'Классик' : 'Петнат'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Дата создания:</span>
+                        <span class="detail-value">${formatDate(batch.createdDate)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Статус:</span>
+                        <span class="detail-value status-badge status-${status}">${statusText}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>🍎 Сырьё</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Сорта:</span>
+                        <span class="detail-value">${batch.stage1?.varieties || '—'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Регион:</span>
+                        <span class="detail-value">${batch.stage1?.region || '—'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Объём:</span>
+                        <span class="detail-value">${batch.stage1?.volume || 0} л</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Нач. Brix:</span>
+                        <span class="detail-value">${batch.stage1?.brix || 0}°</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ABV:</span>
+                        <span class="detail-value">${batch.stage1?.actualAbv || batch.stage1?.predictedAbv || '—'}%</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>⚗️ Брожение</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Дрожжи:</span>
+                        <span class="detail-value">${batch.stage2?.yeast || '—'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Начало:</span>
+                        <span class="detail-value">${formatDate(batch.stage2?.startDate)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Снятие с осадка:</span>
+                        <span class="detail-value">${formatDate(batch.stage2?.rackingDate)}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>📊 Замеры</h4>
+                    <div class="measurements-list">
+            `;
+            
+            if (batch.stage2?.measurements && batch.stage2.measurements.length > 0) {
+                batch.stage2.measurements.slice(-5).forEach(m => {
+                    html += `
+                        <div class="measurement-item">
+                            <span>${formatDate(m.date)}</span>
+                            <span><strong>${m.density}°Brix</strong> ${m.temp ? `(${m.temp}°C)` : ''}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<div class="measurement-item">Нет замеров</div>';
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            // Добавляем информацию о финале в зависимости от типа
+            if (batch.type === 'classic') {
+                html += `
+                    <div class="detail-section">
+                        <h4>🍾 Дегоржаж</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Дата:</span>
+                            <span class="detail-value">${formatDate(batch.stage4?.disgorging)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Экспед. ликёр:</span>
+                            <span class="detail-value">${batch.stage4?.liqueurSugar || 0} г/л</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Фин. код:</span>
+                            <span class="detail-value">${batch.stage4?.finalCode || '—'}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="detail-section">
+                        <h4>✅ Контроль качества</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Дегустация:</span>
+                            <span class="detail-value">${formatDate(batch.stage5?.tastingDate)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Игристость:</span>
+                            <span class="detail-value">${batch.stage5?.sparkling || 0}/5</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Упаковка:</span>
+                            <span class="detail-value">${formatDate(batch.stage5?.packDate)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Вкус:</span>
+                            <span class="detail-value">${batch.stage5?.tasteNotes || '—'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (batch.generalNotes) {
+                html += `
+                    <div class="detail-section">
+                        <h4>📝 Заметки</h4>
+                        <p>${batch.generalNotes}</p>
+                    </div>
+                `;
+            }
+            
+            detailsGrid.innerHTML = html;
+            batchDetails.style.display = 'block';
+        };
+
+        // --- Инициализация ---
+        async function init() {
+            // Сначала пробуем загрузить локальный файл
+            await loadLocalData();
+            
+            // Если есть сохранённый доступ к папке, пробуем использовать его
+            if (localStorage.getItem('calendarFolderAccess') === 'granted' && batches.length === 0) {
+                try {
+                    directoryHandle = await window.showDirectoryPicker();
+                    await loadDataFromHandle();
+                } catch {
+                    // Игнорируем ошибку
+                }
+            }
+        }
+
+        // --- Обработчики событий ---
+        chooseFolderBtn.addEventListener('click', askForFolder);
+        manualFolderBtn.addEventListener('click', askForFolder);
+        
+        refreshBtn.addEventListener('click', async () => {
+            if (directoryHandle) {
+                await loadDataFromHandle();
+            } else {
+                await loadLocalData();
+            }
+        });
+        
+        exportBtn.addEventListener('click', () => {
+            // Экспорт в Excel
+            const wb = XLSX.utils.book_new();
+            
+            // Подготовка данных для таблицы
+            const tableData = [['Код', 'Название', 'Тип', 'Статус', 'Дата отжима', 'Начало брожения', 'Снятие', 'Финальная дата', 'ABV', 'Заметки']];
+            
+            batches.forEach(b => {
+                const status = getBatchStatus(b);
+                const statusText = status === STATUS.ACTIVE ? 'Активное' : 
+                                  status === STATUS.AGING ? 'Выдержка' : 'Готово';
+                const finalDate = b.type === 'classic' ? b.stage4?.disgorging : 
+                                 (b.stage5?.packDate || b.stage5?.tastingDate);
+                
+                tableData.push([
+                    b.code || '',
+                    b.name || '',
+                    b.type === 'classic' ? 'Классик' : 'Петнат',
+                    statusText,
+                    formatDate(b.stage1?.date),
+                    formatDate(b.stage2?.startDate),
+                    formatDate(b.stage2?.rackingDate),
+                    formatDate(finalDate),
+                    b.stage1?.actualAbv || b.stage1?.predictedAbv || '',
+                    b.generalNotes || ''
+                ]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(tableData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Партии');
+            XLSX.writeFile(wb, 'calendar_cider.xlsx');
+        });
+        
+        yearFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
+        typeFilter.addEventListener('change', applyFilters);
+        
+        closeDetailsBtn.addEventListener('click', () => {
+            batchDetails.style.display = 'none';
+        });
+
+        // Запуск
+        init();
+    })();
+</script>
+</body>
+</html>
