@@ -1,0 +1,9 @@
+[package]
+name = "cidremaker4"
+version = "0.1.0"
+edition = "2021"
+description = "Portable cider and wine production journal"
+license = "MIT"
+
+[dependencies]
+eframe = "0.31.1"
